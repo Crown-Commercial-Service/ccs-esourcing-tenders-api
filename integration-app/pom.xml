@@ -27,7 +27,7 @@
 
     <dependency>
       <groupId>uk.gov.crowncommercial</groupId>
-      <artifactId>ccs-esource-integration-api</artifactId>
+      <artifactId>integration-api</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
 
