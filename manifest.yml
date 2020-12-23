@@ -1,0 +1,9 @@
+---
+applications:
+  - name: ((CF_ROUTE_PREFIX))ccs-esourcing-tenders-api
+    routes:
+      - route: ((CF_ROUTE_PREFIX))ccs-esourcing-tenders-api.apps.internal
+    memory: ((CF_MEMORY))
+    buildpacks:
+      - https://github.com/cloudfoundry/java-buildpack#v4.33
+    path: integration-app/target/integration-app-0.0.1-SNAPSHOT.jar
