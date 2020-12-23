@@ -1,2 +1,2 @@
-# ccs-esource-integration
-CCS Esource Integration
+# ccs-esourcing-tenders-api
+CCS Esourcing Tenders API
