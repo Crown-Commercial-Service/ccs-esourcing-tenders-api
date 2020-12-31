@@ -8,16 +8,17 @@ import org.springframework.stereotype.Service;
 import uk.gov.crowncommercial.api.TendersApiDelegate;
 import uk.gov.crowncommercial.model.InlineResponse201;
 import uk.gov.crowncommercial.model.Procurement;
+import uk.gov.crowncommercial.model.Tender;
 
 @Service
 public class TenderApiService implements TendersApiDelegate {
 
-  private static Logger logger = LoggerFactory.getLogger(TenderApiService.class);
+  private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
   @Override
   public ResponseEntity<InlineResponse201> createTender(Procurement procurement) {
 
-    logger.info("Creating Tender with procurement : {}", procurement.toString());
+    logger.info("Creating Tender with procurement : {}", procurement);
 
     InlineResponse201 inlineResponse201 = new InlineResponse201();
 
@@ -27,4 +28,16 @@ public class TenderApiService implements TendersApiDelegate {
     return new ResponseEntity<>(inlineResponse201, HttpStatus.CREATED);
   }
 
+  @Override
+  public ResponseEntity<Tender> getTenderById(Long id) {
+
+    logger.info("Getting Tenders with ID : {}", id);
+
+    Tender tender = new Tender();
+    tender.setId(id);
+    tender.setDescription("Tender - Laptops for Schools");
+    tender.setStatus(0);
+
+    return ResponseEntity.ok(tender);
+  }
 }

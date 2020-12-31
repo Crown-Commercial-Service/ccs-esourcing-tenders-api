@@ -6,3 +6,5 @@ applications:
     buildpacks:
       - https://github.com/cloudfoundry/java-buildpack#v4.33
     path: integration-app/target/integration-app-0.0.1-SNAPSHOT.jar
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ "jre": { version: 11.+ } }'
