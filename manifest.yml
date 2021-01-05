@@ -10,4 +10,4 @@ applications:
     env:
       JBP_CONFIG_OPEN_JDK_JRE: '{ "jre": { version: 11.+ } }'
     health-check-type: http
-    health-check-http-endpoint: /cloudfoundryapplication/health
+    health-check-http-endpoint: /actuator/health
