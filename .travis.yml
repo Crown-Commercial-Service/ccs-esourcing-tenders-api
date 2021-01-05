@@ -1,0 +1,15 @@
+language: java
+jdk:
+  - openjdk11
+deploy:
+  provider: cloudfoundry
+  api: https://api.london.cloud.service.gov.uk
+  username: paul.illingworth@roweit.co.uk
+  password:
+    secure: okTnDrXhr5mhyme49t6U/F+6vwkgx5MoUZcyE/VStfSDvo5RUdZOE5o0fLQzjGTXUuwOgYBK6nq/5gn4fXVbJQrcW0hv5y4EPHDnoePQ3z34Qm+0d5yXFpgPiN/AoaXZeMT4RmvAOlJAcvr56vKA5CBT2qv+zdh0sOwyHrdlLDSkGHjPsve8l9hSWkhDPU/QRyl1k12VmuYbOAwlq7fZvnVZZrT4IHqeecNiXF04vS6wSAAYOSXuajXcvP17eKByCKUP0Vt1ox1jf1/PvX4YEoEYeVtOsnav+eLjI60qrlKvravwfvcHNcz571zhtbZ5Y7xFOlig95FGEg9hT+jY1CUdiObsRN4gCPAFJIoj+au4z/eLIllv1oZjX3jn0PCcR0+LKUv1DJH8EsKVTUZoMrIdOer3k2V/NUEjOo4WwOMifCSlKtBWJWCBomt3zrZOaMddTupqRZqeVCXpHxDc/pEDZXktwHs1AvELtfLzsr6btnJppxtH6g+pERFXHFdgtawS71x7+IQ8q+g5IEgZFZcnHmYHckw5kBe7x8lInnanEgd1kYu3tl13NO4imqoWBnE4VrhDnh9KjNpdg6DlAQnCMlZDhN+ing9GMQxucFsB8gDF8EsYTbBZoD+kTuYpBRRqmy66qp+rCxlTnNmUbyzRJg3PfneNEp5w5mHrsxU=
+  organization: ccs-esourcing-tenders-api
+  space: sandbox
+  on:
+    repo: RoweIT/ccs-esourcing-tenders-api
+    branch: main
+  skip_cleanup: 'true'

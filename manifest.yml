@@ -1,6 +1,7 @@
 ---
 applications:
   - name: ccs-esourcing-tenders-api
+    instances: 2
     routes:
       - route: ccs-esourcing-tenders-api.apps.internal
     buildpacks:
@@ -8,3 +9,5 @@ applications:
     path: integration-app/target/integration-app-0.0.1-SNAPSHOT.jar
     env:
       JBP_CONFIG_OPEN_JDK_JRE: '{ "jre": { version: 11.+ } }'
+    health-check-type: http
+    health-check-http-endpoint: /cloudfoundryapplication/health
