@@ -4,19 +4,36 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>uk.gov.crowncommercial</groupId>
-  <artifactId>ccs-esourcing-tenders-api</artifactId>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.4.1</version>
+  </parent>
+
+  <groupId>uk.gov.crowncommercial.esourcing</groupId>
   <version>1.0-SNAPSHOT</version>
-
-  <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-  </properties>
-
+  <artifactId>ccs-esourcing-tenders-api</artifactId>
   <packaging>pom</packaging>
 
+  <name>CCS Esource Integration parent</name>
+  <description>Esource integration between Salesforce and Jaggaer</description>
+
+  <properties>
+    <java.version>11</java.version>
+
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <swagger-annotations-version>1.6.2</swagger-annotations-version>
+    <spring-boot-starter-web-version>2.2.12.RELEASE</spring-boot-starter-web-version>
+    <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <log4j-api-version>2.14.0</log4j-api-version>
+    <log4j-core-version>2.14.0</log4j-core-version>
+    <log4j-slf4j-impl-version>2.14.0</log4j-slf4j-impl-version>
+  </properties>
+
   <modules>
-<!--    <module>app</module>-->
     <module>integration-api</module>
     <module>integration-app</module>
   </modules>
