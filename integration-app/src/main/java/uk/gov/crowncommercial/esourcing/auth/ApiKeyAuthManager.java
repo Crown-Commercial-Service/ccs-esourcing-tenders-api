@@ -6,20 +6,17 @@ import org.springframework.security.core.Authentication;
 
 public class ApiKeyAuthManager implements AuthenticationManager {
 
-  private final String key;
+  private final String apikey;
 
-  public ApiKeyAuthManager() {
-    this.key =
-        System.getenv("apikey") != null
-            ? System.getenv("apikey")
-            : "84b0d964-6047-428c-a41f-7df98ccdc6b6";
+  public ApiKeyAuthManager(String apikey) {
+    this.apikey = apikey;
   }
 
   @Override
   public Authentication authenticate(Authentication authentication) {
     String principal = (String) authentication.getPrincipal();
 
-    if (key != null && !key.equals(principal)) {
+    if (apikey != null && !apikey.equals(principal)) {
       throw new BadCredentialsException("The API key was not found or not the expected value.");
     } else {
       authentication.setAuthenticated(true);

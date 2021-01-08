@@ -24,13 +24,14 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <swagger-annotations-version>1.6.2</swagger-annotations-version>
-    <spring-boot-starter-web-version>2.2.12.RELEASE</spring-boot-starter-web-version>
+    <spring-boot-starter-web-version>2.3.7.RELEASE</spring-boot-starter-web-version>
     <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <log4j-api-version>2.14.0</log4j-api-version>
     <log4j-core-version>2.14.0</log4j-core-version>
     <log4j-slf4j-impl-version>2.14.0</log4j-slf4j-impl-version>
+    <validation-api-version>2.0.1.Final</validation-api-version>
   </properties>
 
   <modules>
