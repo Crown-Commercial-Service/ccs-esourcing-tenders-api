@@ -48,19 +48,25 @@ public class IpAddressFilter extends GenericFilterBean {
 
   private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws IOException, ServletException {
-    
+
     // TODO (pillingworth, 2020-01-08) make the paths checked by this filter configurable or use
     // proper servlet filters and map to a path properly - probably means not adding in as a auth
     // filter
     if (request.getServletPath().startsWith("/actuator")) {
-      
+
       LOGGER.debug("Allowing request on path {}", request.getServletPath());
-      
+
     } else {
 
       String remoteAddr = request.getRemoteAddr();
       String addressToValidate = remoteAddr;
-  
+
+      /*
+       * See
+       * https://docs.cloud.service.gov.uk/deploying_services/route_services/#example-route-service-
+       * to-add-ip-address-authentication for info on how GOV.UK PaaS sets the X-Forwarded-For
+       * header
+       */
       String xForwardedFor = request.getHeader("X-Forwarded-For");
       if (xForwardedFor != null) {
         String[] ipAddresses =
@@ -69,10 +75,10 @@ public class IpAddressFilter extends GenericFilterBean {
           addressToValidate = ipAddresses[0];
         }
       }
-  
+
       LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",
           addressToValidate, StringUtils.defaultString(xForwardedFor), addressToValidate);
-  
+
       if (ipAllowList.isEmpty()) {
         LOGGER.debug("Allowing request from {} as no IP allow list is defined", addressToValidate);
       } else if (ipAllowList.contains(addressToValidate)) {
