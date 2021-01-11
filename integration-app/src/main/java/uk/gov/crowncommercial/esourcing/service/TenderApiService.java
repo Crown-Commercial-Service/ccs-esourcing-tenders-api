@@ -14,6 +14,10 @@ import uk.gov.crowncommercial.esourcing.model.Tender;
 public class TenderApiService implements TendersApiDelegate {
 
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
+  
+  public TenderApiService() {
+    
+  }
 
   @Override
   public ResponseEntity<InlineResponse201> createTender(Procurement procurement) {

@@ -1,42 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.4.1</version>
-  </parent>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.1</version>
+	</parent>
 
-  <groupId>uk.gov.crowncommercial.esourcing</groupId>
-  <version>1.0-SNAPSHOT</version>
-  <artifactId>ccs-esourcing-tenders-api</artifactId>
-  <packaging>pom</packaging>
+	<groupId>uk.gov.crowncommercial.esourcing</groupId>
+	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>ccs-esourcing-tenders-api</artifactId>
+	<packaging>pom</packaging>
 
-  <name>CCS Esource Integration parent</name>
-  <description>Esource integration between Salesforce and Jaggaer</description>
+	<name>CCS Esource Integration parent</name>
+	<description>eSourcing integration between Salesforce and Jaggaer</description>
 
-  <properties>
-    <java.version>11</java.version>
+	<url>https://github.com/RoweIT/ccs-esourcing-tenders-api</url>
+	<organization>
+		<name>Crown Commercial Service</name>
+		<url>https://www.gov.uk/government/organisations/crown-commercial-service</url>
+	</organization>
 
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <swagger-annotations-version>1.6.2</swagger-annotations-version>
-    <spring-boot-starter-web-version>2.3.7.RELEASE</spring-boot-starter-web-version>
-    <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <log4j-api-version>2.14.0</log4j-api-version>
-    <log4j-core-version>2.14.0</log4j-core-version>
-    <log4j-slf4j-impl-version>2.14.0</log4j-slf4j-impl-version>
-    <validation-api-version>2.0.1.Final</validation-api-version>
-  </properties>
+	<scm>
+		<url>https://github.com/RoweIT/ccs-esourcing-tenders-api</url>
+		<connection>scm:git:git://github.com/RoweIT/ccs-esourcing-tenders-api.git</connection>
+		<developerConnection>scm:git:git@github.com/RoweIT/ccs-esourcing-tenders-api.git</developerConnection>
+	</scm>
 
-  <modules>
-    <module>integration-api</module>
-    <module>integration-app</module>
-  </modules>
+	<properties>
+		<java.version>11</java.version>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+		<project.encoding>UTF-8</project.encoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		
+		<swagger-annotations-version>1.6.2</swagger-annotations-version>
+		<jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+	</properties>
+
+	<modules>
+		<module>integration-api</module>
+		<module>integration-app</module>
+	</modules>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>4.2.0</version>
+					<configuration>
+						<effort>Max</effort>
+						<threshold>Low</threshold>
+						<xmlOutputDirectory>${project.build.directory}/spotbugs</xmlOutputDirectory>
+					</configuration>
+					<executions>
+						<execution>
+							<id>noFailOnError</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+							<configuration>
+								<failOnError>false</failOnError>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.sonatype.ossindex.maven</groupId>
+					<artifactId>ossindex-maven-plugin</artifactId>
+					<version>3.1.0</version>
+					<configuration>
+						<skip>${ossindex.skip}</skip>
+						<fail>true</fail>
+						<reportFile>${project.build.directory}/ossindex-audit-report.json</reportFile>
+						<excludeVulnerabilityIds>
+						</excludeVulnerabilityIds>
+					</configuration>
+					<executions>
+						<execution>
+							<id>audit-dependencies</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>audit</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
 
 </project>

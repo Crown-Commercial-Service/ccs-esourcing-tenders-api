@@ -2,6 +2,7 @@ package uk.gov.crowncommercial.esourcing.auth;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
@@ -13,22 +14,32 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
  * Standard HTTP Servlet Filter that checks the HTTP requests source IP address is in a specified
- * list for simple allow list gating.
+ * list for simple allow list filtering.
  */
 public class IpAddressFilter extends GenericFilterBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressFilter.class);
 
-  @Value("${ccs.esourcing.tenders.ipallowlist:}")
-  private Set<String> ipAllowList;
+  private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-  public IpAddressFilter() {}
+  private final Set<String> ipAllowList;
+
+  private final List<String> includePaths;
+
+  private final List<String> excludePaths;
+
+  public IpAddressFilter(Set<String> ipAllowList, List<String> includePaths,
+      List<String> excludePaths) {
+    this.ipAllowList = ipAllowList;
+    this.includePaths = includePaths;
+    this.excludePaths = excludePaths;
+  }
 
   @PostConstruct
   public void init() {
@@ -36,7 +47,7 @@ public class IpAddressFilter extends GenericFilterBean {
       LOGGER.warn(
           "No Allow List IP addresses have been specified so requests from all IP addresses will be accepted");
     } else {
-      LOGGER.info("IP Allow List configuration: {}", ipAllowList);
+      LOGGER.info("IP Allow List configuration: {} on paths {}", ipAllowList, includePaths);
     }
   }
 
@@ -49,49 +60,91 @@ public class IpAddressFilter extends GenericFilterBean {
   private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
-    // TODO (pillingworth, 2020-01-08) make the paths checked by this filter configurable or use
-    // proper servlet filters and map to a path properly - probably means not adding in as a auth
-    // filter
-    if (request.getServletPath().startsWith("/actuator")) {
+    String servletPath = request.getServletPath();
 
-      LOGGER.debug("Allowing request on path {}", request.getServletPath());
-
-    } else {
-
-      String remoteAddr = request.getRemoteAddr();
-      String addressToValidate = remoteAddr;
-
-      /*
-       * See
-       * https://docs.cloud.service.gov.uk/deploying_services/route_services/#example-route-service-
-       * to-add-ip-address-authentication for info on how GOV.UK PaaS sets the X-Forwarded-For
-       * header
-       */
-      String xForwardedFor = request.getHeader("X-Forwarded-For");
-      if (xForwardedFor != null) {
-        String[] ipAddresses =
-            Arrays.stream(xForwardedFor.split(",")).map(String::trim).toArray(String[]::new);
-        if (ipAddresses.length > 0) {
-          addressToValidate = ipAddresses[0];
-        }
-      }
-
-      LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",
-          addressToValidate, StringUtils.defaultString(xForwardedFor), addressToValidate);
-
-      if (ipAllowList.isEmpty()) {
-        LOGGER.debug("Allowing request from {} as no IP allow list is defined", addressToValidate);
-      } else if (ipAllowList.contains(addressToValidate)) {
-        LOGGER.debug("Allowing request from {} as IP address is defined in the IP allow list",
-            addressToValidate);
-      } else {
-        LOGGER.debug("Denying request from {} as IP address is not in the allow list",
-            addressToValidate);
-        response.setStatus(HttpStatus.FORBIDDEN.value());
-        return;
-      }
+    if (excludePaths != null && !excludePaths.isEmpty() && matchPath(excludePaths, servletPath)) {
+      LOGGER.debug("Allowing request for path {} as this is defined in the exclusion list",
+          servletPath);
+      chain.doFilter(request, response);
+      return;
     }
 
-    chain.doFilter(request, response);
+    if (includePaths != null && !includePaths.isEmpty() && !matchPath(includePaths, servletPath)) {
+      LOGGER.debug("Allowing request for path {} as this is not defined in the inclusion list",
+          servletPath);
+      chain.doFilter(request, response);
+      return;
+    }
+
+    /*
+     * Work out the IP address to validate, either from the X-Forwarded-For or the source IP address
+     * from the request
+     */
+    String addressToValidate = null;
+
+    /*
+     * See
+     * https://docs.cloud.service.gov.uk/deploying_services/route_services/#example-route-service-
+     * to-add-ip-address-authentication for info on how GOV.UK PaaS sets the X-Forwarded-For header
+     */
+    String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
+    if (xForwardedFor != null) {
+      String[] ipAddresses =
+          Arrays.stream(xForwardedFor.split(",")).map(String::trim).toArray(String[]::new);
+      if (ipAddresses.length > 0) {
+        addressToValidate = ipAddresses[0];
+      }
+    }
+    if (addressToValidate == null) {
+      addressToValidate = request.getRemoteAddr();
+    }
+
+    LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",
+        addressToValidate, StringUtils.defaultString(xForwardedFor), addressToValidate);
+
+    if (ipAllowList.isEmpty()) {
+      LOGGER.debug("Allowing request from address {} as no IP allow list is defined", addressToValidate);
+      chain.doFilter(request, response);
+      return;
+    }
+
+    if (ipAllowList.contains(addressToValidate)) {
+      LOGGER.debug("Allowing request from address {} as IP address is defined in the IP allow list",
+          addressToValidate);
+      chain.doFilter(request, response);
+      return;
+    }
+
+    LOGGER.debug("Denying request from address {} as IP address is not in the allow list",
+        addressToValidate);
+    response.setStatus(HttpStatus.FORBIDDEN.value());
+    return;
+  }
+
+  /**
+   * ANT style path matching against a list of path patterns
+   * 
+   * @param paths the path patterns to match against, if null or empty then no match will ever be
+   *        made
+   * @param path the path to match, if null no match will be made
+   * @return true if the path matches any of the patterns
+   */
+  protected static final boolean matchPath(List<String> paths, String path) {
+    if (paths == null || paths.size() == 0 || path == null) {
+      return false;
+    }
+    AntPathMatcher matcher = new AntPathMatcher();
+    for (String pattern : paths) {
+      if (matcher.isPattern(pattern)) {
+        if (matcher.match(pattern, path)) {
+          return true;
+        }
+      } else { // exact match
+        if (pattern.equals(path)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
