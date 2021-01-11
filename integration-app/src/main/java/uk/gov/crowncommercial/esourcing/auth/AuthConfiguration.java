@@ -1,55 +1,58 @@
 package uk.gov.crowncommercial.esourcing.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
 @Configuration
 @EnableWebSecurity
 public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
+  // TODO (pillingworth, 2020-01-08) make this configurable in the application.properties
   private static final String API_KEY_AUTH_HEADER_NAME = "x-api-key";
 
-  @Value("${ccs.esourceing.tenders.apikey}")
-  private String apikey;
-
-  @Value("${ccs.esourceing.tenders.allowlist}")
-  private String allowList;
-
-  @Autowired private CustomIpAuthenticationProvider authenticationProvider;
-
-  @Override
-  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.authenticationProvider(authenticationProvider);
-  }
-
-  @Bean
-  AuthenticationManager apiKeyAuthManager() {
-    return new ApiKeyAuthManager(apikey);
-  }
+  @Value("${ccs.esourcing.tenders.apikey:}")
+  private Set<String> apiKeys;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    ApiKeyAuthFilter filter = new ApiKeyAuthFilter(API_KEY_AUTH_HEADER_NAME);
-    filter.setAuthenticationManager(apiKeyAuthManager());
 
-    http.authorizeRequests()
-        .antMatchers("/actuator/**")
-        .permitAll()
-        .antMatchers("/Crown-Commercial/crown-commercial-service/v0_4/**")
-        .authenticated()
-        .and()
-        .addFilter(filter)
+    ApiKeyAuthFilter apiKeyFilter = new ApiKeyAuthFilter(API_KEY_AUTH_HEADER_NAME);
+    apiKeyFilter.setAuthenticationManager(new ApiKeyAuthManager(apiKeys));
+
+    // @formatter:off
+    http.addFilterBefore(ipAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+        .addFilter(apiKeyFilter)
+        .authorizeRequests()
+          .antMatchers("/actuator/**").permitAll()
+          .antMatchers("/openapi.yaml").permitAll()
+          .antMatchers("/favicon.ico").permitAll()
+          .anyRequest().authenticated()
+          .and()
         .csrf()
-        .disable()
+          .disable()
+        .cors()
+          .disable()
+        .formLogin()
+          .disable()
+        .httpBasic()
+          .disable()
         .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    // @formatter:on
   }
+  
+
+  @Bean
+  IpAddressFilter ipAddressFilter() {
+    return new IpAddressFilter(); 
+  }
+
+  
 }
