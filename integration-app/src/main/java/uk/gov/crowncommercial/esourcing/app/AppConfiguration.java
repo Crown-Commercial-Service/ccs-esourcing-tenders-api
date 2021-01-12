@@ -1,15 +1,15 @@
-package uk.gov.crowncommercial.esourcing.mvc;
+package uk.gov.crowncommercial.esourcing.app;
 
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MvcConfiguration {
+public class AppConfiguration {
 
   @Bean
   Clock clock() {
-    /* create a Clock so can time can easily be overridden/mocked when unit testing */
+    /* create a Clock so time can easily be overridden/mocked when unit testing */
     return Clock.systemUTC();
   }
 }

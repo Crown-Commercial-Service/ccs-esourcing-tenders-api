@@ -22,13 +22,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.model.Tender;
-import uk.gov.crowncommercial.esourcing.mvc.MvcConfiguration;
 import uk.gov.crowncommercial.esourcing.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
-@Import({MvcConfiguration.class})
+@Import({AppConfiguration.class})
 public class TendersApiControllerIT {
 
   @Autowired

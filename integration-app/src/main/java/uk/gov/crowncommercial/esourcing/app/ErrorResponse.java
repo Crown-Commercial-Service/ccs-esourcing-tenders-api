@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.mvc;
+package uk.gov.crowncommercial.esourcing.app;
 
 import java.time.Instant;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

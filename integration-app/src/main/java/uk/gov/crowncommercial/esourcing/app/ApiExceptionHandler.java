@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.mvc;
+package uk.gov.crowncommercial.esourcing.app;
 
 import java.time.Clock;
 import javax.servlet.http.HttpServletRequest;
@@ -26,14 +26,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   /**
    * Catch/mop up everything else and return a generic Internal Server Error status code.
    * 
-   * @param e a throwable not handled elsewhere
+   * @param t a throwable not handled elsewhere
+   * @param request servlet request used to retrieve request info such as path
    * @return error response entity
    */
   @ExceptionHandler({Throwable.class})
-  public ResponseEntity<Object> handleThrowable(Throwable e, HttpServletRequest request) {
-    LOG.warn("Unhandled exception when handing REST", e);
+  public ResponseEntity<Object> handleThrowable(Throwable t, HttpServletRequest request) {
+    
+    LOG.warn("Unhandled exception when handing REST", t);
+    
     HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     String path = request.getPathInfo();
+    
     return new ResponseEntity<Object>(
         ErrorResponse.builder().timestamp(clock.instant()).status(status.value())
             .error(status.getReasonPhrase()).message("Unhandled exception").path(path).build(),
