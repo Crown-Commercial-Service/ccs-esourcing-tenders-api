@@ -33,7 +33,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler({Throwable.class})
   public ResponseEntity<Object> handleThrowable(Throwable t, HttpServletRequest request) {
     
-    LOG.warn("Unhandled exception when handing REST", t);
+    LOG.warn("Unhandled exception when handling REST call to {}", request.getPathInfo(), t);
     
     HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     String path = request.getPathInfo();
