@@ -40,7 +40,7 @@ public class TendersApiControllerIpRestrictedIT {
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("ccs.esourcing.tenders.ipallowlist", () -> "123.456.789.123");
-    registry.add("ccs.esourcing.tenders.apikey", () -> "banana");
+    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
   }
 
   @Test

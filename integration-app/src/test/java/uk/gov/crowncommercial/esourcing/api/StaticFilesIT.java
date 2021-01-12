@@ -20,7 +20,7 @@ public class StaticFilesIT {
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("ccs.esourcing.tenders.ipallowlist", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.apikey", () -> "banana");
+    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
   }
 
   @Autowired

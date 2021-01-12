@@ -18,7 +18,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Value("${ccs.esourcing.tenders.apikeyheader:x-api-key}")
   private String apiKeyHeader;
   
-  @Value("${ccs.esourcing.tenders.apikey:}")
+  @Value("${ccs.esourcing.tenders.apikeys:}")
   private Set<String> apiKeys;
   
   @Value("${ccs.esourcing.tenders.ipallowlist:}")
