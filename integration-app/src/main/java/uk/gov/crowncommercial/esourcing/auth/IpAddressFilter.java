@@ -127,7 +127,7 @@ public class IpAddressFilter extends GenericFilterBean {
    * @return true if the path matches any of the patterns
    */
   protected static final boolean matchPath(List<String> paths, String path) {
-    if (paths == null || paths.size() == 0 || path == null) {
+    if (paths == null || paths.isEmpty() || path == null) {
       return false;
     }
     AntPathMatcher matcher = new AntPathMatcher();
