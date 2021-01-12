@@ -89,11 +89,8 @@ public class IpAddressFilter extends GenericFilterBean {
      */
     String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
     if (xForwardedFor != null) {
-      String[] ipAddresses =
-          Arrays.stream(xForwardedFor.split(",")).map(String::trim).toArray(String[]::new);
-      if (ipAddresses.length > 0) {
-        addressToValidate = ipAddresses[0];
-      }
+      addressToValidate =
+          Arrays.stream(xForwardedFor.split(",")).map(String::trim).findFirst().orElse(null);
     }
     if (addressToValidate == null) {
       addressToValidate = request.getRemoteAddr();
