@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.service;
+package uk.gov.crowncommercial.esourcing.jaggaer.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
