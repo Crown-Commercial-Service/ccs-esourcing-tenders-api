@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.crowncommercial.esourcing.api.UserApiDelegate;
-import uk.gov.crowncommercial.esourcing.model.User;
+import uk.gov.crowncommercial.esourcing.ccs.api.UserApiDelegate;
+import uk.gov.crowncommercial.esourcing.ccs.model.User;
 
 @Service
 public class UserApiService implements UserApiDelegate {

@@ -43,10 +43,9 @@
 	</properties>
 
 	<modules>
+		<module>jaggaer-mocksvr-app</module>
 		<module>integration-api</module>
 		<module>integration-app</module>
-    <module>jaggaer-api</module>
-		<module>jaggaer-client</module>
 	</modules>
 
 	<build>

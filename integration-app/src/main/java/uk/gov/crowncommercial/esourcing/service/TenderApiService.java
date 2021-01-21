@@ -9,14 +9,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.crowncommercial.esourcing.api.TendersApiDelegate;
-import uk.gov.crowncommercial.esourcing.jaggaer.model.ProjectResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.model.Projects;
-import uk.gov.crowncommercial.esourcing.jaggaer.model.RfxResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.model.Rfxs;
-import uk.gov.crowncommercial.esourcing.model.InlineResponse201;
-import uk.gov.crowncommercial.esourcing.model.Procurement;
-import uk.gov.crowncommercial.esourcing.model.Tender;
+import uk.gov.crowncommercial.esourcing.ccs.api.TendersApiDelegate;
+import uk.gov.crowncommercial.esourcing.ccs.model.InlineResponse201;
+import uk.gov.crowncommercial.esourcing.ccs.model.Procurement;
+import uk.gov.crowncommercial.esourcing.ccs.model.Tender;
+import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.ProjectResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.Projects;
+import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.RfxResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.Rfxs;
+
 
 @Service
 public class TenderApiService implements TendersApiDelegate {

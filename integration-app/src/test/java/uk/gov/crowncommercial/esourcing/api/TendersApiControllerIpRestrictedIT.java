@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.api.Constants.CCS_API_BASE_PATH;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
-import uk.gov.crowncommercial.esourcing.model.Tender;
+import uk.gov.crowncommercial.esourcing.ccs.api.TendersApiController;
+import uk.gov.crowncommercial.esourcing.ccs.model.Tender;
 import uk.gov.crowncommercial.esourcing.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})

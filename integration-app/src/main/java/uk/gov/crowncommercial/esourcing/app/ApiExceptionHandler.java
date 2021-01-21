@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.crowncommercial.esourcing.api.ApiUtil;
+import uk.gov.crowncommercial.esourcing.ccs.api.ApiUtil;
 
 /*
  * Catches any errors raised by the API layer and returns a suitable error response.
