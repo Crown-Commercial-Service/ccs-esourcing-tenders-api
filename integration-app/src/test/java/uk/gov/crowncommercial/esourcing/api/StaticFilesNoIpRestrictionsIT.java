@@ -28,9 +28,18 @@ public class StaticFilesNoIpRestrictionsIT {
   private MockMvc mockMvc;
 
   @Test
-  public void getOpenApiYaml_expectOk() throws Exception {
+  public void getCCsOpenApiYaml_expectOk() throws Exception {
     
-    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/openapi.yaml"))
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ccs/openapi.yaml"))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    assertThat(mvcResult.getResponse().getContentAsString()).startsWith("openapi: 3.0.0");
+  }
+  
+  @Test
+  public void getJaggaerOpenApiYaml_expectOk() throws Exception {
+    
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/jaggaer/openapi.yaml"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).startsWith("openapi: 3.0.0");

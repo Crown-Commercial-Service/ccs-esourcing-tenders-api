@@ -30,9 +30,18 @@ public class StaticFilesIT {
   private MockMvc mockMvc;
 
   @Test
-  public void getOpenApiYaml_noApiKey_expectOk() throws Exception {
+  public void getCCsOpenApiYaml_noApiKey_expectOk() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/openapi.yaml"))
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ccs/openapi.yaml"))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    assertThat(mvcResult.getResponse().getContentAsString()).startsWith("openapi: 3.0.0");
+  }
+
+  @Test
+  public void getJaggaerOpenApiYaml_noApiKey_expectOk() throws Exception {
+
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/jaggaer/openapi.yaml"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).startsWith("openapi: 3.0.0");
