@@ -44,9 +44,9 @@
 
 	<modules>
 		<module>jaggaer-mocksvr-app</module>
-		<module>integration-api</module>
+		<module>jaggaer-client</module>
+		<module>integration-server</module>
 		<module>integration-app</module>
-		<module>jaggaer-api-client</module>
 	</modules>
 
 	<build>

@@ -9,14 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.crowncommercial.esourcing.ccs.api.TendersApiDelegate;
-import uk.gov.crowncommercial.esourcing.ccs.model.InlineResponse201;
-import uk.gov.crowncommercial.esourcing.ccs.model.Procurement;
-import uk.gov.crowncommercial.esourcing.ccs.model.Tender;
-import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.ProjectResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.Projects;
-import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.RfxResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.mock.model.Rfxs;
+import uk.gov.crowncommercial.esourcing.server.api.TendersApiDelegate;
+import uk.gov.crowncommercial.esourcing.server.model.InlineResponse201;
+import uk.gov.crowncommercial.esourcing.server.model.Procurement;
+import uk.gov.crowncommercial.esourcing.server.model.Tender;
+import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.ProjectResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.Projects;
+import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.RfxResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.Rfxs;
 
 
 @Service

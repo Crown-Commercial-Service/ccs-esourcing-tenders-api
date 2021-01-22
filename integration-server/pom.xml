@@ -11,8 +11,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>integration-api</artifactId>
-  <name>integration-api</name>
+  <artifactId>integration-server</artifactId>
+  <name>Integration Server API</name>
 
   <dependencies>
     <dependency>
@@ -43,19 +43,19 @@
         <version>4.3.1</version>
         <executions>
           <execution>
-            <id>server-stub-integration</id>
+            <id>integration-server</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
               <inputSpec>${project.basedir}/src/main/resources/static/ccs/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>uk.gov.crowncommercial.esourcing.ccs.api</apiPackage>
-              <modelPackage>uk.gov.crowncommercial.esourcing.ccs.model</modelPackage>
+              <apiPackage>uk.gov.crowncommercial.esourcing.server.api</apiPackage>
+              <modelPackage>uk.gov.crowncommercial.esourcing.server.model</modelPackage>
               <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
               <configOptions>
                 <delegatePattern>true</delegatePattern>
-                <title>ccs-esourcing-integration-service</title>
+                <title>ccs-integration-server</title>
               </configOptions>
             </configuration>
           </execution>

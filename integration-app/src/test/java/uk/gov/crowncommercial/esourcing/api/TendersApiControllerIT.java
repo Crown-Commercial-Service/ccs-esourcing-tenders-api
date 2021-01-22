@@ -24,8 +24,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
-import uk.gov.crowncommercial.esourcing.ccs.api.TendersApiController;
-import uk.gov.crowncommercial.esourcing.ccs.model.Tender;
+import uk.gov.crowncommercial.esourcing.server.api.TendersApiController;
+import uk.gov.crowncommercial.esourcing.server.model.Tender;
 import uk.gov.crowncommercial.esourcing.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})

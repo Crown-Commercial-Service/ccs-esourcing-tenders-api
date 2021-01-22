@@ -12,7 +12,7 @@
   </parent>
 
   <artifactId>jaggaer-mocksvr-app</artifactId>
-  <name>jaggaer-mocksvr-app</name>
+  <name>Jaggaer Mock Server Application</name>
 
   <dependencies>
     <dependency>
@@ -49,8 +49,8 @@
             <configuration>
               <inputSpec>${project.basedir}/src/main/resources/static/jaggaer/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
-              <apiPackage>uk.gov.crowncommercial.esourcing.jaggaer.mock.api</apiPackage>
-              <modelPackage>uk.gov.crowncommercial.esourcing.jaggaer.mock.model</modelPackage>
+              <apiPackage>uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.api</apiPackage>
+              <modelPackage>uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model</modelPackage>
               <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
               <configOptions>
                 <delegatePattern>true</delegatePattern>
