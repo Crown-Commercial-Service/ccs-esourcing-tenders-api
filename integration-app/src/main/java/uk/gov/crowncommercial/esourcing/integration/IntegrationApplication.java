@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing;
+package uk.gov.crowncommercial.esourcing.integration;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

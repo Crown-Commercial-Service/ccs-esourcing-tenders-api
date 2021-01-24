@@ -12,7 +12,7 @@
 	</parent>
 
 	<artifactId>integration-app</artifactId>
-	<name>integration-app</name>
+	<name>Integration Application</name>
 
 	<dependencies>
 		<dependency>

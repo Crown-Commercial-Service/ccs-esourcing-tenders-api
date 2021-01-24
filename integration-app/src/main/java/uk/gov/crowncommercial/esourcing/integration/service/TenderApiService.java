@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.service;
+package uk.gov.crowncommercial.esourcing.integration.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.crowncommercial.esourcing.server.api.TendersApiDelegate;
-import uk.gov.crowncommercial.esourcing.server.model.InlineResponse201;
-import uk.gov.crowncommercial.esourcing.server.model.Procurement;
-import uk.gov.crowncommercial.esourcing.server.model.Tender;
+import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
+import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
+import uk.gov.crowncommercial.esourcing.integration.server.model.Procurement;
+import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
 import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.ProjectResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.Projects;
 import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.RfxResponse;

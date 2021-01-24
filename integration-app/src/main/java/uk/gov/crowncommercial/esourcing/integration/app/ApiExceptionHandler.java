@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.app;
+package uk.gov.crowncommercial.esourcing.integration.app;
 
 import java.time.Clock;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.crowncommercial.esourcing.server.api.ApiUtil;
+import uk.gov.crowncommercial.esourcing.integration.server.api.ApiUtil;
 
 /*
  * Catches any errors raised by the API layer and returns a suitable error response.

@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.auth;
+package uk.gov.crowncommercial.esourcing.integration.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;

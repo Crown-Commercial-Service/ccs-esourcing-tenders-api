@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.api;
+package uk.gov.crowncommercial.esourcing.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
+import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 
 @WebMvcTest
 @AutoConfigureMockMvc

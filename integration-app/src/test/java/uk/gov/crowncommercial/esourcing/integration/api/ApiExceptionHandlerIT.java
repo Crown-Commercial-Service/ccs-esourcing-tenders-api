@@ -1,9 +1,9 @@
-package uk.gov.crowncommercial.esourcing.api;
+package uk.gov.crowncommercial.esourcing.integration.api;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static uk.gov.crowncommercial.esourcing.api.Constants.API_KEY_HEADER;
-import static uk.gov.crowncommercial.esourcing.api.Constants.CCS_API_BASE_PATH;
+import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
+import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
@@ -22,10 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
-import uk.gov.crowncommercial.esourcing.app.ErrorResponse;
-import uk.gov.crowncommercial.esourcing.server.api.TendersApiController;
-import uk.gov.crowncommercial.esourcing.service.TenderApiService;
+import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
+import uk.gov.crowncommercial.esourcing.integration.app.ErrorResponse;
+import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
+import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
 
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc

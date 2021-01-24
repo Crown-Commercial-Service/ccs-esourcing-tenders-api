@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.auth;
+package uk.gov.crowncommercial.esourcing.integration.auth;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;

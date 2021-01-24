@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.api;
+package uk.gov.crowncommercial.esourcing.integration.api;
 
 class Constants {
 

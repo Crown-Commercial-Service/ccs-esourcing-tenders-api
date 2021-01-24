@@ -11,7 +11,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>jaggaer-client</artifactId>
+  <artifactId>jaggaer-client-api</artifactId>
   <name>Jaggaer Client API</name>
 
   <dependencies>
@@ -68,7 +68,7 @@
         <version>4.3.1</version>
         <executions>
           <execution>
-            <id>jaggaer-client</id>
+            <id>jaggaer-client-api</id>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -85,7 +85,7 @@
                 <library>webclient</library>
                 <dateLibrary>java11</dateLibrary>
                 <java11>true</java11>
-                <title>ccs-jaggaer-client</title>
+                <title>ccs-jaggaer-client-api</title>
               </configOptions>
             </configuration>
           </execution>

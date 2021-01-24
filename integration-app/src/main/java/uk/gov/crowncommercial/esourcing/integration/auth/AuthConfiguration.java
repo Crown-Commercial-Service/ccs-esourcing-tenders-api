@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.auth;
+package uk.gov.crowncommercial.esourcing.integration.auth;
 
 import java.util.Arrays;
 import java.util.Set;

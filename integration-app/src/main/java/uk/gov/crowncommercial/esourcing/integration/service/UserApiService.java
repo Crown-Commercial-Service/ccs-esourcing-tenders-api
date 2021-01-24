@@ -1,11 +1,11 @@
-package uk.gov.crowncommercial.esourcing.service;
+package uk.gov.crowncommercial.esourcing.integration.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.crowncommercial.esourcing.server.api.UserApiDelegate;
-import uk.gov.crowncommercial.esourcing.server.model.User;
+import uk.gov.crowncommercial.esourcing.integration.server.api.UserApiDelegate;
+import uk.gov.crowncommercial.esourcing.integration.server.model.User;
 
 @Service
 public class UserApiService implements UserApiDelegate {

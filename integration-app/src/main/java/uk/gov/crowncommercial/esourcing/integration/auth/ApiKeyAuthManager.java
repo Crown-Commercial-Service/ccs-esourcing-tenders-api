@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.auth;
+package uk.gov.crowncommercial.esourcing.integration.auth;
 
 import java.util.Set;
 import javax.validation.constraints.NotNull;

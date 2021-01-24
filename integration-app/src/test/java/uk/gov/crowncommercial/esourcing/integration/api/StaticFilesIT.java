@@ -1,7 +1,7 @@
-package uk.gov.crowncommercial.esourcing.api;
+package uk.gov.crowncommercial.esourcing.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.crowncommercial.esourcing.api.Constants.API_KEY_HEADER;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import uk.gov.crowncommercial.esourcing.app.AppConfiguration;
+import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 
 @WebMvcTest
 @AutoConfigureMockMvc
@@ -69,7 +69,7 @@ public class StaticFilesIT {
   public void getNoSuchFile_withApiKey_expectNotFound() throws Exception {
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.get("/nosuchfile.txt").header(API_KEY_HEADER, "banana"))
+        .perform(MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "banana"))
         .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
