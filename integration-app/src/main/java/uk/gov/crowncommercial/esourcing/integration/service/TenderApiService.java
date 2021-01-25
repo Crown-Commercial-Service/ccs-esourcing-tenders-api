@@ -13,10 +13,10 @@ import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegat
 import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
 import uk.gov.crowncommercial.esourcing.integration.server.model.Procurement;
 import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
-import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.ProjectResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.Projects;
-import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.RfxResponse;
-import uk.gov.crowncommercial.esourcing.jaggaer.mocksvr.model.Rfxs;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.ProjectResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Projects;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxResponse;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Rfxs;
 
 
 @Service
