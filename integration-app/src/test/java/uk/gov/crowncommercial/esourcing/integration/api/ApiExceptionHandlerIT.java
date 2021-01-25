@@ -4,8 +4,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
@@ -22,10 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.ErrorResponse;
-import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
+import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
@@ -54,7 +53,8 @@ public class ApiExceptionHandlerIT {
   public void getTenderById_throwsNullPointerException_expectInternalServerError()
       throws Exception {
 
-    when(tenderApiService.getTenderById(anyLong())).thenThrow(new NullPointerException());
+    when(tenderApiService.getTenderById(anyLong())).thenThrow(new NullPointerException(
+        "Thrown as part of getTenderById_throwsNullPointerException_expectInternalServerError"));
     when(clock.instant()).thenReturn(Instant.ofEpochSecond(1610454603L));
 
     MvcResult mvcResult = mockMvc
