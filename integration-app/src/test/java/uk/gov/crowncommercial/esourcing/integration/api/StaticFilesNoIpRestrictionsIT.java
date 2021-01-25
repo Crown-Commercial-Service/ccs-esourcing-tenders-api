@@ -13,10 +13,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
+import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 
 @WebMvcTest
 @AutoConfigureMockMvc
-@Import({AppConfiguration.class})
+@Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
 public class StaticFilesNoIpRestrictionsIT {
 
   @DynamicPropertySource
