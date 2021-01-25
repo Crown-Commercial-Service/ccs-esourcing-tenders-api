@@ -108,7 +108,7 @@ components:
       properties:
         operationCode:
           type: string
-          example: Create
+          example: Create_From_Template
         project:
           $ref: '#/components/schemas/Project'
     Rfxs:
@@ -119,7 +119,7 @@ components:
       properties:
         operationCode:
           type: string
-          example: Create
+          example: Create_From_Template
         rfx:
           $ref: '#/components/schemas/Rfx'
     Project:
@@ -137,9 +137,9 @@ components:
           example: Test Project 123
         buyerCompany:
           $ref: '#/components/schemas/BuyerCompany'
-        projectType:
+        sourceTemplateReferenceCode:
           type: string
-          example: CCS_PROJ
+          example: project_609
         additionalInfoList:
           $ref: '#/components/schemas/AdditionalInfoList'
     BuyerCompany:
@@ -171,12 +171,6 @@ components:
         name:
           type: string
           example: Procurement Reference
-        type:
-          type: string
-          example: Text
-        visibleToSupplier:
-          type: integer
-          example: 1
         values:
           $ref: '#/components/schemas/Value'
     Value:
@@ -211,12 +205,8 @@ components:
         - longDescription
         - buyerCompany
         - ownerUser
+        - templateReferenceCode
         - value
-        - valueCurrency
-        - bidsCurrency
-        - qualEnvStatus
-        - techEnvStatus
-        - commEnvStatus
         - publishDate
         - closeDate
         - rfxType
@@ -238,36 +228,18 @@ components:
           $ref: '#/components/schemas/BuyerCompany'
         ownerUser:
           $ref: '#/components/schemas/OwnerUser'
+        templateReferenceCode:
+          type: string
+          example: itt_543
         value:
           type: string
           example: "9000"
-        valueCurrency:
-          type: string
-          example: GBP
-        bidsCurrency:
-          type: string
-          example: GBP
-        qualEnvStatus:
-          type: string
-          example: "0"
-        techEnvStatus:
-          type: string
-          example: "0"
-        commEnvStatus:
-          type: string
-          example: "1"
         publishDate:
           type: string
           example: "2019-08-20T13:54:32.000+00:00"
         closeDate:
           type: string
           example: "2019-08-30T13:54:32.000+00:00"
-        rfxType:
-          type: string
-          example: STANDARD_ITT
-        autoCreateTender:
-          type: string
-          example: "0"
     RfxAdditionalInfoList:
       type: object
       properties:
@@ -281,18 +253,6 @@ components:
         name:
           type: string
           example: Procurement Route
-        type:
-          type: string
-          example: "5"
-        visibleToSupplier:
-          type: integer
-          example: 0
-        label:
-          type: string
-          example: Procurement Route
-        labelLocale:
-          type: string
-          example: en_GB
         values:
           $ref: '#/components/schemas/RfxValue'
     RfxValue:

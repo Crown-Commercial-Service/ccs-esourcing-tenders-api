@@ -26,8 +26,8 @@ public class ProjectApiService implements ProjectsApiDelegate {
     ProjectResponse projectResponse = new ProjectResponse();
 
     projectResponse.setReturnCode(0);
-    projectResponse.setReturnMessage("tender_39483");
-    projectResponse.setTenderCode("OK");
+    projectResponse.setReturnMessage("OK");
+    projectResponse.setTenderCode("tender_39483");
     projectResponse.setTenderReferenceCode("project_1002");
 
     return new ResponseEntity<>(projectResponse, HttpStatus.CREATED);
