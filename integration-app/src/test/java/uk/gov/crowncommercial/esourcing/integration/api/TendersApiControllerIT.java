@@ -45,8 +45,8 @@ public class TendersApiControllerIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ipallowlist", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
+    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "127.0.0.1");
+    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
   }
 
   @Test
@@ -58,7 +58,7 @@ public class TendersApiControllerIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
-            .header(API_KEY_HEADER, "banana").contentType(MediaType.APPLICATION_JSON))
+            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(tender);

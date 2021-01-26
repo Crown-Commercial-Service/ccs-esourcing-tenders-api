@@ -12,4 +12,19 @@ public class AppConfiguration {
     /* create a Clock so time can easily be overridden/mocked when unit testing */
     return Clock.systemUTC();
   }
+
+  @Bean
+  InfoAppConfigurationProperties infoAppConfigurationProperties() {
+    return new InfoAppConfigurationProperties();
+  }
+  
+  @Bean
+  ApplicationStartupCompleteListener applicationStartupCompleteListener() {
+    return new ApplicationStartupCompleteListener();
+  }
+  
+  @Bean
+  ActiveProfilesVerifier activeProfilesVerifier() {
+    return new ActiveProfilesVerifier(true);
+  }
 }

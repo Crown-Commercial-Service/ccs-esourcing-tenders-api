@@ -57,10 +57,10 @@ public class ApiExceptionHandlerRollbarEnabledIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ipallowlist", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
+    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "127.0.0.1");
+    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
     registry.add("rollbar.enabled", () -> "true");
-    registry.add("rollbar.accesstoken", () -> "1298350192839123616203759102938");
+    registry.add("rollbar.access-token", () -> "1298350192839123616203759102938");
     registry.add("rollbar.environment", () -> "integration_test");
     registry.add("info.app.version", () -> "12.34.56");
   }
@@ -76,7 +76,7 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     /* "call" the REST API */
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
-            .header(API_KEY_HEADER, "banana").contentType(MediaType.APPLICATION_JSON))
+            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 
     /* verify the REST API response */
@@ -102,7 +102,7 @@ public class ApiExceptionHandlerRollbarEnabledIT {
   public void getNoSuchFile_withApiKey_expectNotFoundAndNoRollbarSend() throws Exception {
 
     MvcResult mvcResult = mockMvc.perform(
-        MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "banana"))
+        MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "integration-test-api-key"))
         .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
