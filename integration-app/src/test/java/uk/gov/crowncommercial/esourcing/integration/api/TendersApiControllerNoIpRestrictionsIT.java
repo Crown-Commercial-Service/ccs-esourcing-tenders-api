@@ -24,13 +24,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
+import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
 import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
 
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
-@Import({AppConfiguration.class})
+@Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
 public class TendersApiControllerNoIpRestrictionsIT {
 
   @Autowired
@@ -44,8 +45,8 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ipallowlist", () -> "");
-    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
+    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "");
+    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
   }
 
   @Test
@@ -57,7 +58,7 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
-            .header(API_KEY_HEADER, "banana").contentType(MediaType.APPLICATION_JSON))
+            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(tender);

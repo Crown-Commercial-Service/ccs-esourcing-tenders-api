@@ -12,7 +12,7 @@
 	</parent>
 
 	<artifactId>integration-app</artifactId>
-	<name>Integration Application</name>
+	<name>eSourcing Integration Application</name>
 
 	<dependencies>
 		<dependency>
@@ -45,7 +45,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>com.rollbar</groupId>
+			<artifactId>rollbar-spring-boot-webmvc</artifactId>
+			<version>1.7.5</version>
+		</dependency>
 
 		<!-- Test -->
 		

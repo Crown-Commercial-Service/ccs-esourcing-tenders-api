@@ -23,6 +23,20 @@ public class AppConfiguration {
   }
 
   @Bean
+  InfoAppConfigurationProperties infoAppConfigurationProperties() {
+    return new InfoAppConfigurationProperties();
+  }
+
+  @Bean
+  ApplicationStartupCompleteListener applicationStartupCompleteListener() {
+    return new ApplicationStartupCompleteListener();
+  }
+
+  @Bean
+  ActiveProfilesVerifier activeProfilesVerifier() {
+    return new ActiveProfilesVerifier(true);
+  }
+
   @Scope("prototype")
   public ApiClient apiClient() {
 

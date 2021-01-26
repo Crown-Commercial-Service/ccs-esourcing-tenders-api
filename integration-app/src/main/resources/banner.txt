@@ -5,5 +5,5 @@
   \____\____|____/   \___|____/ \___/ \__,_|_|  \___|_|_| |_|\__, |
                                                              |___/ 
 
-CCS eSourcing Tenders API ${application.version}
+${info.app.name} ${info.app.version}
                                                              
