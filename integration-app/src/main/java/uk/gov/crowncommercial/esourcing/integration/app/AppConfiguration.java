@@ -16,6 +16,9 @@ public class AppConfiguration {
   @Value("${jaggaer.bearer.token:}")
   private String bearerToken;
 
+  @Value("${ccs.esourcing.tenders.jaggaer-client-url}")
+  private String JAGGAER_CLIENT_URL;
+
   @Bean
   Clock clock() {
     /* create a Clock so time can easily be overridden/mocked when unit testing */
@@ -37,12 +40,14 @@ public class AppConfiguration {
     return new ActiveProfilesVerifier(true);
   }
 
+  @Bean
   @Scope("prototype")
   public ApiClient apiClient() {
 
     ApiClient apiClient = new ApiClient();
 
     apiClient.setBearerToken(bearerToken);
+    apiClient.setBasePath(JAGGAER_CLIENT_URL);
 
     return apiClient;
   }

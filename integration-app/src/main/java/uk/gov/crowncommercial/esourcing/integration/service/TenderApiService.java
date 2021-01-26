@@ -42,9 +42,6 @@ public class TenderApiService implements TendersApiDelegate {
 
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
-  @Value("${ccs.esourcing.tenders.jaggaer-client-url}")
-  private String JAGGAER_CLIENT_URL;
-
   @Value("${ccs.esourcing.tenders.default.api.timeout}")
   private Long DEFAULT_API_TIMEOUT;
 

@@ -13,14 +13,8 @@ tags:
 
 servers:
   # Added by API Auto Mocking Plugin
-  # - description: SwaggerHub API Auto Mocking
-  #   url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
-
-  - description: Local Mock Jaggaer Server
-    url: http://localhost:8081/joeraymond-roweit/Tenders/1.0.0/
-
-  # - description: Jaggaer Pre Production Server
-  #   url: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/ja/v1
+   - description: SwaggerHub API Auto Mocking
+     url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
 
 paths:
   /projects:
