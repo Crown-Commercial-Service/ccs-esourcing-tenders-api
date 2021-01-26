@@ -23,8 +23,8 @@ public class StaticFilesIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ipallowlist", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.apikeys", () -> "banana");
+    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "127.0.0.1");
+    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
   }
 
   @Autowired
@@ -70,7 +70,7 @@ public class StaticFilesIT {
   public void getNoSuchFile_withApiKey_expectNotFound() throws Exception {
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "banana"))
+        .perform(MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "integration-test-api-key"))
         .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();

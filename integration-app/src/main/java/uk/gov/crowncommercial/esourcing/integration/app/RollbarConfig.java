@@ -1,7 +1,7 @@
 package uk.gov.crowncommercial.esourcing.integration.app;
 
 import java.util.function.Supplier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,55 +17,40 @@ import com.rollbar.spring.webmvc.RollbarSpringConfigBuilder;
 @ComponentScan({"com.rollbar.spring"})
 public class RollbarConfig {
 
-  @Value("${rollbar.enabled:false}")
-  private boolean enabled;
+  @Autowired
+  InfoAppConfigurationProperties infoAppCfgProps;
 
-  @Value("${rollbar.accesstoken:#{null}}")
-  private String accessToken;
-
-  @Value("${rollbar.environment:#{null}}")
-  private String environment;
-
-  @Value("${rollbar.framework:#{null}}")
-  private String framework;
-
-  @Value("${rollbar.endpoint:#{null}}")
-  private String endpoint;
-
-  @Value("${info.app.name:#{null}}")
-  private String infoAppName;
-
-  @Value("${info.app.version:#{null}}")
-  private String infoAppVersion;
+  @Bean
+  RollbarConfigurationProperties rollbarConfigurationProperties() {
+    return new RollbarConfigurationProperties();
+  }
 
   @Bean
   public Rollbar rollbar(Supplier<Sender> senderSupplier) {
 
-    ConfigBuilder builder = RollbarSpringConfigBuilder.withAccessToken(accessToken).enabled(enabled)
-        .sender(senderSupplier.get());
+    RollbarConfigurationProperties cfgProps = rollbarConfigurationProperties();
 
-    if (accessToken != null) {
-      builder.accessToken(accessToken);
+    ConfigBuilder builder = RollbarSpringConfigBuilder.withAccessToken(cfgProps.getAccessToken())
+        .enabled(cfgProps.isEnabled()).sender(senderSupplier.get());
+
+    if (cfgProps.getEndpoint() != null) {
+      builder.endpoint(cfgProps.getEndpoint());
     }
 
-    if (endpoint != null) {
-      builder.endpoint(endpoint);
-    }
-
-    if (environment != null) {
-      builder.environment(environment);
+    if (cfgProps.getEnvironment() != null) {
+      builder.environment(cfgProps.getEnvironment());
     }
 
     /* framework defaults to app name (if set) or the framework value if set */
-    if (infoAppName != null) {
-      builder.framework(infoAppName);
+    if (infoAppCfgProps.getName() != null) {
+      builder.framework(infoAppCfgProps.getName());
     }
-    if (framework != null) {
-      builder.framework(framework);
+    if (cfgProps.getFramework() != null) {
+      builder.framework(cfgProps.getFramework());
     }
 
-    if (infoAppVersion != null) {
-      builder.codeVersion(infoAppVersion);
+    if (infoAppCfgProps.getVersion() != null) {
+      builder.codeVersion(infoAppCfgProps.getVersion());
     }
 
     return new Rollbar(builder.build());

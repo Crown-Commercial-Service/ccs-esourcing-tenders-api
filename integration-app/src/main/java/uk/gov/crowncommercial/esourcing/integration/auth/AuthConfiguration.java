@@ -15,13 +15,13 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 @EnableWebSecurity
 public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
-  @Value("${ccs.esourcing.tenders.apikeyheader:x-api-key}")
+  @Value("${ccs.esourcing.tenders.api-key-header:x-api-key}")
   private String apiKeyHeader;
   
-  @Value("${ccs.esourcing.tenders.apikeys:}")
+  @Value("${ccs.esourcing.tenders.api-keys:}")
   private Set<String> apiKeys;
   
-  @Value("${ccs.esourcing.tenders.ipallowlist:}")
+  @Value("${ccs.esourcing.tenders.ipallow-list:}")
   private Set<String> ipAllowList;
 
   @Override
