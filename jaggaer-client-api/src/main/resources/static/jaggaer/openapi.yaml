@@ -4,16 +4,29 @@ info:
   description: This is a simple API
   version: "1.0.0"
   title: Crown Commercial Service
+
+tags:
+  - name: Projects
+    description: Jaggaer Projects API
+  - name: Rfx
+    description: Jaggaer RFX API
+
 servers:
   # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
+  # - description: SwaggerHub API Auto Mocking
+  #   url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
+
+  - description: Local Mock Jaggaer Server
+    url: http://localhost:8081/joeraymond-roweit/Tenders/1.0.0/
+
+  # - description: Jaggaer Pre Production Server
+  #   url: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/ja/v1
 
 paths:
   /projects:
     post:
       tags:
-        - PROJECTS
+        - Projects
       summary: Create Jaggaer Project
       description: >-
         Creates a Project in Jaggaer.
@@ -54,10 +67,11 @@ paths:
               $ref: '#/components/schemas/Projects'
         description: Created sourcing object
         required: true
+
   /rfxs:
     post:
       tags:
-        - RFX
+        - Rfx
       summary: Create an RFX for invitiation linked to a project
       description: >-
         Creates a CCS RFX for invitiation linked to a project.
@@ -164,23 +178,23 @@ components:
         additionalInfo:
           type: array
           items:
-            $ref: '#/components/schemas/AdditionalInfo'
-    AdditionalInfo:
+            $ref: '#/components/schemas/AdditionalInfoItem'
+    AdditionalInfoItem:
       type: object
       properties:
         name:
           type: string
           example: Procurement Reference
         values:
-          $ref: '#/components/schemas/Value'
-    Value:
+          $ref: '#/components/schemas/Values'
+    Values:
       type: object
       properties:
         value:
           type: array
           items:
-            $ref: '#/components/schemas/Valuelist'
-    Valuelist:
+            $ref: '#/components/schemas/ValueItem'
+    ValueItem:
       type: object
       properties:
         value:
@@ -199,10 +213,8 @@ components:
     RfxSetting:
       type: object
       required:
-        - rfiFlag
         - tenderReferenceCode
         - shortDescription
-        - longDescription
         - buyerCompany
         - ownerUser
         - templateReferenceCode
@@ -212,18 +224,12 @@ components:
         - rfxType
         - autoCreateTender
       properties:
-        rfiFlag:
-          type: string
-          example: "0"
         tenderReferenceCode:
           type: string
           example: projetct_1002
         shortDescription:
           type: string
           example: ITT Test 03122019 Attempt 3
-        longDescription:
-          type: string
-          example: ITT Test 03122019 Long Description
         buyerCompany:
           $ref: '#/components/schemas/BuyerCompany'
         ownerUser:
@@ -246,23 +252,23 @@ components:
         additionalInfo:
           type: array
           items:
-            $ref: '#/components/schemas/RfxAdditionalInfo'
-    RfxAdditionalInfo:
+            $ref: '#/components/schemas/RfxAdditionalInfoItem'
+    RfxAdditionalInfoItem:
       type: object
       properties:
         name:
           type: string
           example: Procurement Route
         values:
-          $ref: '#/components/schemas/RfxValue'
-    RfxValue:
+          $ref: '#/components/schemas/RfxValues'
+    RfxValues:
       type: object
       properties:
         value:
           type: array
           items:
-            $ref: '#/components/schemas/RfxValuelist'
-    RfxValuelist:
+            $ref: '#/components/schemas/RfxValueItem'
+    RfxValueItem:
       type: object
       properties:
         value:
@@ -298,3 +304,9 @@ components:
         tenderReferenceCode:
           type: string
           example: project_1002
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - bearerAuth: []

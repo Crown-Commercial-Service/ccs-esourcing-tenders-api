@@ -62,7 +62,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
     </dependency>
   </dependencies>
   <build>
@@ -79,10 +78,10 @@
             </goals>
             <configuration>
               <inputSpec>${project.basedir}/src/main/resources/static/jaggaer/openapi.yaml</inputSpec>
-              <apisToGenerate>Jaggaer</apisToGenerate>
+              <apisToGenerate>Projects,Rfx</apisToGenerate>
               <generatorName>java</generatorName>
-              <invokerPackage>uk.gov.crowncommercial.esourcing.jaggaer.client.invoker</invokerPackage>
-              <apiPackage>uk.gov.crowncommercial.esourcing.jaggaer.client.api</apiPackage>
+              <invokerPackage>uk.gov.crowncommercial.esourcing.jaggaer.client</invokerPackage>
+              <apiPackage>uk.gov.crowncommercial.esourcing.jaggaer.client</apiPackage>
               <modelPackage>uk.gov.crowncommercial.esourcing.jaggaer.client.model</modelPackage>
               <generateAliasAsModel>true</generateAliasAsModel>
               <skipValidateSpec>false</skipValidateSpec>
