@@ -36,6 +36,7 @@ public class IpAddressFilter extends GenericFilterBean {
 
   public IpAddressFilter(Set<String> ipAllowList, List<String> includePaths,
       List<String> excludePaths) {
+
     this.ipAllowList = ipAllowList;
     this.includePaths = includePaths;
     this.excludePaths = excludePaths;
@@ -43,6 +44,7 @@ public class IpAddressFilter extends GenericFilterBean {
 
   @PostConstruct
   public void init() {
+
     if (ipAllowList.isEmpty()) {
       LOGGER.warn(
           "No Allow List IP addresses have been specified so requests from all IP addresses will be accepted");
@@ -54,10 +56,13 @@ public class IpAddressFilter extends GenericFilterBean {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
-    doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+
+    if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+      doHttpFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+    }
   }
 
-  private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+  private void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
     String servletPath = request.getServletPath();
@@ -100,7 +105,8 @@ public class IpAddressFilter extends GenericFilterBean {
         addressToValidate, StringUtils.defaultString(xForwardedFor), addressToValidate);
 
     if (ipAllowList.isEmpty()) {
-      LOGGER.debug("Allowing request from address {} as no IP allow list is defined", addressToValidate);
+      LOGGER.debug("Allowing request from address {} as no IP allow list is defined",
+          addressToValidate);
       chain.doFilter(request, response);
       return;
     }
@@ -127,9 +133,11 @@ public class IpAddressFilter extends GenericFilterBean {
    * @return true if the path matches any of the patterns
    */
   protected static final boolean matchPath(List<String> paths, String path) {
+
     if (paths == null || paths.isEmpty() || path == null) {
       return false;
     }
+    
     AntPathMatcher matcher = new AntPathMatcher();
     for (String pattern : paths) {
       if (matcher.isPattern(pattern)) {

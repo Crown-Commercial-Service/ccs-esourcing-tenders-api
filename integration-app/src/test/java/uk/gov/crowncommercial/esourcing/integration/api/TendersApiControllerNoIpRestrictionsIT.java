@@ -45,8 +45,8 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "");
-    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
+    registry.add("ccs.esourcing.ip-allow-list", () -> "");
+    registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
   }
 
   @Test

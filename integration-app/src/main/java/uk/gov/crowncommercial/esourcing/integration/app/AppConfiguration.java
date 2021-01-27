@@ -16,7 +16,7 @@ public class AppConfiguration {
   @Value("${jaggaer.bearer.token:}")
   private String bearerToken;
 
-  @Value("${ccs.esourcing.tenders.jaggaer-client-url}")
+  @Value("${ccs.esourcing.jaggaer-client-url}")
   private String JAGGAER_CLIENT_URL;
 
   @Bean

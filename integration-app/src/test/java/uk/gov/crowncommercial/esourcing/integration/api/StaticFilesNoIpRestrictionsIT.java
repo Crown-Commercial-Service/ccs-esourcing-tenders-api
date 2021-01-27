@@ -22,7 +22,7 @@ public class StaticFilesNoIpRestrictionsIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "");
+    registry.add("ccs.esourcing.ip-allow-list", () -> "");
   }
 
   @Autowired

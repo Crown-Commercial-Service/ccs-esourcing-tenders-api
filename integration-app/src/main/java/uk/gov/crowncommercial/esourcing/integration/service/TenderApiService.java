@@ -42,7 +42,7 @@ public class TenderApiService implements TendersApiDelegate {
 
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
-  @Value("${ccs.esourcing.tenders.default.api.timeout}")
+  @Value("${ccs.esourcing.default.api.timeout}")
   private Long DEFAULT_API_TIMEOUT;
 
   public TenderApiService() {}

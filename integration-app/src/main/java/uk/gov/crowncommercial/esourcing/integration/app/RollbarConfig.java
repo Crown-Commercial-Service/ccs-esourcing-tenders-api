@@ -41,9 +41,9 @@ public class RollbarConfig {
       builder.environment(cfgProps.getEnvironment());
     }
 
-    /* framework defaults to app name (if set) or the framework value if set */
-    if (infoAppCfgProps.getName() != null) {
-      builder.framework(infoAppCfgProps.getName());
+    /* framework defaults to app artifact id (if set) or the framework value if set */
+    if (infoAppCfgProps.getArtifactId() != null) {
+      builder.framework(infoAppCfgProps.getArtifactId());
     }
     if (cfgProps.getFramework() != null) {
       builder.framework(cfgProps.getFramework());
