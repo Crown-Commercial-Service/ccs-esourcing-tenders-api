@@ -8,11 +8,23 @@ It "sits" between CCSs Salesforce CRM and CCSs Jaggaer eSourcing applications. T
 
 The name "Integration API" is misnomer as this will consist of an Integration API and an implementation of the API in other words an Integration Service.
 
-![Simple Block Diagram](./docs/Simple Block Diagram.png)
+<p align="center">
+  <img src="./docs/Simple Block Diagram.png"/>
+</p>
+<p align="center">
+Simple Block Diagram
+</p>
+
 
 The APIs exposed and used by the application are all defined using OpenAPI definitions. These definitions are available as downloadable resources allowing ease of use with tools such as SmartBears Swagger UI.
 
-![Simple Block Diagram](./docs/Detailed Block Diagram.png)
+<p align="center">
+  <img src="./docs/Detailed Block Diagram.png"/>
+</p>
+<p align="center">
+Detailed Block Diagram
+</p>
+
 
 ## Prerequisites
 The application can de developed and built on Windows, Linux or MacOS.
@@ -40,7 +52,7 @@ Recommended IntelliJ installation:
 
 Eclipse and IntelliJ must be configured to use same source code formatting rules to ensure that no changes/diffs are introduced due to IDE reformatting. 
 
-Java code formatting should follow the Google Java Code style as defined here https://google.github.io/styleguide/javaguide.html and supported tooling can be installed standalone or into the IDE as described here https://github.com/google/google-java-format. The Eclipse the coding style configuration is available here [eclipse-java-google-style.xml](./dev/resources/eclipse-java-google-style.xml)
+Java code formatting should follow the [Google Java Code style](https://google.github.io/styleguide/javaguide.html) as defined here https://google.github.io/styleguide/javaguide.html using the [supported tooling](https://github.com/google/google-java-format) if required. The Eclipse the coding style configuration is available here [eclipse-java-google-style.xml](./dev/resources/eclipse-java-google-style.xml)
 
 Static analysis is performed using SpotBugs in the maven build.
 
