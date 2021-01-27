@@ -146,9 +146,6 @@ Given that most of these properties have suitable default values set for each of
 | rollbar.framework            | ROLLBAR_FRAMEWORK          | string        | Value to use for the Rollbar framework attribute             |
 | rollbar.endpoint             | ROLLBAR_ENDPOINT           | string        | Can be used to override Rollbar URL endpoint                 |
 
-## Additional information
-This is a good place to link to additional or related information if it’s available such as API documentation or a separate documentation website. 
-
 ## Licence
 The project is licensed with the [MIT License](https://opensource.org/licenses/MIT).
 
