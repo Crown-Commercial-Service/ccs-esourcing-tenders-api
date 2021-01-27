@@ -52,7 +52,7 @@ Recommended IntelliJ installation:
 
 Eclipse and IntelliJ must be configured to use same source code formatting rules to ensure that no changes/diffs are introduced due to IDE reformatting. 
 
-Java code formatting should follow the [Google Java Code style](https://google.github.io/styleguide/javaguide.html) as defined here https://google.github.io/styleguide/javaguide.html using the [supported tooling](https://github.com/google/google-java-format) if required. The Eclipse the coding style configuration is available here [eclipse-java-google-style.xml](./dev/resources/eclipse-java-google-style.xml)
+Java code formatting should follow the [Google Java Code style](https://google.github.io/styleguide/javaguide.html) using the [supported tooling](https://github.com/google/google-java-format) if required. The Eclipse the coding style configuration is available here [eclipse-java-google-style.xml](./dev/resources/eclipse-java-google-style.xml)
 
 Static analysis is performed using SpotBugs in the maven build.
 
