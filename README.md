@@ -123,7 +123,7 @@ The is taken further with the project contriving to create [Spring Profile](http
 The application is a Spring Boot Java application that is designed to be built using [Travis CI](https://travis-ci.com/) and then deployed into a [GOV.UK PaaS](https://login.london.cloud.service.gov.uk/) / Cloud Foundry platform but it can be deployed and run as a standalone application. As such it contains
 
 + .travis.yml
-  + TravisCI configuration file for CI/CD integration
+  + Travis CI configuration file for CI/CD integration
 + manifest.yml
   + GOV.UK PaaS / CloudFoundry manifest file
 
