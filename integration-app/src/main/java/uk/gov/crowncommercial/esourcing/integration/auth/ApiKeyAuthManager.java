@@ -15,29 +15,29 @@ public class ApiKeyAuthManager implements AuthenticationManager {
   private final Set<String> apiKeys;
 
   public ApiKeyAuthManager(@NotNull Set<String> apiKeys) {
-    
+
     if (apiKeys.isEmpty()) {
       LOGGER.warn("No API Keys have been defined so no requests will be authenticated");
     } else {
       LOGGER.info("{} API Keys configured", apiKeys.size());
     }
-    
+
     this.apiKeys = apiKeys;
   }
 
   @Override
   public Authentication authenticate(Authentication authentication) {
-    
+
     String principal = (String) authentication.getPrincipal();
 
-    if (apiKeys.contains(principal)) {
-      LOGGER.debug("Authenticating request as API Key is in defined list");
-    } else {
+    if (!apiKeys.contains(principal)) {
       LOGGER.debug("Not authenticating request as API Key is not in defined list");
       throw new BadCredentialsException("API key not found");
     }
-    
+
+    LOGGER.debug("Authenticating request as API Key is in defined list");
     authentication.setAuthenticated(true);
+
     return authentication;
   }
 }

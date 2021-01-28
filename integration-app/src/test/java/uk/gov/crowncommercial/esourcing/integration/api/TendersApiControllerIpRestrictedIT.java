@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +31,7 @@ import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
 @Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
+@ActiveProfiles("integrationtest")
 public class TendersApiControllerIpRestrictedIT {
 
   @Autowired
@@ -43,7 +45,7 @@ public class TendersApiControllerIpRestrictedIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.ip-allow-list", () -> "123.456.789.123");
+    registry.add("ccs.esourcing.ip-allow-list", () -> "192.168.0.1/30");
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
   }
 
@@ -82,7 +84,7 @@ public class TendersApiControllerIpRestrictedIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(Constants.CCS_API_BASE_PATH + "/tenders/1")
-            .header("X-Forwarded-For", "123.456.789.123").header(Constants.API_KEY_HEADER, "integration-test-api-key")
+            .header("X-Forwarded-For", "192.168.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
@@ -91,7 +93,7 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void getTenderById_withValidMultipleXForwardedForHeader_expectOk() throws Exception {
+  public void getTenderById_withValidLowerLimitMultipleXForwardedForHeader_expectOk() throws Exception {
 
     Tender tender = new Tender().id(1L).description("description").status(2);
     when(tenderApiService.getTenderById(anyLong()))
@@ -99,7 +101,24 @@ public class TendersApiControllerIpRestrictedIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(Constants.CCS_API_BASE_PATH + "/tenders/1")
-            .header("X-Forwarded-For", "123.456.789.123, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
+            .header("X-Forwarded-For", "192.168.0.0, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    String expected = objectMapper.writeValueAsString(tender);
+    JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
+  }
+
+  @Test
+  public void getTenderById_withValidUpperLimitMultipleXForwardedForHeader_expectOk() throws Exception {
+
+    Tender tender = new Tender().id(1L).description("description").status(2);
+    when(tenderApiService.getTenderById(anyLong()))
+        .thenReturn(new ResponseEntity<Tender>(tender, HttpStatus.OK));
+
+    MvcResult mvcResult = mockMvc
+        .perform(MockMvcRequestBuilders.get(Constants.CCS_API_BASE_PATH + "/tenders/1")
+            .header("X-Forwarded-For", "192.168.0.3, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
@@ -116,7 +135,7 @@ public class TendersApiControllerIpRestrictedIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(Constants.CCS_API_BASE_PATH + "/tenders/1")
-            .header("X-Forwarded-For", "111.222.333.444").header(Constants.API_KEY_HEADER, "integration-test-api-key")
+            .header("X-Forwarded-For", "192.168.0.4").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
@@ -132,7 +151,7 @@ public class TendersApiControllerIpRestrictedIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(Constants.CCS_API_BASE_PATH + "/tenders/1")
-            .header("X-Forwarded-For", "111.222.333.444, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
+            .header("X-Forwarded-For", "192.168.0.4, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 

@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +33,7 @@ import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
 @Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
+@ActiveProfiles("integrationtest")
 public class TendersApiControllerNoIpRestrictionsIT {
 
   @Autowired
@@ -39,7 +41,7 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
   @MockBean
   private TenderApiService tenderApiService;
-  
+
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -58,7 +60,8 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
-            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON))
+            .header(API_KEY_HEADER, "integration-test-api-key")
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(tender);
