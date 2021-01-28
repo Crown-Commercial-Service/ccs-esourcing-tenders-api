@@ -57,8 +57,8 @@ public class ApiExceptionHandlerRollbarEnabledIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
+    registry.add("ccs.esourcing.ip-allow-list", () -> "127.0.0.1");
+    registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
     registry.add("rollbar.enabled", () -> "true");
     registry.add("rollbar.access-token", () -> "1298350192839123616203759102938");
     registry.add("rollbar.environment", () -> "integration_test");
@@ -93,7 +93,7 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     assertThat(payload.getAccessToken()).isEqualTo("1298350192839123616203759102938");
     assertThat(payload.getData().getCodeVersion()).isEqualTo("12.34.56");
     assertThat(payload.getData().getEnvironment()).isEqualTo("integration_test");
-    assertThat(payload.getData().getFramework()).isEqualTo("eSourcing Integration Application");
+    assertThat(payload.getData().getFramework()).isEqualTo("esourcing-integration-app");
     assertThat(payload.getData().getLanguage()).isEqualTo("java");
     assertThat(payload.getData().getLevel()).isEqualTo(Level.ERROR);
   }

@@ -53,8 +53,8 @@ public class ApiExceptionHandlerRollbarDisabledIT {
   
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
-    registry.add("ccs.esourcing.tenders.ip-allow-list", () -> "127.0.0.1");
-    registry.add("ccs.esourcing.tenders.api-keys", () -> "integration-test-api-key");
+    registry.add("ccs.esourcing.ip-allow-list", () -> "127.0.0.1");
+    registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
     registry.add("rollbar.enabled", () -> "false");
   }
   
