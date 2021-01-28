@@ -1,7 +1,12 @@
 package uk.gov.crowncommercial.esourcing.integration.auth;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +20,14 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 @EnableWebSecurity
 public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthConfiguration.class);
+
   @Value("${ccs.esourcing.api-key-header:x-api-key}")
   private String apiKeyHeader;
-  
+
   @Value("${ccs.esourcing.api-keys:}")
   private Set<String> apiKeys;
-  
+
   @Value("${ccs.esourcing.ipallow-list:}")
   private Set<String> ipAllowList;
 
@@ -35,7 +42,6 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
     // @formatter:off
     http.addFilterBefore(ipAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-        .addFilterBefore(actuatorIpAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
         .addFilter(apiKeyFilter)
         .authorizeRequests()
           .antMatchers("/actuator/**").permitAll()
@@ -59,12 +65,33 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
   @Bean
   IpAddressFilter ipAddressFilter() {
-    return new IpAddressFilter(ipAllowList, null, Arrays.asList("/actuator/**"));
-  }
+    List<IpAddressFilterRule> rules = new ArrayList<>();
 
-  @Bean
-  IpAddressFilter actuatorIpAddressFilter() {
-    return new IpAddressFilter(actuatorIpAllowList, Arrays.asList("/actuator/**"), null);
+    List<String> actuatorPaths = Arrays.asList("/actuator/**");
+    if (!actuatorIpAllowList.isEmpty()) {
+      LOGGER.info("Configuring filter with Actuator IP Allow List for paths {}, ip addresses {}",
+          String.join(",", actuatorPaths), String.join(",", actuatorIpAllowList));
+      IpAddressFilterRule internalIpAddressRule =
+          new IpAddressFilterRule(actuatorIpAllowList, actuatorPaths);
+      rules.add(internalIpAddressRule);
+    } else {
+      LOGGER.warn(
+          "No Actuator IP Allow List has been defined so requests from all IP addresses will be accepted for paths {}",
+          actuatorPaths);
+    }
+
+    List<String> allPaths = Collections.emptyList();
+    if (!ipAllowList.isEmpty()) {
+      LOGGER.info("Configuring filter with IP Allow List for paths {}, ip addresses {}",
+          String.join(",", allPaths), String.join(",", ipAllowList));
+      IpAddressFilterRule ipAddressRule = new IpAddressFilterRule(ipAllowList, allPaths);
+      rules.add(ipAddressRule);
+    } else {
+      LOGGER.warn(
+          "No IP Allow List has been defined so requests from all IP addresses will be accepted for paths {}",
+          allPaths);
+    }
+    return new IpAddressFilter(rules);
   }
 
   /**

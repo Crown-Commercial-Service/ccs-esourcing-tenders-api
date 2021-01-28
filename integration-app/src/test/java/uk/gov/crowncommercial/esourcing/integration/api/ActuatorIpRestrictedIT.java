@@ -26,6 +26,7 @@ public class ActuatorIpRestrictedIT {
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
+    registry.add("ccs.esourcing.ipallow-list", () -> "192.168.0.0");
     registry.add("ccs.esourcing.actuator-ipallow-list", () -> "10.0.0.0/24");
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
   }

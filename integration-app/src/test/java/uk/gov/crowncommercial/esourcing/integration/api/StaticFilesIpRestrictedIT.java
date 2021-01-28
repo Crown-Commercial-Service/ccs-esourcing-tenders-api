@@ -33,7 +33,7 @@ public class StaticFilesIpRestrictedIT {
   @Test
   public void getOpenApiYaml_expectForbidden() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/openapi.yaml"))
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/ccs/openapi.yaml"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
     
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
