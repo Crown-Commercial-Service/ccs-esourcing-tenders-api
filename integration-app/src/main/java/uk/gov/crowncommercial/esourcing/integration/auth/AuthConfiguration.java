@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -51,8 +52,9 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
           .and()
         .csrf()
           .disable()
-        .cors()
-          .disable()
+        // see https://stackoverflow.com/a/45685747/210445
+        .cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+          .and()
         .formLogin()
           .disable()
         .httpBasic()
@@ -61,7 +63,6 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     // @formatter:on
   }
-
 
   @Bean
   IpAddressFilter ipAddressFilter() {
