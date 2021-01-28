@@ -13,6 +13,6 @@ deploy:
   space: sandbox
   on:
     repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
-    branch: sandbox
+    branch: develop/sandbox
   skip_cleanup: 'true'
   
