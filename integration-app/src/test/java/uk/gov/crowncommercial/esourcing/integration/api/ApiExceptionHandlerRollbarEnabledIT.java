@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +39,7 @@ import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
 @Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
+@ActiveProfiles("integrationtest")
 public class ApiExceptionHandlerRollbarEnabledIT {
 
   @Autowired

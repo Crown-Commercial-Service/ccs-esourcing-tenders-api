@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +33,7 @@ import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
 @Import({AppConfiguration.class, RollbarConfig.class, IntegrationTestConfig.class})
+@ActiveProfiles("integrationtest")
 public class TendersApiControllerIT {
 
   @Autowired

@@ -1,10 +1,10 @@
 package uk.gov.crowncommercial.esourcing.integration.auth;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -28,7 +29,7 @@ public class IpAddressFilter extends GenericFilterBean {
 
   private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-  private final Set<String> ipAllowList;
+  private final List<IpAddressMatcher> ipAddressMatchers;
 
   private final List<String> includePaths;
 
@@ -37,20 +38,20 @@ public class IpAddressFilter extends GenericFilterBean {
   public IpAddressFilter(Set<String> ipAllowList, List<String> includePaths,
       List<String> excludePaths) {
 
-    this.ipAllowList = ipAllowList;
-    this.includePaths = includePaths;
-    this.excludePaths = excludePaths;
-  }
-
-  @PostConstruct
-  public void init() {
-
     if (ipAllowList.isEmpty()) {
       LOGGER.warn(
           "No Allow List IP addresses have been specified so requests from all IP addresses will be accepted");
     } else {
-      LOGGER.info("IP Allow List configuration: {} on paths {}", ipAllowList, includePaths);
+      LOGGER.info("IP Allow List configuration: {}, include {}, exclude {}", ipAllowList,
+          includePaths, excludePaths);
     }
+
+    this.ipAddressMatchers = new ArrayList<>(ipAllowList.size());
+    for (String ipAllow : ipAllowList) {
+      ipAddressMatchers.add(new IpAddressMatcher(ipAllow));
+    }
+    this.includePaths = includePaths;
+    this.excludePaths = excludePaths;
   }
 
   @Override
@@ -62,21 +63,22 @@ public class IpAddressFilter extends GenericFilterBean {
     }
   }
 
-  private void doHttpFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  private void doHttpFilter(HttpServletRequest request, HttpServletResponse response,
+      FilterChain chain) throws IOException, ServletException {
 
-    String servletPath = request.getServletPath();
+    String path = getPath(request);
 
-    if (excludePaths != null && !excludePaths.isEmpty() && matchPath(excludePaths, servletPath)) {
-      LOGGER.debug("Allowing request for path {} as this is defined in the exclusion list",
-          servletPath);
+    if (excludePaths != null && !excludePaths.isEmpty() && path != null
+        && matchPath(excludePaths, path)) {
+      LOGGER.debug("Allowing request for path {} as this is defined in the exclusion list", path);
       chain.doFilter(request, response);
       return;
     }
 
-    if (includePaths != null && !includePaths.isEmpty() && !matchPath(includePaths, servletPath)) {
+    if (includePaths != null && !includePaths.isEmpty() && path != null
+        && !matchPath(includePaths, path)) {
       LOGGER.debug("Allowing request for path {} as this is not defined in the inclusion list",
-          servletPath);
+          path);
       chain.doFilter(request, response);
       return;
     }
@@ -102,16 +104,16 @@ public class IpAddressFilter extends GenericFilterBean {
     }
 
     LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",
-        addressToValidate, StringUtils.defaultString(xForwardedFor), addressToValidate);
+        request.getRemoteAddr(), StringUtils.defaultString(xForwardedFor), addressToValidate);
 
-    if (ipAllowList.isEmpty()) {
+    if (ipAddressMatchers.isEmpty()) {
       LOGGER.debug("Allowing request from address {} as no IP allow list is defined",
           addressToValidate);
       chain.doFilter(request, response);
       return;
     }
 
-    if (ipAllowList.contains(addressToValidate)) {
+    if (matchesAddress(addressToValidate)) {
       LOGGER.debug("Allowing request from address {} as IP address is defined in the IP allow list",
           addressToValidate);
       chain.doFilter(request, response);
@@ -122,6 +124,16 @@ public class IpAddressFilter extends GenericFilterBean {
         addressToValidate);
     response.setStatus(HttpStatus.FORBIDDEN.value());
     return;
+  }
+
+  private boolean matchesAddress(String address) {
+
+    for (IpAddressMatcher ipAddressMatcher : ipAddressMatchers) {
+      if (ipAddressMatcher.matches(address)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -137,7 +149,7 @@ public class IpAddressFilter extends GenericFilterBean {
     if (paths == null || paths.isEmpty() || path == null) {
       return false;
     }
-    
+
     AntPathMatcher matcher = new AntPathMatcher();
     for (String pattern : paths) {
       if (matcher.isPattern(pattern)) {
@@ -151,5 +163,19 @@ public class IpAddressFilter extends GenericFilterBean {
       }
     }
     return false;
+  }
+
+  protected String getPath(HttpServletRequest request) {
+    String servletPath = request.getServletPath();
+    String pathInfo = request.getPathInfo();
+    if (servletPath == null || servletPath.isEmpty()) {
+      return pathInfo;
+    } else {
+      if (pathInfo == null || pathInfo.isEmpty()) {
+        return servletPath;
+      } else {
+        return servletPath + pathInfo;
+      }
+    }
   }
 }

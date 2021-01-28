@@ -24,6 +24,9 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Value("${ccs.esourcing.ipallow-list:}")
   private Set<String> ipAllowList;
 
+  @Value("${ccs.esourcing.actuator-ipallow-list:}")
+  private Set<String> actuatorIpAllowList;
+
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
@@ -32,6 +35,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
     // @formatter:off
     http.addFilterBefore(ipAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+        .addFilterBefore(actuatorIpAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
         .addFilter(apiKeyFilter)
         .authorizeRequests()
           .antMatchers("/actuator/**").permitAll()
@@ -56,6 +60,11 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   IpAddressFilter ipAddressFilter() {
     return new IpAddressFilter(ipAllowList, null, Arrays.asList("/actuator/**"));
+  }
+
+  @Bean
+  IpAddressFilter actuatorIpAddressFilter() {
+    return new IpAddressFilter(actuatorIpAllowList, Arrays.asList("/actuator/**"), null);
   }
 
   /**
