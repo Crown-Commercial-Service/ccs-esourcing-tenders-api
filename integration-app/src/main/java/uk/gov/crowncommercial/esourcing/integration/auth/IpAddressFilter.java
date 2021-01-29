@@ -47,21 +47,28 @@ public class IpAddressFilter extends GenericFilterBean {
       FilterChain chain) throws IOException, ServletException {
 
     String path = getPath(request);
-    String ipAddress = getIpAddress(request);
-
 
     if (ipAddressFilterRules.isEmpty()) {
       LOGGER.debug(
-          "Allowing request for path {} from address {} as no IP filtering list is defined", path,
-          ipAddress);
+          "Allowing request for path {} as no IP filtering list is defined", path);
       chain.doFilter(request, response);
       return;
     }
 
+    String ipAddress = request.getRemoteAddr();
     if (matchesAddress(path, ipAddress)) {
       LOGGER.debug(
-          "Allowing request for path {} from address {} as IP address is defined in the IP allow list",
+          "Allowing request for path {} from address {} as remote IP address is defined in the IP allow list",
           path, ipAddress);
+      chain.doFilter(request, response);
+      return;
+    }
+    
+    ipAddress = getXForwardedForIpAddress(request);
+    if (matchesAddress(path, ipAddress)) {
+      LOGGER.debug(
+          "Allowing request for path {} from address {} as {} IP address is defined in the IP allow list",
+          path, ipAddress, X_FORWARDED_FOR_HEADER);
       chain.doFilter(request, response);
       return;
     }
@@ -141,12 +148,12 @@ public class IpAddressFilter extends GenericFilterBean {
   }
 
   /**
-   * Get the ip address to check from the request; uses X_FORWARDED_FOR_HEADER or remote address
+   * Get the IP address to check from the request; uses X_FORWARDED_FOR_
    * 
    * @param request the HTTP servlet request
-   * @return the ip address to check, should never return null
+   * @return the IP address to check, null if no X_FORWARDED_FOR_HEADER is set
    */
-  protected static final String getIpAddress(HttpServletRequest request) {
+  protected static final String getXForwardedForIpAddress(HttpServletRequest request) {
     /*
      * Work out the IP address to validate, either from the X-Forwarded-For or the source IP address
      * from the request
@@ -168,9 +175,6 @@ public class IpAddressFilter extends GenericFilterBean {
       } else if (ipAddresses.size() > 1) {
         ipAddress = ipAddresses.get(ipAddresses.size() - 2);
       }
-    }
-    if (ipAddress == null) {
-      ipAddress = request.getRemoteAddr();
     }
 
     LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",

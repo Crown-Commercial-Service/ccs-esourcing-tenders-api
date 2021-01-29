@@ -73,7 +73,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
       LOGGER.info("Configuring filter with Actuator IP Allow List for paths {}, ip addresses {}",
           String.join(",", actuatorPaths), String.join(",", actuatorIpAllowList));
       IpAddressFilterRule internalIpAddressRule =
-          new IpAddressFilterRule(actuatorIpAllowList, actuatorPaths);
+          new IpAddressFilterRule("actuator", actuatorIpAllowList, actuatorPaths);
       rules.add(internalIpAddressRule);
     } else {
       LOGGER.warn(
@@ -85,7 +85,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
     if (!ipAllowList.isEmpty()) {
       LOGGER.info("Configuring filter with IP Allow List for paths {}, ip addresses {}",
           String.join(",", allPaths), String.join(",", ipAllowList));
-      IpAddressFilterRule ipAddressRule = new IpAddressFilterRule(ipAllowList, allPaths);
+      IpAddressFilterRule ipAddressRule = new IpAddressFilterRule("default", ipAllowList, allPaths);
       rules.add(ipAddressRule);
     } else {
       LOGGER.warn(

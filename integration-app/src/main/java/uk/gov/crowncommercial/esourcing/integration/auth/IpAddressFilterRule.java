@@ -12,6 +12,8 @@ public class IpAddressFilterRule {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressFilterRule.class);
 
+  private final String name;
+  
   private final List<IpAddressMatcher> ipAddressMatchers;
 
   private final List<String> includePaths;
@@ -20,8 +22,9 @@ public class IpAddressFilterRule {
     ALLOW, BLOCK, ABSTAIN;
   }
 
-  public IpAddressFilterRule(Set<String> ipAllowList, List<String> includePaths) {
+  public IpAddressFilterRule(String name, Set<String> ipAllowList, List<String> includePaths) {
 
+    this.name = name;
     this.ipAddressMatchers = new ArrayList<>(ipAllowList.size());
     for (String ipAllow : ipAllowList) {
       ipAddressMatchers.add(new IpAddressMatcher(ipAllow));
@@ -33,27 +36,27 @@ public class IpAddressFilterRule {
 
     if (includePaths != null && !includePaths.isEmpty() && path != null
         && !matchPath(includePaths, path)) {
-      LOGGER.debug("Abstaining request for path {} as this is not defined in the inclusion list",
-          path);
+      LOGGER.debug("Abstaining request for path {} as this is not defined in inclusion list for rule {}",
+          path, name);
       return Result.ABSTAIN;
     }
 
     if (ipAddressMatchers.isEmpty()) {
-      LOGGER.debug("Allowing request for path {} from address {} as no IP allow list is defined",
-          path, address);
+      LOGGER.debug("Allowing request for path {} from address {} as no IP allow list is defined for rule {}",
+          path, address, name);
       return Result.ALLOW;
     }
 
     if (matchesAddress(address)) {
       LOGGER.debug(
-          "Allowing request for path {} from address {} as IP address is defined in the IP allow list",
-          path, address);
+          "Allowing request for path {} from address {} as IP address is defined in the IP allow list for rule {}",
+          path, address, name);
       return Result.ALLOW;
     }
 
     LOGGER.debug(
-        "Denying request for path {} from address {} as IP address is not in the allow list", path,
-        address);
+        "Denying request for path {} from address {} as IP address is not in the allow list for rule {}", path,
+        address, name);
     return Result.BLOCK;
   }
 
