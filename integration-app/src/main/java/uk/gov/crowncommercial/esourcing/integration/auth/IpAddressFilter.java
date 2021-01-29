@@ -3,6 +3,7 @@ package uk.gov.crowncommercial.esourcing.integration.auth;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -50,21 +51,24 @@ public class IpAddressFilter extends GenericFilterBean {
 
 
     if (ipAddressFilterRules.isEmpty()) {
-      LOGGER.debug("Allowing request for path {} from address {} as no IP filtering list is defined",
-          path, ipAddress);
+      LOGGER.debug(
+          "Allowing request for path {} from address {} as no IP filtering list is defined", path,
+          ipAddress);
       chain.doFilter(request, response);
       return;
     }
 
     if (matchesAddress(path, ipAddress)) {
-      LOGGER.debug("Allowing request for path {} from address {} as IP address is defined in the IP allow list",
+      LOGGER.debug(
+          "Allowing request for path {} from address {} as IP address is defined in the IP allow list",
           path, ipAddress);
       chain.doFilter(request, response);
       return;
     }
 
-    LOGGER.debug("Denying request for path {} from address {} as IP address is not in the allow list",
-        path, ipAddress);
+    LOGGER.debug(
+        "Denying request for path {} from address {} as IP address is not in the allow list", path,
+        ipAddress);
     response.setStatus(HttpStatus.FORBIDDEN.value());
     return;
   }
@@ -153,16 +157,20 @@ public class IpAddressFilter extends GenericFilterBean {
      * See
      * https://docs.cloud.service.gov.uk/deploying_services/route_services/#example-route-service-
      * to-add-ip-address-authentication for info on how GOV.UK PaaS sets the X-Forwarded-For header
+     * but basically we need the second from last in the list.
      */
     String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
     if (xForwardedFor != null) {
-      ipAddress =
-          Arrays.stream(xForwardedFor.split(",")).map(String::trim).findFirst().orElse(null);
+      List<String> ipAddresses =
+          Arrays.stream(xForwardedFor.split(",")).map(String::trim).collect(Collectors.toList());
+      if (ipAddresses.size() > 1) {
+        ipAddress = ipAddresses.get(ipAddresses.size() - 2);
+      }
     }
     if (ipAddress == null) {
       ipAddress = request.getRemoteAddr();
     }
-    
+
     LOGGER.debug("Remote address: {}, X-Forwarded-For: {}, Addresss to validate: {}",
         request.getRemoteAddr(), StringUtils.defaultString(xForwardedFor), ipAddress);
 
