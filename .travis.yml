@@ -1,6 +1,8 @@
 language: java
 jdk:
   - openjdk11
+cache:
+  - $HOME/.m2
 script:
   - mvn verify
 deploy:

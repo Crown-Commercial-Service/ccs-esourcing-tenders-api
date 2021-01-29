@@ -163,7 +163,9 @@ public class IpAddressFilter extends GenericFilterBean {
     if (xForwardedFor != null) {
       List<String> ipAddresses =
           Arrays.stream(xForwardedFor.split(",")).map(String::trim).collect(Collectors.toList());
-      if (ipAddresses.size() > 1) {
+      if (ipAddresses.size() == 1) {
+        ipAddress = ipAddresses.get(ipAddresses.size() - 1);
+      } else if (ipAddresses.size() > 1) {
         ipAddress = ipAddresses.get(ipAddresses.size() - 2);
       }
     }

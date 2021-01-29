@@ -67,7 +67,7 @@ public class IpAddressFilterTest {
     Mockito.when(request.getHeader("X-Forwarded-For")).thenReturn("10.0.0.8");
     Mockito.when(request.getRemoteAddr()).thenReturn("127.0.0.1");
     
-    assertThat(IpAddressFilter.getIpAddress(request)).isEqualTo("127.0.0.1");
+    assertThat(IpAddressFilter.getIpAddress(request)).isEqualTo("10.0.0.8");
   }
 
   @Test
