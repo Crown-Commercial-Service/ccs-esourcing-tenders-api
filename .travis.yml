@@ -6,13 +6,6 @@ cache:
 script:
   - mvn verify
 deploy:
-    #
-    # dev - we don't auto deploy into Dev Space as it is used for manual pushes only
-    #
-      
-    #
-    # sandbox
-    #
   - provider: cloudfoundry
     api: https://api.london.cloud.service.gov.uk
     username: paul.illingworth+ccs-esourcing-sandbox@roweit.co.uk
@@ -20,15 +13,11 @@ deploy:
       secure: bVK3pAaQtX2tiDkrSUUNYitbETGBbMRk7NcbXFnRqwnGf+HAU0+8c8YfQkqUkD0s9ivrqPHNufVFKRuLl91vYaJOUBYQC3kSdeHVbbSRVf4x/mlvO6VIVqz1SsbEXsccCi9v8YLp7Zp/ljZZvdgKW6N1mW3QkSyLusmL5QBV9JM+9JnNpJ4UCnFMuCCb+1r7FKSSpsGOS8UOgB0MCdHAg5yddiYc5cEkPIz9WQAwVq0dhmOKjzShXrEnBTs7gBCsCEB4A64l5tYIxu5yuWh81STpwhd91zKvcZtbKH5eSZNVn4Pj3b4PfyV9/DGnL0+U/fHV/B1PZ2cqwy95Ihru6B7fUW31eTH+yWjIG//na4VOfTD/THuxcznoZPnMhSmZLXtIvDF4GSY2bQoVBQrssO0Yrv5xWJDMFX7BCeZpxADIX75LXSE+asGCZC0riPP+wsq2ncGMqy0VnjXoPPcktAvpLIu15SoYJC/afIie34Shp5uAyzizXNfrlZdkQdAIiGmkN417xuEUjD1tYvJEl19+1EUhaxMvpelTucLkAv9/ywMz+DzEuDwrx1qaPWxzE6DWmCVZZBh9yG6QbPdrno+vPfcB6N7rp3WbGHcB+ZQnLrwxCmzPDK5wsTXo6Z442P7TfcDXokpO+M5zFPNQVlQ7f4ncZS7JoOrKQxU0w0g=
     organization: ccs-esourcing-tenders-api
     space: sandbox
-    manifest: manifest-staging.yml
+    manifest: manifest-sandbox.yml
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/sandbox
-    skip_cleanup: 'true'
-    
-    #
-    # test
-    #
+    skip_cleanup: true
   - provider: cloudfoundry
     api: https://api.london.cloud.service.gov.uk
     username: paul.illingworth+ccs-esourcing-test@roweit.co.uk
@@ -36,11 +25,8 @@ deploy:
       secure: FcOgAZyc7j+nhtcJMK/3edopYu61uEC6iVK0dCLRuOQnYPa0hWF3RsYxq3C8bAlnl0aZrBYUVVuYYgcegYjkZRrfb0FNXZpTynltDFcLLkStDB7lWpJqhX3SkwcrIv3nSR9fv01d2wm1BhacHP0r7HZzALzmEz2pX10sebmWMEYSxvMOkl0AjjNj7PQYxHaag8YP5QQJwRj7mzSHIJUvWd8vPyeKX9/s17/+CIIVSzRWfO+NVIOmwFlBbxK821j+HrqmijyOpodefdLz5IUOS3LTjdPwCY7MHX+LZPbe9H2GZItM0fHRTA8xFrj8/gzaW69kGKjMyIOsDkN0tRbm6FoeQiYyfbF4hI+Git+PdF5E61xVrNpSagAQFcemwjmhksWt4bDS2IBpI2aceDaB+7HbVQn4az75HnP9qTaRxQpI8jgc918ayKUn4+VnHSHi9IYeMRk37cfe4kb9UQBRQQMwPmLM4V7FQHr+9fE94T3Ylu7gFT3U8/xpgHITdJRXMw2esOCWX4cCImblf/BanrVmM/kfLBzWyXGuJOo1c7jS5JcQoewJc/Q1nsUaHg8/9jznUjpam9hUvxXKNK25tWITfpeLl234uzZxzhEnulpKWFnmVipCLz7SSpChNJ9yQp/uhrCBPSNflifB5mfiwyOfwPJ6d3Q9mAasw5wb3Yo=
     organization: ccs-esourcing-tenders-api
     space: Test
+    manifest: manifest-test.yml
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/test
-    skip_cleanup: 'true'  
-
-    #
-    # uat - we don't auto deploy into UAT Space as we don't need that just yet
-    #
+    skip_cleanup: true  
