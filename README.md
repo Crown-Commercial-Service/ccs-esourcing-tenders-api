@@ -110,13 +110,13 @@ Within the GOV.UK PaaS Cloud Foundry [Organisation](https://docs.cloudfoundry.or
 
 The is taken further with the project contriving to create [Spring Profile](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-profiles)s which also match the Spaces and the deployment branches. The Spring Profile is then used to set the more static configuration suitable for the particular deployment environment. As an example the *local* profile configuration is defined in the [application-local.properties](./integration-app/src/main/resources/application-local.properties) file.
 
-| Profile | Space   | Branch         |                                                              |
-| ------- | ------- | -------------- | ------------------------------------------------------------ |
-| local   | none    | none           | Used for local development testing                           |
-| dev     | Dev     | none           | Used for manual development testing, no CI/CD, manual pushes to Dev |
-| sandbox | sandbox | deploy/sandbox | Shared development environment, CI/CD when changes pushed to deploy/sandbox |
-| test    | Test    | deploy/test    | Shared test environment, CI/CD when changes pushed to deploy/test |
-| uat     | UAT     | deploy/uat     | Shared UAT environment, CI/CD when changes pushed to deploy/uat |
+| Profile | Space   | Branch         | Manifest         |                                                              |
+| ------- | ------- | -------------- | ---------------- | ------------------------------------------------------------ |
+| local   | none    | none           | none             | Used for local development testing                           |
+| dev     | Dev     | none           | manifest-dev     | Used for manual development testing, no CI/CD, manual pushes to Dev |
+| sandbox | sandbox | deploy/sandbox | manifest-sandbox | Shared development environment, CI/CD when changes pushed to deploy/sandbox |
+| test    | Test    | deploy/test    | manifest-test    | Shared test environment, CI/CD when changes pushed to deploy/test |
+| uat     | UAT     | deploy/uat     | manifest-uat     | Shared UAT environment, CI/CD when changes pushed to deploy/uat |
 
 ## How to configure and deploy the project
 
