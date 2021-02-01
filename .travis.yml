@@ -7,7 +7,7 @@ script:
   - mvn verify
 deploy:
     #
-    # dev - we don't auto deploy into dev, it is used for manual pushes only
+    # dev - we don't auto deploy into Dev Space as it is used for manual pushes only
     #
       
     #
@@ -35,12 +35,12 @@ deploy:
     password:
       secure: FcOgAZyc7j+nhtcJMK/3edopYu61uEC6iVK0dCLRuOQnYPa0hWF3RsYxq3C8bAlnl0aZrBYUVVuYYgcegYjkZRrfb0FNXZpTynltDFcLLkStDB7lWpJqhX3SkwcrIv3nSR9fv01d2wm1BhacHP0r7HZzALzmEz2pX10sebmWMEYSxvMOkl0AjjNj7PQYxHaag8YP5QQJwRj7mzSHIJUvWd8vPyeKX9/s17/+CIIVSzRWfO+NVIOmwFlBbxK821j+HrqmijyOpodefdLz5IUOS3LTjdPwCY7MHX+LZPbe9H2GZItM0fHRTA8xFrj8/gzaW69kGKjMyIOsDkN0tRbm6FoeQiYyfbF4hI+Git+PdF5E61xVrNpSagAQFcemwjmhksWt4bDS2IBpI2aceDaB+7HbVQn4az75HnP9qTaRxQpI8jgc918ayKUn4+VnHSHi9IYeMRk37cfe4kb9UQBRQQMwPmLM4V7FQHr+9fE94T3Ylu7gFT3U8/xpgHITdJRXMw2esOCWX4cCImblf/BanrVmM/kfLBzWyXGuJOo1c7jS5JcQoewJc/Q1nsUaHg8/9jznUjpam9hUvxXKNK25tWITfpeLl234uzZxzhEnulpKWFnmVipCLz7SSpChNJ9yQp/uhrCBPSNflifB5mfiwyOfwPJ6d3Q9mAasw5wb3Yo=
     organization: ccs-esourcing-tenders-api
-    space: test
+    space: Test
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/test
     skip_cleanup: 'true'  
 
     #
-    # uat, pre-prod, prod etc - not yet defined
+    # uat - we don't auto deploy into UAT Space as we don't need that just yet
     #
