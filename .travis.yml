@@ -22,11 +22,11 @@ deploy:
     api: https://api.london.cloud.service.gov.uk
     username: paul.illingworth+ccs-esourcing-test@roweit.co.uk
     password:
-      secure: FcOgAZyc7j+nhtcJMK/3edopYu61uEC6iVK0dCLRuOQnYPa0hWF3RsYxq3C8bAlnl0aZrBYUVVuYYgcegYjkZRrfb0FNXZpTynltDFcLLkStDB7lWpJqhX3SkwcrIv3nSR9fv01d2wm1BhacHP0r7HZzALzmEz2pX10sebmWMEYSxvMOkl0AjjNj7PQYxHaag8YP5QQJwRj7mzSHIJUvWd8vPyeKX9/s17/+CIIVSzRWfO+NVIOmwFlBbxK821j+HrqmijyOpodefdLz5IUOS3LTjdPwCY7MHX+LZPbe9H2GZItM0fHRTA8xFrj8/gzaW69kGKjMyIOsDkN0tRbm6FoeQiYyfbF4hI+Git+PdF5E61xVrNpSagAQFcemwjmhksWt4bDS2IBpI2aceDaB+7HbVQn4az75HnP9qTaRxQpI8jgc918ayKUn4+VnHSHi9IYeMRk37cfe4kb9UQBRQQMwPmLM4V7FQHr+9fE94T3Ylu7gFT3U8/xpgHITdJRXMw2esOCWX4cCImblf/BanrVmM/kfLBzWyXGuJOo1c7jS5JcQoewJc/Q1nsUaHg8/9jznUjpam9hUvxXKNK25tWITfpeLl234uzZxzhEnulpKWFnmVipCLz7SSpChNJ9yQp/uhrCBPSNflifB5mfiwyOfwPJ6d3Q9mAasw5wb3Yo=
+      secure: hjWOxagIXnkIZ+ELp5fJbi4yO+uvnLNYWXh5V8BtNN1Ja+ZLJ0sC+WvYYEUOx5wEo7tBh0/8AI96coW6jEKxznhmJF61t6A1HRQe69DgS80/djeXyMHyqtuKUBuf4kl2e/D3ovO9AYN+ReyUb16cceiXwrK5Z7xAquP4iEXAF2LHlPM11l1jtov/+U2I/d/Ws+h+flspHaSL9hgLKb8mT33bQC2ekMH/ZLciQuPq/Ui5kTrCP/9lrrAXafYVhL1U7LRB8ARSUWGL/o8Rjhl46TpYZNe8f0WNlhjl+DCUnFQNCykaxBDRrgD/agz8LOxUPEU1VoPaMivmVibWhgw7+xbq1gd45HDrElCfb+6ZkMoSphHfcckTSIr726K19qGoqMUUM2fuxIafari2oziggFRxo4QM3U2Pk2PzMYSfMBV0Pft+mYOwlWAdFVBKRlGGXo57qsbUrFtdHZkIRV8+0JcHzV/yMNipIXVSz2RjPmH5C9vzKM/fGjrrKp/BGIpamZ7ile8czoauKg+DxPI4kW4r21Uowm8wDJVtCLJRYYVQPXcQJ5DDPlKSoqvdAAE13ZGlwWC/Vrx1xGNqa/xEwv4Ya/W7NGPUWoYSdsm9Z1pu8mjVwf64kXYtFUvUd+B8QhhHUfSkDGDBWG8iKblXiKDRB047NmzptoozBCAOhP8=
     organization: ccs-esourcing-tenders-api
     space: Test
     manifest: manifest-test.yml
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/test
-    skip_cleanup: true  
+    skip_cleanup: 'true'      
