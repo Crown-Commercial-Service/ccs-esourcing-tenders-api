@@ -3,8 +3,10 @@
 # test Space/environment manifest
 #
 applications:
-  - name: test-ccs-esourcing-tenders-api
+  - name: ccs-esourcing-tenders-api
     instances: 2
+    routes:
+      - route: test-ccs-esourcing-tenders-api.london.cloudapps.digital
     buildpacks:
       - https://github.com/cloudfoundry/java-buildpack#v4.33
     path: integration-app/target/integration-app-1.0.0-SNAPSHOT.jar

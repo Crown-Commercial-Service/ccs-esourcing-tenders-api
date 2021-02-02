@@ -19,15 +19,18 @@
 # cloudfoundry organisation/space with permissions to manage the space.
 #
 
+# define the environment/space/spring profile we are using
+ENVIRONMENT="dev"
+
 # Application name.
 # Also defines the URL endpoint for the deployed service. As such this must
 # contain URL "friendly" characters and not contain a '.' as the URL
 # endpoint then looks like a subdomain and the GOV.UK PaaS wildcard HTTPS
 # certificates no longer work.
-APP_NAME="sandbox-ccs-esourcing-tenders-api"
+APP_NAME="ccs-esourcing-tenders-api"
 
-# push app but do not start
-# cf push --no-start -f .\manifest-sandbox.yml
+# define app but do not push or start
+cf apply-manifest -f .\manifest-$ENVIRONMENT.yml
 
 # optionally set IP addresses if IP restricted
 SALESFORCE_IP_ADDRESSES=""
@@ -52,6 +55,7 @@ cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENT_URL ""
 # Application is now deployed but not running. It is anticipated that the actual
 # deployment will be via TravisCI and no other manual configuration is required.
 
-# Start or restage the application as required
-# cf start $APP_NAME
-# cf restage test-ccs-esourcing-tenders-api
+# Push (or start, or restage) the application (if required)
+cf push -f .\manifest-$ENVIRONMENT.yml 
+#cf start $APP_NAME
+#cf restage $APP_NAME
