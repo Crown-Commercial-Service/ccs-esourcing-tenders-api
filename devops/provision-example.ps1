@@ -17,15 +17,18 @@
 # cloudfoundry organisation/space with permissions to manage the space.
 #
 
+# define the environment/space/spring profile we are using
+$ENVIRONMENT = "dev"
+
 # Application name.
 # Also defines the URL endpoint for the deployed service. As such this must
 # contain URL "friendly" characters and not contain a '.' as the URL
 # endpoint then looks like a subdomain and the GOV.UK PaaS wildcard HTTPS
 # certificates no longer work.
-$APP_NAME = "sandbox-ccs-esourcing-tenders-api"
+$APP_NAME = $ENVIRONMENT + "-ccs-esourcing-tenders-api"
 
 # push app but do not start
-# cf push --no-start -f .\manifest-sandbox.yml
+# cf push --no-start -f .\manifest-$ENVIRONMENT.yml
 
 # optionally set IP addresses if IP restricted
 $SALESFORCE_IP_ADDRESSES = ""
