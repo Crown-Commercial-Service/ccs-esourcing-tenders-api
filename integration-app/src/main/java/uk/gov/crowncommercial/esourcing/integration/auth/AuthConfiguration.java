@@ -46,7 +46,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
         .addFilter(apiKeyFilter)
         .authorizeRequests()
           .antMatchers("/actuator/**").permitAll()
-          .antMatchers("/*/openapi.yaml").permitAll()
+          .antMatchers("/*/*/openapi.yaml").permitAll()
           .antMatchers("/favicon.ico").permitAll()
           .anyRequest().authenticated()
           .and()
