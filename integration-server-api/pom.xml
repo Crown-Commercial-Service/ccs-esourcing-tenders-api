@@ -48,7 +48,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/src/main/resources/static/ccs/openapi.yaml</inputSpec>
+              <inputSpec>${project.basedir}/src/main/resources/static/resources/ccs/openapi.yaml</inputSpec>
               <generatorName>spring</generatorName>
               <apiPackage>uk.gov.crowncommercial.esourcing.integration.server.api</apiPackage>
               <modelPackage>uk.gov.crowncommercial.esourcing.integration.server.model</modelPackage>

@@ -56,12 +56,18 @@ public class TenderApiService implements TendersApiDelegate {
 
     ProjectResponse projectsResponseBody =
         projectsApi.createProject(getProject(projectTender)).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+
+    logger.info("Create Project response : {}", projectsResponseBody);
+
     final String tenderRef =
         projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
 
     if (tenderRef != null) {
       RfxResponse rfxsResponseBody =
           rfxApi.createRFX(getRfxs(tenderRef, projectTender.getTender())).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+
+      logger.info("Create ITT Event response : {}", rfxsResponseBody);
+
       final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
 
 
