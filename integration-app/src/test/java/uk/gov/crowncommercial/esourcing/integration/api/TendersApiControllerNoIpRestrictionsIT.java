@@ -1,7 +1,7 @@
 package uk.gov.crowncommercial.esourcing.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
@@ -26,9 +26,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
-import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
-import uk.gov.crowncommercial.esourcing.integration.server.model.Tender;
+import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})
 @AutoConfigureMockMvc
@@ -52,28 +53,28 @@ public class TendersApiControllerNoIpRestrictionsIT {
   }
 
   @Test
-  public void getTenderById_expectOk() throws Exception {
+  public void postProjectITT_expectOk() throws Exception {
 
-    Tender tender = new Tender().id(1L).description("description").status(2);
-    when(tenderApiService.getTenderById(anyLong()))
-        .thenReturn(new ResponseEntity<Tender>(tender, HttpStatus.OK));
+    InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
+    when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
+        .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
+        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
             .header(API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    String expected = objectMapper.writeValueAsString(tender);
+    String expected = objectMapper.writeValueAsString(inlineResponse201);
     JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
   }
 
   @Test
-  public void getTenderById_noApiKey_expectForbidden() throws Exception {
+  public void postProjectITT_noApiKey_expectForbidden() throws Exception {
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.get(CCS_API_BASE_PATH + "/tenders/1")
-            .contentType(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+            .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();

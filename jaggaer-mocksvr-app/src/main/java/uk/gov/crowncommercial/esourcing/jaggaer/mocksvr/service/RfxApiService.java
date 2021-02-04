@@ -27,8 +27,8 @@ public class RfxApiService implements RfxsApiDelegate {
 
     rfxResponse.setReturnCode(0);
     rfxResponse.setReturnMessage("OK");
-    rfxResponse.setRfxId("rfq_47310");
-    rfxResponse.setRfxReferenceCode("itt_534");
+    rfxResponse.setRfxId("rfq_49182");
+    rfxResponse.setRfxReferenceCode("itt_586");
 
     return new ResponseEntity<>(rfxResponse, HttpStatus.CREATED);
   }

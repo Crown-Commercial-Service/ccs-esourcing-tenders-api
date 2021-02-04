@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
 import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
-import uk.gov.crowncommercial.esourcing.integration.server.model.Procurement;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.ProjectsApi;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxApi;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.AdditionalInfoItem;
@@ -48,24 +48,25 @@ public class TenderApiService implements TendersApiDelegate {
   public TenderApiService() {}
 
   @Override
-  public ResponseEntity<InlineResponse201> createTender(Procurement procurement) {
+  public ResponseEntity<InlineResponse201> createProcurementCase(
+      uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender projectTender) {
 
-    logger.info("Creating Tender with procurement : {}", procurement);
+    logger.info("Creating Tender with procurement : {}", projectTender);
     InlineResponse201 inlineResponse201 = new InlineResponse201();
 
     ProjectResponse projectsResponseBody =
-        projectsApi.createProject(getProject()).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+        projectsApi.createProject(getProject(projectTender)).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
     final String tenderRef =
         projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
 
     if (tenderRef != null) {
       RfxResponse rfxsResponseBody =
-          rfxApi.createRFX(getRfxs(tenderRef)).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
-      final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxId() : null;
+          rfxApi.createRFX(getRfxs(tenderRef, projectTender.getTender())).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+      final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
 
 
-      inlineResponse201.setProjectCode(tenderRef);
-      inlineResponse201.setIttCode(ittRef);
+      inlineResponse201.setTenderReferenceCode(tenderRef);
+      inlineResponse201.setRfxReferenceCode(ittRef);
 
       return new ResponseEntity<>(inlineResponse201, HttpStatus.CREATED);
     }
@@ -73,7 +74,7 @@ public class TenderApiService implements TendersApiDelegate {
     return new ResponseEntity<>(inlineResponse201, HttpStatus.BAD_REQUEST);
   }
 
-  private Projects getProject() {
+  private Projects getProject(ProjectTender projectTender) {
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId("51435");
 
@@ -83,7 +84,7 @@ public class TenderApiService implements TendersApiDelegate {
     Values values = new Values();
     List<ValueItem> valueItemList = new ArrayList<>();
     ValueItem valueItem = new ValueItem();
-    valueItem.setValue("23732643");
+    valueItem.setValue(projectTender.getProcurementReference());
     valueItemList.add(valueItem);
     values.setValue(valueItemList);
     additionalInfoItem.setName("Procurement Reference");
@@ -92,7 +93,7 @@ public class TenderApiService implements TendersApiDelegate {
     additionalInfoList.setAdditionalInfo(additionalInfoItemList);
 
     Tender tender = new Tender();
-    tender.setTitle("RoweIT Project for Provision of Face Masks");
+    tender.setTitle(projectTender.getSubject());
     tender.setBuyerCompany(buyerCompany);
     tender.setSourceTemplateReferenceCode("project_609");
     tender.setAdditionalInfoList(additionalInfoList);
@@ -107,14 +108,14 @@ public class TenderApiService implements TendersApiDelegate {
     return projects;
   }
 
-  private Rfxs getRfxs(String tenderRef){
+  private Rfxs getRfxs(String tenderRef, uk.gov.crowncommercial.esourcing.integration.server.model.Tender tender){
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId("51435");
 
     RfxAdditionalInfoList rfxAdditionalInfoList = new RfxAdditionalInfoList();
-    getRfxAddInfo(rfxAdditionalInfoList, "Procurement Route", "Call Off (Competition)");
-    getRfxAddInfo(rfxAdditionalInfoList, "Framework Name", "TT3242");
-    getRfxAddInfo(rfxAdditionalInfoList, "Lot Number", "Lot 1");
+    rfxAdditionalInfoList.addAdditionalInfoItem(getRfxAddInfo("Procurement Route", "Call Off (Competition)"));
+    rfxAdditionalInfoList.addAdditionalInfoItem(getRfxAddInfo("Framework Name", "TT3242"));
+    rfxAdditionalInfoList.addAdditionalInfoItem(getRfxAddInfo("Lot Number", "Lot 1"));
 
     Rfx rfx = new Rfx();
     rfx.setRfxAdditionalInfoList(rfxAdditionalInfoList);
@@ -124,13 +125,13 @@ public class TenderApiService implements TendersApiDelegate {
 
     RfxSetting rfxSetting = new RfxSetting();
     rfxSetting.tenderReferenceCode(tenderRef);
-    rfxSetting.setShortDescription("ITT for Provision of Facemasks - Call Off(Competition)");
+    rfxSetting.setShortDescription(String.valueOf(tender.getDescription()));
     rfxSetting.setBuyerCompany(buyerCompany);
     rfxSetting.setOwnerUser(ownerUser);
     rfxSetting.setTemplateReferenceCode("itt_543");
-    rfxSetting.setValue("9000");
-    rfxSetting.setPublishDate("2019-08-20T13:54:32.000+00:00");
-    rfxSetting.setCloseDate("2019-08-30T13:54:32.000+00:00");
+    rfxSetting.setValue(String.valueOf(tender.getValue()));
+    rfxSetting.setPublishDate(String.valueOf(tender.getTenderPeriod().getStartDate()));
+    rfxSetting.setCloseDate(String.valueOf(tender.getTenderPeriod().getEndDate()));
     rfx.setRfxSetting(rfxSetting);
 
     Rfxs rfxs = new Rfxs();
@@ -140,9 +141,7 @@ public class TenderApiService implements TendersApiDelegate {
     return rfxs;
   }
 
-  private RfxAdditionalInfoList getRfxAddInfo(
-      RfxAdditionalInfoList rfxAdditionalInfo, String name, String value) {
-    List<RfxAdditionalInfoItem> rfxAdditionalInfoItemList = new ArrayList<>();
+  private RfxAdditionalInfoItem getRfxAddInfo(String name, String value) {
     RfxAdditionalInfoItem rfxAdditionalInfoItem = new RfxAdditionalInfoItem();
     RfxValues rfxValues = new RfxValues();
     List<RfxValueItem> rfxValueItemList = new ArrayList<>();
@@ -152,8 +151,7 @@ public class TenderApiService implements TendersApiDelegate {
     rfxValues.setValue(rfxValueItemList);
     rfxAdditionalInfoItem.setName(name);
     rfxAdditionalInfoItem.setValues(rfxValues);
-    rfxAdditionalInfoItemList.add(rfxAdditionalInfoItem);
 
-    return rfxAdditionalInfo;
+    return rfxAdditionalInfoItem;
   }
 }
