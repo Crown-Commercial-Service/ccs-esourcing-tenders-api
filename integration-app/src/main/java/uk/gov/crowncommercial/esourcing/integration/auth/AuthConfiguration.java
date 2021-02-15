@@ -10,11 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -61,6 +68,10 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
           .disable()
         .sessionManagement()
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    //          .and()
+    //        .oauth2Client(oauth2 -> oauth2
+    //            .authorizationCodeGrant(codeGrant -> codeGrant
+    //                .accessTokenResponseClient(this.accessTokenResponseClient())));
     // @formatter:on
   }
 
@@ -107,4 +118,18 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
     return new ApiKeyAuthManager(apiKeys);
   }
 
+  @Bean
+  public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+    DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient =
+        new DefaultAuthorizationCodeTokenResponseClient();
+    OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
+        new OAuth2AccessTokenResponseHttpMessageConverter();
+    tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomTokenResponseConverter());
+    RestTemplate restTemplate =
+        new RestTemplate(
+            Arrays.asList(new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+    restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+    accessTokenResponseClient.setRestOperations(restTemplate);
+    return accessTokenResponseClient;
+  }
 }

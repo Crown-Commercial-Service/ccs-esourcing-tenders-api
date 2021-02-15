@@ -9,8 +9,7 @@ servers:
     url: https://virtserver.swaggerhub.com/crown-commercial-service/ccs-esourcing-client/1.0.0-SNAPSHOT
 
 tags:
-  - name: Project
-  - name: ITT
+  - name: ProjectITT
   - name: ITT Status
 
 paths:
@@ -18,7 +17,7 @@ paths:
   /tenders/ProcurementProjects/projectITT:
     post:
       tags:
-        - Project
+        - ProjectITT
       summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
       description: >-
         Creates a new CCS procurement case in the Jaggaer eSourcing platform.
@@ -67,79 +66,6 @@ paths:
         description: Created sourcing object
         required: true
 
-  /tenders/ProcurementProjects/{procID}/events:
-    post:
-      tags:
-        - ITT
-      description: Creates a new Event for the Procurement Project.
-      operationId: createCaseRFx
-      parameters:
-        - name: procID
-          in: path
-          description: Procurement Project ID
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProcurementID'
-        - name: x-correlation-id
-          in: header
-          description: Logging Service header - The id of the first proccess in the process chain (root process/service)
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: x-causation-id
-          in: header
-          description: Logging Service header - The id of the predecessor proccess in the process chain (root process/service)
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: x-channel
-          in: header
-          description: Logging Service header - Type of device
-          required: true
-          schema:
-            type: string
-            enum:
-              - smartphone
-              - tablet
-              - desktop
-              - other
-        - name: x-client
-          in: header
-          description: Logging Service header - Type of client app
-          schema:
-            type: string
-            enum:
-              - mobile-app
-              - browser
-              - client-apis
-              - bot-app
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Tender'
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericID'
-        401:
-          description: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-        403:
-          description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-
   /tenders/ProcurementProjects/updateProcurementStage:
     post:
       tags:
@@ -179,38 +105,93 @@ components:
       required:
         - subject
         - procurementReference
-        - tender
+        - rfx
       properties:
+        tenderReferenceCode:
+          type: string
+          nullable: false
+          example: project_1078
         subject:
           type: string
           example: Project for Provision of Face Masks
         procurementReference:
           type: string
           example: "324233324"
-        tender:
-          $ref: '#/components/schemas/Tender'
+        rfx:
+          $ref: '#/components/schemas/Rfx'
 
-    Tender:
-      title: Tender
-      required:
-        - tenderPeriod
+    Rfx:
+      title: Rfx
       type: object
+      required:
+        - rfxSetting
+        - rfxAdditionalInfo
       properties:
-        description:
-          title: Tender description
+        rfxSetting:
+          $ref: '#/components/schemas/RfxSetting'
+        rfxAdditionalInfo:
+          $ref: '#/components/schemas/RfxAdditionalInfo'
+
+    RfxSetting:
+      title: RfxSetting
+      type: object
+      required:
+        - shortDescription
+        - value
+        - publishDate
+        - closeDate
+      properties:
+        shortDescription:
           type: string
-          description: A summary description of the tender. This complements any structured information provided using the items array. Descriptions should be short and easy to read. Avoid using ALL CAPS.
-          example: ITT for Provision of Facemasks - Call Off(Competition)
+          example: RFQ for Provision of PPE
         value:
-          title: Value
           type: string
           example: "9000"
-        tenderPeriod:
-          title: Tender period
-          description: The period when the tender is open for submissions. The end date is the closing date for tender submissions.
-          allOf:
-            - $ref: '#/components/schemas/Period'
-      description: Data regarding tender process - publicly inviting prospective contractors to submit bids for evaluation and selecting a winner or winners.
+        valueCurrency:
+          type: string
+          example: GBP
+        bidsCurrency:
+          type: string
+          example: GBP
+        qualEnvStatus:
+          type: string
+          example: 0
+        techEnvStatus:
+          type: string
+          example: 1
+        commEnvStatus:
+          type: string
+          example: 0
+        publishDate:
+          type: string
+          example: "2021-01-28T12:00:00.000+00:00"
+        closeDate:
+          type: string
+          example: "2021-02-27T12:00:00.000+00:00"
+        rfxType:
+          type: string
+          nullable: false
+          example: STANDARD_ITT
+        visibilityEGComments:
+          type: string
+          example: 1
+        rankingStrategy:
+          type: string
+          example: BEST_TECHNICAL_SCORE
+
+    RfxAdditionalInfo:
+      title: RfxAdditionalInfo
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          example: Procurement Route
+        value:
+          type: string
+          example: Call Off (Competition)
 
     RfxStatusList:
       type: array
@@ -235,379 +216,13 @@ components:
           example: ITT Live
         actualStartDate:
           type: string
-          example: 2020-03-27T15:38:53.000+0000
+          example: "2020-03-27T15:38:53.000+0000"
         tenderEndDate:
           type: string
-          example: 2020-03-27T15:38:53.000+0000
+          example: "2020-03-27T15:38:53.000+0000"
         closingTime:
           type: string
-          example: 14:38:53.000Z
-
-    Value:
-      title: Value
-      type: object
-      properties:
-        amount:
-          title: Amount
-          type: number
-          description: Amount as a number.
-        currency:
-          title: Currency
-          description: The currency of the amount, from the closed [currency](https://standard.open-contracting.org/1.1/en/schema/codelists/#currency) codelist.
-          allOf:
-            - $ref: '#/components/schemas/Currency'
-      description: Financial values should be published with a currency attached.
-
-    TenderStatus:
-      title: Tender status
-      type: string
-      description: |-
-        The current status of the tender, from the closed
-        [tenderStatus](https://standard.open-contracting.org/1.1/en/schema/codelists/#tender-status)
-        codelist.
-      enum:
-        - planning
-        - planned
-        - active
-        - cancelled
-        - unsuccessful
-        - complete
-        - withdrawn
-
-    Period:
-      title: Period
-      type: object
-      properties:
-        startDate:
-          title: Start date
-          type: string
-          description: The start date for the period. When known, a precise start date must be provided.
-          format: date-time
-        endDate:
-          title: End date
-          type: string
-          description: The end date for the period. When known, a precise end date must be provided.
-          format: date-time
-        maxExtentDate:
-          title: Maximum extent
-          type: string
-          description: The period cannot be extended beyond this date. This field can be used to express the maximum available date for extension or renewal of this period.
-          format: date-time
-        durationInDays:
-          title: Duration (days)
-          type: integer
-          description: The maximum duration of this period in days. A user interface can collect or display this data in months or years as appropriate, and then convert it into days when storing this field. This field can be used when exact dates are not known. If a startDate and endDate are set, this field, if used, should be equal to the difference between startDate and endDate. Otherwise, if a startDate and maxExtentDate are set, this field, if used, should be equal to the difference between startDate and maxExtentDate.
-      description: Key events during a contracting process may have a known start date, end date, duration, or maximum extent (the latest date the period can extend to). In some cases, not all of these fields will have known or relevant values.
-
-    Currency:
-      title: Currency
-      type: string
-      description: |-
-        Currency code [currency](https://standard.open-contracting.org/1.1/en/schema/codelists/#currency)
-              codelist.
-      enum:
-        - ADP
-        - AED
-        - AFA
-        - AFN
-        - ALK
-        - ALL
-        - AMD
-        - ANG
-        - AOA
-        - AOK
-        - AON
-        - AOR
-        - ARA
-        - ARP
-        - ARS
-        - ARY
-        - ATS
-        - AUD
-        - AWG
-        - AYM
-        - AZM
-        - AZN
-        - BAD
-        - BAM
-        - BBD
-        - BDT
-        - BEC
-        - BEF
-        - BEL
-        - BGJ
-        - BGK
-        - BGL
-        - BGN
-        - BHD
-        - BIF
-        - BMD
-        - BND
-        - BOB
-        - BOP
-        - BOV
-        - BRB
-        - BRC
-        - BRE
-        - BRL
-        - BRN
-        - BRR
-        - BSD
-        - BTN
-        - BUK
-        - BWP
-        - BYB
-        - BYN
-        - BYR
-        - BZD
-        - CAD
-        - CDF
-        - CHC
-        - CHE
-        - CHF
-        - CHW
-        - CLF
-        - CLP
-        - CNY
-        - COP
-        - COU
-        - CRC
-        - CSD
-        - CSJ
-        - CSK
-        - CUC
-        - CUP
-        - CVE
-        - CYP
-        - CZK
-        - DDM
-        - DEM
-        - DJF
-        - DKK
-        - DOP
-        - DZD
-        - ECS
-        - ECV
-        - EEK
-        - EGP
-        - ERN
-        - ESA
-        - ESB
-        - ESP
-        - ETB
-        - EUR
-        - FIM
-        - FJD
-        - FKP
-        - FRF
-        - GBP
-        - GEK
-        - GEL
-        - GHC
-        - GHP
-        - GHS
-        - GIP
-        - GMD
-        - GNE
-        - GNF
-        - GNS
-        - GQE
-        - GRD
-        - GTQ
-        - GWE
-        - GWP
-        - GYD
-        - HKD
-        - HNL
-        - HRD
-        - HRK
-        - HTG
-        - HUF
-        - IDR
-        - IEP
-        - ILP
-        - ILR
-        - ILS
-        - INR
-        - IQD
-        - IRR
-        - ISJ
-        - ISK
-        - ITL
-        - JMD
-        - JOD
-        - JPY
-        - KES
-        - KGS
-        - KHR
-        - KMF
-        - KPW
-        - KRW
-        - KWD
-        - KYD
-        - KZT
-        - LAJ
-        - LAK
-        - LBP
-        - LKR
-        - LRD
-        - LSL
-        - LSM
-        - LTL
-        - LTT
-        - LUC
-        - LUF
-        - LUL
-        - LVL
-        - LVR
-        - LYD
-        - MAD
-        - MDL
-        - MGA
-        - MGF
-        - MKD
-        - MLF
-        - MMK
-        - MNT
-        - MOP
-        - MRO
-        - MRU
-        - MTL
-        - MTP
-        - MUR
-        - MVQ
-        - MVR
-        - MWK
-        - MXN
-        - MXP
-        - MXV
-        - MYR
-        - MZE
-        - MZM
-        - MZN
-        - NAD
-        - NGN
-        - NIC
-        - NIO
-        - NLG
-        - NOK
-        - NPR
-        - NZD
-        - OMR
-        - PAB
-        - PEH
-        - PEI
-        - PEN
-        - PES
-        - PGK
-        - PHP
-        - PKR
-        - PLN
-        - PLZ
-        - PTE
-        - PYG
-        - QAR
-        - RHD
-        - ROK
-        - ROL
-        - RON
-        - RSD
-        - RUB
-        - RUR
-        - RWF
-        - SAR
-        - SBD
-        - SCR
-        - SDD
-        - SDG
-        - SDP
-        - SEK
-        - SGD
-        - SHP
-        - SIT
-        - SKK
-        - SLL
-        - SOS
-        - SRD
-        - SRG
-        - SSP
-        - STD
-        - STN
-        - SUR
-        - SVC
-        - SYP
-        - SZL
-        - THB
-        - TJR
-        - TJS
-        - TMM
-        - TMT
-        - TND
-        - TOP
-        - TPE
-        - TRL
-        - TRY
-        - TTD
-        - TWD
-        - TZS
-        - UAH
-        - UAK
-        - UGS
-        - UGW
-        - UGX
-        - USD
-        - USN
-        - USS
-        - UYI
-        - UYN
-        - UYP
-        - UYU
-        - UYW
-        - UZS
-        - VEB
-        - VEF
-        - VES
-        - VNC
-        - VND
-        - VUV
-        - WST
-        - XAF
-        - XAG
-        - XAU
-        - XBA
-        - XBB
-        - XBC
-        - XBD
-        - XCD
-        - XDR
-        - XEU
-        - XFO
-        - XFU
-        - XOF
-        - XPD
-        - XPF
-        - XPT
-        - XRE
-        - XSU
-        - XTS
-        - XUA
-        - XXX
-        - YDD
-        - YER
-        - YUD
-        - YUM
-        - YUN
-        - ZAL
-        - ZAR
-        - ZMK
-        - ZMW
-        - ZRN
-        - ZRZ
-        - ZWC
-        - ZWD
-        - ZWL
-        - ZWN
-        - ZWR
+          example: "14:38:53.000Z"
 
     RfxStatus200ResponseList:
       type: array
@@ -626,18 +241,6 @@ components:
         errorMessage:
           type: string
           example: ""
-
-    GenericID:
-      type: number
-      format: integer
-      readOnly: true
-      example: 1234
-
-    ProcurementID:
-      type: number
-      format: string
-      readOnly: true
-      example: 12345
 
     inline_response_403:
       type: object
