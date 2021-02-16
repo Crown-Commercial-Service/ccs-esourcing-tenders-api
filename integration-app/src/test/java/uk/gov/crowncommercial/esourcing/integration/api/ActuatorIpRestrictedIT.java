@@ -29,6 +29,10 @@ public class ActuatorIpRestrictedIT {
     registry.add("ccs.esourcing.ipallow-list", () -> "192.168.0.0");
     registry.add("ccs.esourcing.actuator-ipallow-list", () -> "10.0.0.0/24");
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
+    registry.add("spring.security.oauth2.client.provider.jaggaer.token-uri", () -> "token-uri");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-id", () -> "client-id");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-secret", () -> "client-secret");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.authorization-grant-type", () -> "authorization-grant-type");
   }
   
   @RestController

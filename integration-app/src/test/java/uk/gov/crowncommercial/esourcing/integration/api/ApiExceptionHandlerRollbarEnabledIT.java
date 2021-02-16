@@ -66,10 +66,14 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     registry.add("rollbar.access-token", () -> "1298350192839123616203759102938");
     registry.add("rollbar.environment", () -> "integration_test");
     registry.add("info.app.version", () -> "12.34.56");
+    registry.add("spring.security.oauth2.client.provider.jaggaer.token-uri", () -> "token-uri");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-id", () -> "client-id");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-secret", () -> "client-secret");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.authorization-grant-type", () -> "authorization-grant-type");
   }
 
   @Test
-  public void postProjectITT_throwsNullPointerException_expectInternalServerErrorAndRollbarSend()
+  public void salesforce_throwsNullPointerException_expectInternalServerErrorAndRollbarSend()
       throws Exception {
 
     /* mock the service call */
@@ -78,14 +82,14 @@ public class ApiExceptionHandlerRollbarEnabledIT {
 
     /* "call" the REST API */
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 
     /* verify the REST API response */
     ErrorResponse errorResponse = ErrorResponse.builder().timestamp(clock.instant()).status(500)
         .error("Internal Server Error").message("Unhandled exception")
-        .path("/crown-commercial-service/ccs-esourcing-client/1.0.0-SNAPSHOT/tenders/ProcurementProjects/projectITT").build();
+        .path("/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce").build();
     String expected = objectMapper.writeValueAsString(errorResponse);
     JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
 

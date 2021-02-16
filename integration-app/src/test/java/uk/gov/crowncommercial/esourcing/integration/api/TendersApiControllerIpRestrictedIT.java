@@ -48,17 +48,21 @@ public class TendersApiControllerIpRestrictedIT {
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("ccs.esourcing.ip-allow-list", () -> "192.168.0.1/30");
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
+    registry.add("spring.security.oauth2.client.provider.jaggaer.token-uri", () -> "token-uri");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-id", () -> "client-id");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-secret", () -> "client-secret");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.authorization-grant-type", () -> "authorization-grant-type");
   }
 
   @Test
-  public void postProjectITT_expectForbidden() throws Exception {
+  public void salesforce_expectForbidden() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(Constants.API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
@@ -66,10 +70,10 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_noApiKey_expectForbidden() throws Exception {
+  public void salesforce_noApiKey_expectForbidden() throws Exception {
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
@@ -77,14 +81,14 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_withValidXForwardedForHeader_expectOk() throws Exception {
+  public void salesforce_withValidXForwardedForHeader_expectOk() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
@@ -94,14 +98,14 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_withValidLowerLimitMultipleXForwardedForHeader_expectOk() throws Exception {
+  public void salesforce_withValidLowerLimitMultipleXForwardedForHeader_expectOk() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.0, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
@@ -111,14 +115,14 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_withValidUpperLimitMultipleXForwardedForHeader_expectOk() throws Exception {
+  public void salesforce_withValidUpperLimitMultipleXForwardedForHeader_expectOk() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.3, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
@@ -128,14 +132,14 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_withInvalidXForwardedForHeader_expectForbidden() throws Exception {
+  public void salesforce_withInvalidXForwardedForHeader_expectForbidden() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.4").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
@@ -144,14 +148,14 @@ public class TendersApiControllerIpRestrictedIT {
   }
 
   @Test
-  public void postProjectITT_withInvalidMultipleXForwardedForHeader_expectForbidden() throws Exception {
+  public void salesforce_withInvalidMultipleXForwardedForHeader_expectForbidden() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.4, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();

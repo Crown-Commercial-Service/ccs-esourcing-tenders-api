@@ -25,6 +25,10 @@ public class StaticFilesIpRestrictedIT {
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
     registry.add("ccs.esourcing.ip-allow-list", () -> "192.168.0.1");
+    registry.add("spring.security.oauth2.client.provider.jaggaer.token-uri", () -> "token-uri");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-id", () -> "client-id");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.client-secret", () -> "client-secret");
+    registry.add("spring.security.oauth2.client.registration.jaggaer.authorization-grant-type", () -> "authorization-grant-type");
   }
 
   @Autowired

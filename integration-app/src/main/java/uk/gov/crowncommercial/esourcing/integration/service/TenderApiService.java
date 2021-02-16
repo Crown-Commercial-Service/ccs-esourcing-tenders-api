@@ -44,7 +44,7 @@ public class TenderApiService implements TendersApiDelegate {
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
   @Value("${ccs.esourcing.default.api.timeout}000")
-  private Long DEFAULT_API_TIMEOUT;
+  private Long defaultApiTimeout;
 
   public TenderApiService() {}
 
@@ -60,9 +60,10 @@ public class TenderApiService implements TendersApiDelegate {
 
     logger.info("Sending Project request to Jaggaer, request body : {}", projectsRequestBody);
 
-    ProjectResponse projectsResponseBody = projectsApi.createProject(projectsRequestBody).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+    ProjectResponse projectsResponseBody =
+        projectsApi.createProject(projectsRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
 
-    logger.info("Create Project response : {}", projectsResponseBody.toString());
+    logger.info("Create Project response : {}", projectsResponseBody);
 
     final String tenderRef =
         projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
@@ -71,13 +72,15 @@ public class TenderApiService implements TendersApiDelegate {
 
       Rfxs rfxRequestBody = getRfxs(tenderRef, projectTender.getRfx());
 
-      logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody.toString());
+      logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody);
 
-      RfxResponse rfxsResponseBody = rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(DEFAULT_API_TIMEOUT));
+      RfxResponse rfxsResponseBody =
+          rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
 
       logger.info("Create ITT Event response : {}", rfxsResponseBody);
 
-      final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
+      final String ittRef =
+          rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
 
       inlineResponse201.setTenderReferenceCode(tenderRef);
       inlineResponse201.setRfxReferenceCode(ittRef);
@@ -91,7 +94,7 @@ public class TenderApiService implements TendersApiDelegate {
   private Projects getProject(ProjectTender projectTender) {
 
     Projects projects = new Projects();
-    if(StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())){
+    if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())) {
       projects.setOperationCode("CREATEUPDATE");
     } else {
       projects.setOperationCode("CREATE_FROM_TEMPLATE");
@@ -116,7 +119,7 @@ public class TenderApiService implements TendersApiDelegate {
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId("51435");
     tender.setBuyerCompany(buyerCompany);
-    if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())){
+    if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())) {
       tender.setTenderReferenceCode(projectTender.getTenderReferenceCode());
       tender.setProjectType("CCS_PROJ");
     } else {
@@ -133,13 +136,16 @@ public class TenderApiService implements TendersApiDelegate {
     return projects;
   }
 
-  private Rfxs getRfxs(String tenderReferenceCode, uk.gov.crowncommercial.esourcing.integration.server.model.Rfx rfx){
+  private Rfxs getRfxs(
+      String tenderReferenceCode,
+      uk.gov.crowncommercial.esourcing.integration.server.model.Rfx rfx) {
 
     Rfxs rfxs = new Rfxs();
     rfxs.setOperationCode("CREATE");
 
     RfxAdditionalInfoList rfxAdditionalInfoList = new RfxAdditionalInfoList();
-    rfxAdditionalInfoList.addAdditionalInfoItem(getRfxAddInfo("Procurement Route", "Call Off (Competition)"));
+    rfxAdditionalInfoList.addAdditionalInfoItem(
+        getRfxAddInfo("Procurement Route", "Call Off (Competition)"));
 
     Rfx rfxJag = new Rfx();
     rfxJag.setRfxAdditionalInfoList(rfxAdditionalInfoList);
@@ -157,37 +163,31 @@ public class TenderApiService implements TendersApiDelegate {
     ownerUser.setLogin("sro-ccs");
     rfxSetting.setOwnerUser(ownerUser);
     rfxSetting.setValue(String.valueOf(rfx.getRfxSetting().getValue()));
+    rfxSetting.setRfxType("STANDARD_ITT");
 
-    if (StringUtils.isNotEmpty(rfx.getRfxSetting().getRfxType()))
-    {
-      rfxSetting.setRfxType(rfx.getRfxSetting().getRfxType());
-
-      if (StringUtils.isNotEmpty(rfx.getRfxSetting().getValueCurrency() )) {
-        rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
-      }
-      if (rfx.getRfxSetting().getBidsCurrency() != null) {
-        rfxSetting.setBidsCurrency(rfx.getRfxSetting().getBidsCurrency());
-      }
-      if (rfx.getRfxSetting().getValueCurrency() != null) {
-        rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
-      }
-      if (rfx.getRfxSetting().getQualEnvStatus() != null) {
-        rfxSetting.setQualEnvStatus(rfx.getRfxSetting().getQualEnvStatus());
-      }
-      if (rfx.getRfxSetting().getTechEnvStatus() != null) {
-        rfxSetting.setTechEnvStatus(rfx.getRfxSetting().getTechEnvStatus());
-      }
-      if (rfx.getRfxSetting().getCommEnvStatus() != null) {
-        rfxSetting.setCommEnvStatus(rfx.getRfxSetting().getCommEnvStatus());
-      }
-      if (rfx.getRfxSetting().getVisibilityEGComments() != null) {
-        rfxSetting.setVisibilityEGComments(rfx.getRfxSetting().getVisibilityEGComments());
-      }
-      if (rfx.getRfxSetting().getRankingStrategy() != null) {
-        rfxSetting.setRankingStrategy(rfx.getRfxSetting().getRankingStrategy());
-      }
-    } else {
-      rfxSetting.setTemplateReferenceCode("itt_543");
+    if (StringUtils.isNotEmpty(rfx.getRfxSetting().getValueCurrency())) {
+      rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
+    }
+    if (rfx.getRfxSetting().getBidsCurrency() != null) {
+      rfxSetting.setBidsCurrency(rfx.getRfxSetting().getBidsCurrency());
+    }
+    if (rfx.getRfxSetting().getValueCurrency() != null) {
+      rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
+    }
+    if (rfx.getRfxSetting().getQualEnvStatus() != null) {
+      rfxSetting.setQualEnvStatus(rfx.getRfxSetting().getQualEnvStatus());
+    }
+    if (rfx.getRfxSetting().getTechEnvStatus() != null) {
+      rfxSetting.setTechEnvStatus(rfx.getRfxSetting().getTechEnvStatus());
+    }
+    if (rfx.getRfxSetting().getCommEnvStatus() != null) {
+      rfxSetting.setCommEnvStatus(rfx.getRfxSetting().getCommEnvStatus());
+    }
+    if (rfx.getRfxSetting().getVisibilityEGComments() != null) {
+      rfxSetting.setVisibilityEGComments(rfx.getRfxSetting().getVisibilityEGComments());
+    }
+    if (rfx.getRfxSetting().getRankingStrategy() != null) {
+      rfxSetting.setRankingStrategy(rfx.getRfxSetting().getRankingStrategy());
     }
 
     rfxSetting.setPublishDate(String.valueOf(rfx.getRfxSetting().getPublishDate()));

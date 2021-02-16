@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
   title: CCS eSourcing Client
-  version: 1.0.0-SNAPSHOT
+  version: 0.0.1-SNAPSHOT
 
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/crown-commercial-service/ccs-esourcing-client/1.0.0-SNAPSHOT
+    url: https://virtserver.swaggerhub.com/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
 
 tags:
   - name: ProjectITT
@@ -14,10 +14,10 @@ tags:
 
 paths:
 
-  /tenders/ProcurementProjects/projectITT:
+  /tenders/ProcurementProjects/salesforce:
     post:
       tags:
-        - ProjectITT
+        - Salesforce
       summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
       description: >-
         Creates a new CCS procurement case in the Jaggaer eSourcing platform.
@@ -168,10 +168,6 @@ components:
         closeDate:
           type: string
           example: "2021-02-27T12:00:00.000+00:00"
-        rfxType:
-          type: string
-          nullable: false
-          example: STANDARD_ITT
         visibilityEGComments:
           type: string
           example: 1
