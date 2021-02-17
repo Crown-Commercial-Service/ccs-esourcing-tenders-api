@@ -66,10 +66,6 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     registry.add("rollbar.access-token", () -> "1298350192839123616203759102938");
     registry.add("rollbar.environment", () -> "integration_test");
     registry.add("info.app.version", () -> "12.34.56");
-    registry.add("spring.security.oauth2.client.provider.jaggaer.token-uri", () -> "token-uri");
-    registry.add("spring.security.oauth2.client.registration.jaggaer.client-id", () -> "client-id");
-    registry.add("spring.security.oauth2.client.registration.jaggaer.client-secret", () -> "client-secret");
-    registry.add("spring.security.oauth2.client.registration.jaggaer.authorization-grant-type", () -> "authorization-grant-type");
   }
 
   @Test

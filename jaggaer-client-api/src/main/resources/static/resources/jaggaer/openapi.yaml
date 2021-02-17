@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: This is a simple API
-  version: 1.0.0-SNAPSHOT
+  version: 0.0.1-SNAPSHOT
   title: Crown Commercial Service
 
 tags:
@@ -13,8 +13,10 @@ tags:
 
 servers:
   # Added by API Auto Mocking Plugin
-   - description: SwaggerHub API Auto Mocking
-     url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/joeraymond-roweit/jaggaer-client/0.0.1-SNAPSHOT
+  - description: SwaggerHub API Auto Mocking
+    url: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
 
 paths:
   /projects:
@@ -118,7 +120,7 @@ components:
       properties:
         operationCode:
           type: string
-          example: CREATE_FROM_TEMPLATE
+          example: CREATEUPDATE
         project:
           $ref: '#/components/schemas/Project'
 
@@ -212,7 +214,7 @@ components:
       properties:
         operationCode:
           type: string
-          example: CREATE_FROM_TEMPLATE
+          example: CREATEUPDATE
         rfx:
           $ref: '#/components/schemas/Rfx'
 

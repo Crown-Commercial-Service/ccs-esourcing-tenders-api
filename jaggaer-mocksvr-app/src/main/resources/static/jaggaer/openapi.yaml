@@ -2,7 +2,7 @@ openapi: 3.0.0
 
 info:
   description: This is a simple API
-  version: "1.0.0"
+  version: 0.0.1-SNAPSHOT
   title: Crown Commercial Service
 
 tags:
@@ -13,8 +13,10 @@ tags:
 
 servers:
   # Added by API Auto Mocking Plugin
-   - description: SwaggerHub API Auto Mocking
-     url: https://virtserver.swaggerhub.com/joeraymond-roweit/Tenders/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/joeraymond-roweit/jaggaer-client/0.0.1-SNAPSHOT
+  - description: SwaggerHub API Auto Mocking
+    url: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
 
 paths:
   /projects:
@@ -106,8 +108,10 @@ paths:
               $ref: '#/components/schemas/Rfxs'
         description: Created rfx object
         required: true
+
 components:
   schemas:
+
     Projects:
       type: object
       required:
@@ -116,20 +120,10 @@ components:
       properties:
         operationCode:
           type: string
-          example: Create_From_Template
+          example: CREATEUPDATE
         project:
           $ref: '#/components/schemas/Project'
-    Rfxs:
-      type: object
-      required:
-        - operationCode
-        - rfx
-      properties:
-        operationCode:
-          type: string
-          example: Create_From_Template
-        rfx:
-          $ref: '#/components/schemas/Rfx'
+
     Project:
       type: object
       required:
@@ -137,9 +131,17 @@ components:
       properties:
         tender:
           $ref: '#/components/schemas/Tender'
+
     Tender:
       type: object
+      required:
+        - title
+        - buyerCompany
+        - additionalInfoList
       properties:
+        tenderReferenceCode:
+          type: string
+          example: project_1078
         title:
           type: string
           example: Test Project 123
@@ -148,8 +150,12 @@ components:
         sourceTemplateReferenceCode:
           type: string
           example: project_609
+        projectType:
+          type: string
+          example: CCS_PROJ
         additionalInfoList:
           $ref: '#/components/schemas/AdditionalInfoList'
+
     BuyerCompany:
       type: object
       required:
@@ -158,6 +164,7 @@ components:
         id:
           type: string
           example: "51435"
+
     OwnerUser:
       type: object
       required:
@@ -166,6 +173,7 @@ components:
         login:
           type: string
           example: sro-ccs
+
     AdditionalInfoList:
       type: object
       properties:
@@ -173,6 +181,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AdditionalInfoItem'
+
     AdditionalInfoItem:
       type: object
       properties:
@@ -181,6 +190,7 @@ components:
           example: Procurement Reference
         values:
           $ref: '#/components/schemas/Values'
+
     Values:
       type: object
       properties:
@@ -188,12 +198,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValueItem'
+
     ValueItem:
       type: object
       properties:
         value:
           type: object
           example: "324233324"
+
+    Rfxs:
+      type: object
+      required:
+        - operationCode
+        - rfx
+      properties:
+        operationCode:
+          type: string
+          example: CREATEUPDATE
+        rfx:
+          $ref: '#/components/schemas/Rfx'
+
     Rfx:
       type: object
       required:
@@ -204,6 +228,7 @@ components:
           $ref: '#/components/schemas/RfxSetting'
         rfxAdditionalInfoList:
           $ref: '#/components/schemas/RfxAdditionalInfoList'
+
     RfxSetting:
       type: object
       required:
@@ -211,13 +236,13 @@ components:
         - shortDescription
         - buyerCompany
         - ownerUser
-        - templateReferenceCode
         - value
         - publishDate
         - closeDate
-        - rfxType
-        - autoCreateTender
       properties:
+        rfxReferenceCode:
+          type: string
+          example: itt_597
         tenderReferenceCode:
           type: string
           example: projetct_1002
@@ -234,12 +259,37 @@ components:
         value:
           type: string
           example: "9000"
+        valueCurrency:
+          type: string
+          example: GBP
+        bidsCurrency:
+          type: string
+          example: GBP
+        qualEnvStatus:
+          type: string
+          example: "0"
+        techEnvStatus:
+          type: string
+          example: "1"
+        commEnvStatus:
+          type: string
+          example: "0"
         publishDate:
           type: string
           example: "2019-08-20T13:54:32.000+00:00"
         closeDate:
           type: string
           example: "2019-08-30T13:54:32.000+00:00"
+        rfxType:
+          type: string
+          example: STANDARD_ITT
+        visibilityEGComments:
+          type: string
+          example: "1"
+        rankingStrategy:
+          type: string
+          example: BEST_TECHNICAL_SCORE
+
     RfxAdditionalInfoList:
       type: object
       properties:
@@ -247,6 +297,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RfxAdditionalInfoItem'
+
     RfxAdditionalInfoItem:
       type: object
       properties:
@@ -255,6 +306,7 @@ components:
           example: Procurement Route
         values:
           $ref: '#/components/schemas/RfxValues'
+
     RfxValues:
       type: object
       properties:
@@ -262,12 +314,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RfxValueItem'
+
     RfxValueItem:
       type: object
       properties:
         value:
           type: object
           example: Open Market
+
     RfxResponse:
       type: object
       properties:
@@ -283,6 +337,7 @@ components:
         rfxReferenceCode:
           type: string
           example: itt_534
+
     ProjectResponse:
       type: object
       properties:
@@ -298,9 +353,14 @@ components:
         tenderReferenceCode:
           type: string
           example: project_1002
+
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
+    oAuthSample:    # <---- arbitrary name
+      type: oauth2
+      flows:
+        clientCredentials :   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+          tokenUrl: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
+          scopes: {}
+
 security:
-  - bearerAuth: []
+  - oAuthSample: []

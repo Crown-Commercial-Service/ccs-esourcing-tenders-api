@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,15 +37,26 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Values;
 @Service
 public class TenderApiService implements TendersApiDelegate {
 
-  @Autowired private ProjectsApi projectsApi;
-  @Autowired private RfxApi rfxApi;
+  private final ProjectsApi projectsApi;
+  private final RfxApi rfxApi;
 
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
   @Value("${ccs.esourcing.default.api.timeout}000")
   private Long defaultApiTimeout;
+  @Value("${ccs.esourcing.jaggaer.default.buyer-company-id}")
+  private String defaultBuyerCompanyId;
+  @Value("${ccs.esourcing.jaggaer.default.project-type}")
+  private String defaultProjectType;
+  @Value("${ccs.esourcing.jaggaer.default.source-template-reference-code}")
+  private String defaultSourceTemplateReferenceCode;
+  @Value("${ccs.esourcing.jaggaer.default.owner-user}")
+  private String defaultOwnerUser;
 
-  public TenderApiService() {}
+  public TenderApiService(ProjectsApi projectsApi, RfxApi rfxApi) {
+    this.projectsApi = projectsApi;
+    this.rfxApi = rfxApi;
+  }
 
   @Override
   public ResponseEntity<InlineResponse201> createProcurementCase(
@@ -117,13 +127,13 @@ public class TenderApiService implements TendersApiDelegate {
     Tender tender = new Tender();
     tender.setTitle(projectTender.getSubject());
     BuyerCompany buyerCompany = new BuyerCompany();
-    buyerCompany.setId("51435");
+    buyerCompany.setId(defaultBuyerCompanyId);
     tender.setBuyerCompany(buyerCompany);
     if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())) {
       tender.setTenderReferenceCode(projectTender.getTenderReferenceCode());
-      tender.setProjectType("CCS_PROJ");
+      tender.setProjectType(defaultProjectType);
     } else {
-      tender.setSourceTemplateReferenceCode("project_609");
+      tender.setSourceTemplateReferenceCode(defaultSourceTemplateReferenceCode);
     }
 
     tender.setAdditionalInfoList(additionalInfoList);
@@ -145,7 +155,7 @@ public class TenderApiService implements TendersApiDelegate {
 
     RfxAdditionalInfoList rfxAdditionalInfoList = new RfxAdditionalInfoList();
     rfxAdditionalInfoList.addAdditionalInfoItem(
-        getRfxAddInfo("Procurement Route", "Call Off (Competition)"));
+        getRfxAddInfo("Procurement Route", rfx.getProcurementRoute()));
 
     Rfx rfxJag = new Rfx();
     rfxJag.setRfxAdditionalInfoList(rfxAdditionalInfoList);
@@ -153,45 +163,36 @@ public class TenderApiService implements TendersApiDelegate {
     RfxSetting rfxSetting = new RfxSetting();
 
     rfxSetting.setTenderReferenceCode(tenderReferenceCode);
-    rfxSetting.setShortDescription(String.valueOf(rfx.getRfxSetting().getShortDescription()));
+    rfxSetting.setShortDescription(String.valueOf(rfx.getShortDescription()));
 
     BuyerCompany buyerCompany = new BuyerCompany();
-    buyerCompany.setId("51435");
+    buyerCompany.setId(defaultBuyerCompanyId);
     rfxSetting.setBuyerCompany(buyerCompany);
 
     OwnerUser ownerUser = new OwnerUser();
-    ownerUser.setLogin("sro-ccs");
+    ownerUser.setLogin(defaultOwnerUser);
     rfxSetting.setOwnerUser(ownerUser);
-    rfxSetting.setValue(String.valueOf(rfx.getRfxSetting().getValue()));
+    rfxSetting.setValue(String.valueOf(rfx.getValue()));
     rfxSetting.setRfxType("STANDARD_ITT");
 
-    if (StringUtils.isNotEmpty(rfx.getRfxSetting().getValueCurrency())) {
-      rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
+    if (rfx.getQualEnvStatus() != null) {
+      rfxSetting.setQualEnvStatus(rfx.getQualEnvStatus());
     }
-    if (rfx.getRfxSetting().getBidsCurrency() != null) {
-      rfxSetting.setBidsCurrency(rfx.getRfxSetting().getBidsCurrency());
+    if (rfx.getTechEnvStatus() != null) {
+      rfxSetting.setTechEnvStatus(rfx.getTechEnvStatus());
     }
-    if (rfx.getRfxSetting().getValueCurrency() != null) {
-      rfxSetting.setValueCurrency(rfx.getRfxSetting().getValueCurrency());
+    if (rfx.getCommEnvStatus() != null) {
+      rfxSetting.setCommEnvStatus(rfx.getCommEnvStatus());
     }
-    if (rfx.getRfxSetting().getQualEnvStatus() != null) {
-      rfxSetting.setQualEnvStatus(rfx.getRfxSetting().getQualEnvStatus());
+    if (rfx.getVisibilityEGComments() != null) {
+      rfxSetting.setVisibilityEGComments(rfx.getVisibilityEGComments());
     }
-    if (rfx.getRfxSetting().getTechEnvStatus() != null) {
-      rfxSetting.setTechEnvStatus(rfx.getRfxSetting().getTechEnvStatus());
-    }
-    if (rfx.getRfxSetting().getCommEnvStatus() != null) {
-      rfxSetting.setCommEnvStatus(rfx.getRfxSetting().getCommEnvStatus());
-    }
-    if (rfx.getRfxSetting().getVisibilityEGComments() != null) {
-      rfxSetting.setVisibilityEGComments(rfx.getRfxSetting().getVisibilityEGComments());
-    }
-    if (rfx.getRfxSetting().getRankingStrategy() != null) {
-      rfxSetting.setRankingStrategy(rfx.getRfxSetting().getRankingStrategy());
+    if (rfx.getRankingStrategy() != null) {
+      rfxSetting.setRankingStrategy(rfx.getRankingStrategy());
     }
 
-    rfxSetting.setPublishDate(String.valueOf(rfx.getRfxSetting().getPublishDate()));
-    rfxSetting.setCloseDate(String.valueOf(rfx.getRfxSetting().getCloseDate()));
+    rfxSetting.setPublishDate(String.valueOf(rfx.getPublishDate()));
+    rfxSetting.setCloseDate(String.valueOf(rfx.getCloseDate()));
     rfxJag.setRfxSetting(rfxSetting);
 
     rfxs.setRfx(rfxJag);

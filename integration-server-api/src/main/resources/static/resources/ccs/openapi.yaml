@@ -9,7 +9,7 @@ servers:
     url: https://virtserver.swaggerhub.com/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
 
 tags:
-  - name: ProjectITT
+  - name: salesforce
   - name: ITT Status
 
 paths:
@@ -17,7 +17,7 @@ paths:
   /tenders/ProcurementProjects/salesforce:
     post:
       tags:
-        - Salesforce
+        - salesforce
       summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
       description: >-
         Creates a new CCS procurement case in the Jaggaer eSourcing platform.
@@ -124,35 +124,18 @@ components:
       title: Rfx
       type: object
       required:
-        - rfxSetting
-        - rfxAdditionalInfo
-      properties:
-        rfxSetting:
-          $ref: '#/components/schemas/RfxSetting'
-        rfxAdditionalInfo:
-          $ref: '#/components/schemas/RfxAdditionalInfo'
-
-    RfxSetting:
-      title: RfxSetting
-      type: object
-      required:
         - shortDescription
         - value
         - publishDate
         - closeDate
+        - procurementRoute
       properties:
         shortDescription:
           type: string
           example: RFQ for Provision of PPE
         value:
           type: string
-          example: "9000"
-        valueCurrency:
-          type: string
-          example: GBP
-        bidsCurrency:
-          type: string
-          example: GBP
+          example: 0
         qualEnvStatus:
           type: string
           example: 0
@@ -174,18 +157,7 @@ components:
         rankingStrategy:
           type: string
           example: BEST_TECHNICAL_SCORE
-
-    RfxAdditionalInfo:
-      title: RfxAdditionalInfo
-      type: object
-      required:
-        - name
-        - value
-      properties:
-        name:
-          type: string
-          example: Procurement Route
-        value:
+        procurementRoute:
           type: string
           example: Call Off (Competition)
 
@@ -238,6 +210,14 @@ components:
           type: string
           example: ""
 
+    inline_response_401:
+      type: object
+      properties:
+        error:
+          type: string
+          example: The resource you were looking for requires L2 authentication.
+          default: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
+
     inline_response_403:
       type: object
       properties:
@@ -261,14 +241,6 @@ components:
           type: string
           example: An unknown error has occurred.
           default: An unknown error has occurred.
-
-    inline_response_401:
-      type: object
-      properties:
-        error:
-          type: string
-          example: The resource you were looking for requires L2 authentication.
-          default: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
 
   securitySchemes:
     ApiKeyAuth:        # arbitrary name for the security scheme
