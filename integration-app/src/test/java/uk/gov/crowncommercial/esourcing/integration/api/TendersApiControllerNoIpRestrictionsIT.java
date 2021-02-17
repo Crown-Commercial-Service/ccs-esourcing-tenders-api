@@ -2,6 +2,7 @@ package uk.gov.crowncommercial.esourcing.integration.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
@@ -53,14 +54,14 @@ public class TendersApiControllerNoIpRestrictionsIT {
   }
 
   @Test
-  public void postProjectITT_expectOk() throws Exception {
+  public void salesforce_expectOk() throws Exception {
 
     InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
-    when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
-        .thenReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK));
+    doReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK))
+    .when(tenderApiService).createProcurementCase(any(ProjectTender.class));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
@@ -70,10 +71,10 @@ public class TendersApiControllerNoIpRestrictionsIT {
   }
 
   @Test
-  public void postProjectITT_noApiKey_expectForbidden() throws Exception {
+  public void salesforce_noApiKey_expectForbidden() throws Exception {
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/projectITT")
+        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 

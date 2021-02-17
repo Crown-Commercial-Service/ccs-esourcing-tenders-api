@@ -106,5 +106,4 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   ApiKeyAuthManager apiKeyAuthManager() {
     return new ApiKeyAuthManager(apiKeys);
   }
-
 }
