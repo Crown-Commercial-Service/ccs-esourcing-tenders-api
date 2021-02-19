@@ -157,6 +157,21 @@ public class TenderApiService implements TendersApiDelegate {
     rfxAdditionalInfoList.addAdditionalInfoItem(
         getRfxAddInfo("Procurement Route", rfx.getProcurementRoute()));
 
+    if(rfx.getFrameworkName() != null){
+      rfxAdditionalInfoList.addAdditionalInfoItem(
+          getRfxAddInfo("Framework Name", rfx.getFrameworkName()));
+    }
+    if(rfx.getFrameworkLotNumber() != null){
+      rfxAdditionalInfoList.addAdditionalInfoItem(
+          getRfxAddInfo("Lot Number", rfx.getFrameworkLotNumber()));
+    }
+
+    // TODO Awaiting confirmation from Jaggaer of parameter name
+//    if(rfx.getFrameworkRMNumber() != null){
+//      rfxAdditionalInfoList.addAdditionalInfoItem(
+//          getRfxAddInfo("RM Number", rfx.getFrameworkRMNumber()));
+//    }
+
     Rfx rfxJag = new Rfx();
     rfxJag.setRfxAdditionalInfoList(rfxAdditionalInfoList);
 

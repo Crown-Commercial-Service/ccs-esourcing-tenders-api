@@ -6,7 +6,7 @@ info:
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
+    url: https://dev-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
 
 tags:
   - name: salesforce
@@ -160,6 +160,15 @@ components:
         procurementRoute:
           type: string
           example: Call Off (Competition)
+        frameworkName:
+          type: string
+          example: TT3242
+        frameworkLotNumber:
+          type: string
+          example: Lot 1
+        frameworkRMNumber:
+          type: string
+          example: 12345
 
     RfxStatusList:
       type: array

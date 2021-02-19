@@ -117,7 +117,9 @@ public class AppConfiguration {
 
     /*
       Create new webclient to be used in combination with an Exchange Function Filter to
-      intercept the token response before it is processed
+      intercept the token response before it is processed.  This is required because the
+      parameter names (token & expire_in) in the Jaggaer token response do not conform
+      to the Oauth standards.
      */
     ReactiveOAuth2AuthorizedClientService authorizedClientService =
         new InMemoryReactiveOAuth2AuthorizedClientService(clientRegistrationRepository);
@@ -194,7 +196,7 @@ public class AppConfiguration {
 
   /**
    * This class generates an Exchange Filter Function to intercept the token response and
-   * check and replace non-standard parameter names
+   * check and replace non-standard Oauth parameter names
    */
   private static final class JaggaerExchangeFilterFunction implements ExchangeFilterFunction {
 
@@ -269,3 +271,4 @@ public class AppConfiguration {
     }
   }
 }
+
