@@ -4,9 +4,14 @@ info:
   version: 0.0.1-SNAPSHOT
 
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://dev-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
+  - description: CCS Gov PaaS Server (Dev,Sandbox)
+    url: 'https://{environment}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT'
+    variables:
+      environment:
+        default: sandbox    # Default server
+        enum:
+          - dev
+          - sandbox
 
 tags:
   - name: salesforce
@@ -23,7 +28,7 @@ paths:
         Creates a new CCS procurement case in the Jaggaer eSourcing platform.
       operationId: createProcurementCase
       responses:
-        201:
+        '201':
           description: Success (for object creation). Its information is available in the data field at the top level of the response body. The API URL where the object can be retrieved is also returned in the Location header of the response.
           content:
             application/json:
@@ -38,24 +43,22 @@ paths:
                     type: string
                     description: the itt code (tender id)
                     example: "itt_586"
-        403:
-          description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
-        404:
-          description: Not found. Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-        500:
-          description: An unknown server error has occurred.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_500'
+        '400':
+          $ref: '#/components/responses/400InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+        '502':
+          $ref: '#/components/responses/500InternalServerError'
+        '504':
+          $ref: '#/components/responses/504GatewayTimeout'
         default:
           description: successful operation
       requestBody:
@@ -78,26 +81,31 @@ paths:
             schema:
               $ref: '#/components/schemas/RfxStatusList'
       responses:
-        200:
+        '200':
           description: ok
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RfxStatus200ResponseList'
-        401:
-          description: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_401'
-        403:
-          description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: '#/components/schemas/inline_response_403'
+        '400':
+          $ref: '#/components/responses/400InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+        '502':
+          $ref: '#/components/responses/500InternalServerError'
+        '504':
+          $ref: '#/components/responses/504GatewayTimeout'
 
 components:
+
   schemas:
 
     ProjectTender:
@@ -109,7 +117,6 @@ components:
       properties:
         tenderReferenceCode:
           type: string
-          nullable: false
           example: project_1078
         subject:
           type: string
@@ -219,37 +226,138 @@ components:
           type: string
           example: ""
 
-    inline_response_401:
+    Errors:
       type: object
       properties:
-        error:
-          type: string
-          example: The resource you were looking for requires L2 authentication.
-          default: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
 
-    inline_response_403:
+    Error:
       type: object
       properties:
-        error:
+        status:
           type: string
-          example: You are not authorized to access this page.
-          default: You are not authorized to access this page.
+        title:
+          type: string
+        detail:
+          type: string
 
-    inline_response_404:
-      type: object
-      properties:
-        error:
-          type: string
-          example: The resource you were looking for could not be found.
-          default: The resource you were looking for could not be found.
 
-    inline_response_500:
-      type: object
-      properties:
-        error:
-          type: string
-          example: An unknown error has occurred.
-          default: An unknown error has occurred.
+  responses:
+
+    400InvalidRequest:
+      description: Invalid request. This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: The resource you were looking for requires L2 authentication.
+                default: Invalid Request
+
+    401Unauthorized:
+      description: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: The resource you were looking for requires L2 authentication.
+                default: No authorization. A valid API key was not provided with the request, so the API could not associate a user with the request.
+
+    403Forbidden:
+      description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: You are not authorized to access this page.
+                default: You are not authorized to access this page.
+
+    404NotFound:
+      description: Not found. Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: The resource you were looking for could not be found.
+                default: The resource you were looking for could not be found.
+
+    429TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: The resource has recieved to many requests
+                default: The resource has recieved to many requests
+
+    500InternalServerError:
+      description: An unknown server error has occurred.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: An unknown error has occurred.
+                default: An unknown error has occurred.
+
+    502BadGateway:
+      description: Bad Gateway. The server received an invalid response or backend is not ready to handle requests. Repeat request for repeatable operations or check object data with interval 1-5 min.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: Gateway Error
+                default: Gateway Error
+
+    504GatewayTimeout:
+      description: Bad Gateway. The server received an invalid response or backend is not ready to handle requests. Repeat request for repeatable operations or check object data with interval 1-5 min.
+      content:
+        application/vnd.api+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Errors'
+            type: object
+            properties:
+              description:
+                type: string
+                example: Service Unavailable
+                default: Service Unavailable
 
   securitySchemes:
     ApiKeyAuth:        # arbitrary name for the security scheme
