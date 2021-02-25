@@ -1,4 +1,4 @@
-# JAGGAER MOCK SERVER
+# SALESFORCE MOCK SERVER
 
 ## Overview
 Java 11 / SpringBoot openapi generated API

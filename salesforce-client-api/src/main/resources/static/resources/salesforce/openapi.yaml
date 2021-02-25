@@ -1,80 +1,18 @@
 openapi: 3.0.0
 info:
-  title: CCS eSourcing Integration Server API
+  title: CCS eSourcing Salesforce Client API
   version: 0.0.1-SNAPSHOT
 servers:
-  - description: 'CCS GPaaS Server (Dev,Sandbox)'
-    url: >-
-      https://{environment}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT
-    variables:
-      environment:
-        default: sandbox
-        enum:
-          - dev
-          - sandbox
-# Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/joeraymond-roweit/Integration_Server_API/0.0.1-SNAPSHOT
+    url: https://virtserver.swaggerhub.com/joeraymond-roweit/Salesforce_Client_API/0.0.1-SNAPSHOT
 tags:
-  - name: salesforce
-  - name: RfxStatus
+  - name: RfxStatusList
 paths:
-  /tenders/ProcurementProjects/salesforce:
-    post:
-      tags:
-        - salesforce
-      summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
-      description: Creates a new CCS procurement case in the Jaggaer eSourcing platform.
-      operationId: createProcurementCase
-      responses:
-        '201':
-          description: >-
-            Success (for object creation). Its information is available in the
-            data field at the top level of the response body. The API URL where
-            the object can be retrieved is also returned in the Location header
-            of the response.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  tenderReferenceCode:
-                    type: string
-                    description: project code (project id)
-                    example: project_1063
-                  rfxReferenceCode:
-                    type: string
-                    description: the itt code (tender id)
-                    example: itt_586
-        '400':
-          $ref: '#/components/responses/400InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '404':
-          $ref: '#/components/responses/404NotFound'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
-        '500':
-          $ref: '#/components/responses/500InternalServerError'
-        '502':
-          $ref: '#/components/responses/502BadGateway'
-        '504':
-          $ref: '#/components/responses/504GatewayTimeout'
-        default:
-          description: successful operation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProjectTender'
-        description: Created sourcing object
-        required: true
   /tenders/ProcurementProjects/updateProcurementStage:
     post:
       tags:
-        - RfxStatus
+        - RfxStatusList
       description: Update Procurement Project stage
       operationId: updateCaseRFxStatus
       requestBody:
@@ -107,73 +45,6 @@ paths:
           $ref: '#/components/responses/504GatewayTimeout'
 components:
   schemas:
-    ProjectTender:
-      type: object
-      required:
-        - subject
-        - procurementReference
-        - rfx
-      properties:
-        tenderReferenceCode:
-          type: string
-          example: project_1078
-        subject:
-          type: string
-          example: Project for Provision of Face Masks
-        procurementReference:
-          type: string
-          example: '324233324'
-        rfx:
-          $ref: '#/components/schemas/Rfx'
-    Rfx:
-      title: Rfx
-      type: object
-      required:
-        - shortDescription
-        - value
-        - publishDate
-        - closeDate
-        - procurementRoute
-      properties:
-        shortDescription:
-          type: string
-          example: RFQ for Provision of PPE
-        value:
-          type: string
-          example: 0
-        qualEnvStatus:
-          type: string
-          example: 0
-        techEnvStatus:
-          type: string
-          example: 1
-        commEnvStatus:
-          type: string
-          example: 0
-        publishDate:
-          type: string
-          example: '2021-01-28T12:00:00.000+00:00'
-        closeDate:
-          type: string
-          example: '2021-02-27T12:00:00.000+00:00'
-        visibilityEGComments:
-          type: string
-          example: 1
-        rankingStrategy:
-          type: string
-          example: BEST_TECHNICAL_SCORE
-        procurementRoute:
-          type: string
-          example: Call Off (Competition)
-        frameworkName:
-          type: string
-          example: TT3242
-        frameworkLotNumber:
-          type: string
-          example: Lot 1
-        frameworkRMNumber:
-          type: string
-          example: 12345
     RfxStatusList:
       type: array
       items:
