@@ -1,31 +1,26 @@
 openapi: 3.0.0
-
 info:
-  description: This is a simple API
+  title: CCS eSourcing Jaggaer Client API
   version: 0.0.1-SNAPSHOT
-  title: Crown Commercial Service
-
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/joeraymond-roweit/Jaggaer_Client_API/0.0.1-SNAPSHOT
+  - description: Jaaager Pre-Prod Environment
+    url: >-
+      https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/ja/v1/
 tags:
   - name: Projects
     description: Jaggaer Projects API
   - name: Rfx
     description: Jaggaer RFX API
-
-servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/joeraymond-roweit/jaggaer-client/0.0.1-SNAPSHOT
-  - description: SwaggerHub API Auto Mocking
-    url: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
-
 paths:
   /projects:
     post:
       tags:
         - Projects
       summary: Create Jaggaer Project
-      description: >-
-        Creates a Project in Jaggaer.
+      description: Creates a Project in Jaggaer.
       operationId: createProject
       responses:
         '201':
@@ -35,7 +30,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProjectResponse'
         '403':
-          description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
+          description: >-
+            The API key and request syntax was valid but the server is refusing
+            to complete the request. This can happen if you are trying to read
+            or write to objects or properties that you do not have access to.
           content:
             application/vnd.api+json:
               schema:
@@ -45,7 +43,10 @@ paths:
                     example: You are not authorized to access this page.
                     default: You are not authorized to access this page.
         '404':
-          description: Not found. Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+          description: >-
+            Not found. Either the request method and path supplied do not
+            specify a known action in the API, or the object specified by the
+            request does not exist.
           content:
             application/vnd.api+json:
               schema:
@@ -63,14 +64,12 @@ paths:
               $ref: '#/components/schemas/Projects'
         description: Created sourcing object
         required: true
-
   /rfxs:
     post:
       tags:
         - Rfx
       summary: Create an RFX for invitiation linked to a project
-      description: >-
-        Creates a CCS RFX for invitiation linked to a project.
+      description: Creates a CCS RFX for invitiation linked to a project.
       operationId: createRFX
       responses:
         '201':
@@ -80,7 +79,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/RfxResponse'
         '403':
-          description: The API key and request syntax was valid but the server is refusing to complete the request. This can happen if you are trying to read or write to objects or properties that you do not have access to.
+          description: >-
+            The API key and request syntax was valid but the server is refusing
+            to complete the request. This can happen if you are trying to read
+            or write to objects or properties that you do not have access to.
           content:
             application/vnd.api+json:
               schema:
@@ -90,7 +92,10 @@ paths:
                     example: You are not authorized to access this page.
                     default: You are not authorized to access this page.
         '404':
-          description: Not found. Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+          description: >-
+            Not found. Either the request method and path supplied do not
+            specify a known action in the API, or the object specified by the
+            request does not exist.
           content:
             application/vnd.api+json:
               schema:
@@ -108,10 +113,8 @@ paths:
               $ref: '#/components/schemas/Rfxs'
         description: Created rfx object
         required: true
-
 components:
   schemas:
-
     Projects:
       type: object
       required:
@@ -123,7 +126,6 @@ components:
           example: CREATEUPDATE
         project:
           $ref: '#/components/schemas/Project'
-
     Project:
       type: object
       required:
@@ -131,7 +133,6 @@ components:
       properties:
         tender:
           $ref: '#/components/schemas/Tender'
-
     Tender:
       type: object
       required:
@@ -155,7 +156,6 @@ components:
           example: CCS_PROJ
         additionalInfoList:
           $ref: '#/components/schemas/AdditionalInfoList'
-
     BuyerCompany:
       type: object
       required:
@@ -163,8 +163,7 @@ components:
       properties:
         id:
           type: string
-          example: "51435"
-
+          example: '51435'
     OwnerUser:
       type: object
       required:
@@ -173,7 +172,6 @@ components:
         login:
           type: string
           example: sro-ccs
-
     AdditionalInfoList:
       type: object
       properties:
@@ -181,7 +179,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AdditionalInfoItem'
-
     AdditionalInfoItem:
       type: object
       properties:
@@ -190,7 +187,6 @@ components:
           example: Procurement Reference
         values:
           $ref: '#/components/schemas/Values'
-
     Values:
       type: object
       properties:
@@ -198,14 +194,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValueItem'
-
     ValueItem:
       type: object
       properties:
         value:
           type: object
-          example: "324233324"
-
+          example: '324233324'
     Rfxs:
       type: object
       required:
@@ -217,7 +211,6 @@ components:
           example: CREATEUPDATE
         rfx:
           $ref: '#/components/schemas/Rfx'
-
     Rfx:
       type: object
       required:
@@ -228,7 +221,6 @@ components:
           $ref: '#/components/schemas/RfxSetting'
         rfxAdditionalInfoList:
           $ref: '#/components/schemas/RfxAdditionalInfoList'
-
     RfxSetting:
       type: object
       required:
@@ -258,7 +250,7 @@ components:
           example: itt_543
         value:
           type: string
-          example: "9000"
+          example: '9000'
         valueCurrency:
           type: string
           example: GBP
@@ -267,29 +259,28 @@ components:
           example: GBP
         qualEnvStatus:
           type: string
-          example: "0"
+          example: '0'
         techEnvStatus:
           type: string
-          example: "1"
+          example: '1'
         commEnvStatus:
           type: string
-          example: "0"
+          example: '0'
         publishDate:
           type: string
-          example: "2019-08-20T13:54:32.000+00:00"
+          example: '2019-08-20T13:54:32.000+00:00'
         closeDate:
           type: string
-          example: "2019-08-30T13:54:32.000+00:00"
+          example: '2019-08-30T13:54:32.000+00:00'
         rfxType:
           type: string
           example: STANDARD_ITT
         visibilityEGComments:
           type: string
-          example: "1"
+          example: '1'
         rankingStrategy:
           type: string
           example: BEST_TECHNICAL_SCORE
-
     RfxAdditionalInfoList:
       type: object
       properties:
@@ -297,7 +288,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RfxAdditionalInfoItem'
-
     RfxAdditionalInfoItem:
       type: object
       properties:
@@ -306,7 +296,6 @@ components:
           example: Procurement Route
         values:
           $ref: '#/components/schemas/RfxValues'
-
     RfxValues:
       type: object
       properties:
@@ -314,14 +303,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RfxValueItem'
-
     RfxValueItem:
       type: object
       properties:
         value:
           type: object
           example: Open Market
-
     RfxResponse:
       type: object
       properties:
@@ -337,7 +324,6 @@ components:
         rfxReferenceCode:
           type: string
           example: itt_534
-
     ProjectResponse:
       type: object
       properties:
@@ -353,14 +339,13 @@ components:
         tenderReferenceCode:
           type: string
           example: project_1002
-
   securitySchemes:
-    oAuthSample:    # <---- arbitrary name
+    oAuthSample:
       type: oauth2
       flows:
-        clientCredentials :   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
-          tokenUrl: https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
+        clientCredentials:
+          tokenUrl: >-
+            https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
           scopes: {}
-
 security:
   - oAuthSample: []
