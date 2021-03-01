@@ -29,7 +29,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Value("${ccs.esourcing.api-keys:}")
   private Set<String> apiKeys;
 
-  @Value("${ccs.esourcing.ipallow-list:}")
+  @Value("${ccs.esourcing.ip-allow-list:}")
   private Set<String> ipAllowList;
 
   @Value("${ccs.esourcing.actuator-ipallow-list:}")
@@ -38,6 +38,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
+    LOGGER.info("API Key header name of '{}', used with API keys - {}.", apiKeyHeader, apiKeys);
     ApiKeyAuthFilter apiKeyFilter = new ApiKeyAuthFilter(apiKeyHeader);
     apiKeyFilter.setAuthenticationManager(apiKeyAuthManager());
 

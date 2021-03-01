@@ -135,16 +135,22 @@ All of the ESourcing application specific application properties that can be set
 
 Given that most of these properties have suitable default values set for each of the environments the following lists properties that are of interest that may need to be set.
 
-| Property                     | Environment variable       | Value         | Description                                                  |
-| ---------------------------- | -------------------------- | ------------- | ------------------------------------------------------------ |
-| ccs.esourcing.ipallow-list   | CCS_ESOURCING_ALLOWLIST    | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
-| ccs.esourcing.api-key-header | CCS_ESOURCING_APIKEYHEADER | string        | HTTP header to be used for API Key authentication            |
-| ccs.esourcing.api-keys       | CCS_ESOURCING_APIKEYS      | string        | Comma separated list of API keys used for "authenticating" requests |
-| rollbar.enabled              | ROLLBAR_ENABLED            | true \| false | Enable Rollbar integration                                   |
-| rollbar.access-token         | ROLLBAR_ACCESS_TOKEN       | string        | The access token for the Rollbar account/project             |
-| rollbar.environment          | ROLLBAR_ENVIRONMENT        | string        | Value to use for the Rollbar environment attribute           |
-| rollbar.framework            | ROLLBAR_FRAMEWORK          | string        | Value to use for the Rollbar framework attribute             |
-| rollbar.endpoint             | ROLLBAR_ENDPOINT           | string        | Can be used to override Rollbar URL endpoint                 |
+| Property                                                                    | Environment variable                                                        | Value         | Description                                                                                                       |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| ccs.esourcing.ip-allow-list                                                 | CCS_ESOURCING_IP_ALLOW_LIST                                                 | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
+| ccs.esourcing.api-key-header                                                | CCS_ESOURCING_API_KEY_HEADER                                                | string        | HTTP header to be used for API Key authentication                                                                 |
+| ccs.esourcing.api-keys                                                      | CCS_ESOURCING_API_KEYS                                                      | string        | Comma separated list of API keys used for "authenticating" requests                                               |
+| rollbar.enabled                                                             | ROLLBAR_ENABLED                                                             | true \| false | Enable Rollbar integration                                                                                        |
+| rollbar.access-token                                                        | ROLLBAR_ACCESS_TOKEN                                                        | string        | The access token for the Rollbar account/project                                                                  |
+| rollbar.environment                                                         | ROLLBAR_ENVIRONMENT                                                         | string        | Value to use for the Rollbar environment attribute                                                                |
+| rollbar.framework                                                           | ROLLBAR_FRAMEWORK                                                           | string        | Value to use for the Rollbar framework attribute                                                                  |
+| rollbar.endpoint                                                            | ROLLBAR_ENDPOINT                                                            | string        | Can be used to override Rollbar URL endpoint                                                                      |
+| spring.security.oauth2.client.provider.jaggaer.token_uri                    | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKEN_URI                    | string        | Jaggaer Token API URL                                                                                             |
+| spring.security.oauth2.client.registration.jaggaer.client-id                | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_ID                | string        | Jaggaer Client ID                                                                                                 |
+| spring.security.oauth2.client.registration.jaggaer.client-secret            | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_SECRET            | string        | Jaggaer Client Secret                                                                                             |
+| spring.security.oauth2.client.registration.jaggaer.authorization-grant-type | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_AUTHORIZATION_GRANT_TYPE | string        | Jaggaer Oauth grant type                                                                                          |
+| ccs.esourcing.jaggaer-client-url                                            | CCS_ESOURCING_JAGGAER_CLIENT_URL                                            | string        | The URL of the Jaggaer API                                                                                        |
+| ccs.esourcing.salesforce-client-url                                         | CCS_ESOURCING_SALESFORCE_CLIENT_URL                                         | string        | The URL of the Salesforce API                                                                                     |
 
 ## Licence
 The project is licensed with the [MIT License](https://opensource.org/licenses/MIT).
