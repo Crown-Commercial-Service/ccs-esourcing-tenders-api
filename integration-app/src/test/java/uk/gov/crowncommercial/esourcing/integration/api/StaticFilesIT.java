@@ -51,6 +51,15 @@ public class StaticFilesIT {
   }
 
   @Test
+  public void getSalesforceOpenApiYaml_noApiKey_expectOk() throws Exception {
+
+    MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/resources/salesforce/openapi.yaml"))
+        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+
+    assertThat(mvcResult.getResponse().getContentAsString()).startsWith("openapi: 3.0.0");
+  }
+
+  @Test
   public void getFavIcon_noApiKey_expectOk() throws Exception {
 
     MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/favicon.ico"))

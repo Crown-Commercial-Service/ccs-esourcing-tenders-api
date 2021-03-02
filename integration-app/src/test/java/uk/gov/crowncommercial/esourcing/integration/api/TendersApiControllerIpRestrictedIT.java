@@ -5,6 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +54,15 @@ public class TendersApiControllerIpRestrictedIT {
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
   }
 
+  ClassLoader classLoader = getClass().getClassLoader();
+  InputStream inputStream = classLoader.getResourceAsStream("test-data/valid-request-body.json");
+  String requestBody;
+  {
+    assert inputStream != null;
+    requestBody = new BufferedReader(new InputStreamReader(inputStream))
+        .lines().collect(Collectors.joining("\n"));
+  }
+
   @Test
   public void salesforce_expectForbidden() throws Exception {
 
@@ -86,7 +99,7 @@ public class TendersApiControllerIpRestrictedIT {
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(inlineResponse201);
@@ -103,7 +116,7 @@ public class TendersApiControllerIpRestrictedIT {
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.0, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(inlineResponse201);
@@ -120,7 +133,7 @@ public class TendersApiControllerIpRestrictedIT {
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.3, 10.0.0.1").header(Constants.API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(inlineResponse201);
@@ -137,7 +150,7 @@ public class TendersApiControllerIpRestrictedIT {
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(Constants.CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header("X-Forwarded-For", "192.168.0.4").header(Constants.API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content("requestBody"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();

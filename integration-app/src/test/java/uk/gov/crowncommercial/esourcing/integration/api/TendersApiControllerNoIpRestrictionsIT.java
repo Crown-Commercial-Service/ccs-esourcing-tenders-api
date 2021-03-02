@@ -3,11 +3,14 @@ package uk.gov.crowncommercial.esourcing.integration.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +56,15 @@ public class TendersApiControllerNoIpRestrictionsIT {
     registry.add("ccs.esourcing.api-keys", () -> "integration-test-api-key");
   }
 
+  ClassLoader classLoader = getClass().getClassLoader();
+  InputStream inputStream = classLoader.getResourceAsStream("test-data/valid-request-body.json");
+  String requestBody;
+  {
+    assert inputStream != null;
+    requestBody = new BufferedReader(new InputStreamReader(inputStream))
+        .lines().collect(Collectors.joining("\n"));
+  }
+
   @Test
   public void salesforce_expectOk() throws Exception {
 
@@ -63,7 +75,7 @@ public class TendersApiControllerNoIpRestrictionsIT {
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
     String expected = objectMapper.writeValueAsString(inlineResponse201);
@@ -75,7 +87,7 @@ public class TendersApiControllerNoIpRestrictionsIT {
 
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .contentType(MediaType.APPLICATION_JSON).content("{requestBody}"))
         .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
