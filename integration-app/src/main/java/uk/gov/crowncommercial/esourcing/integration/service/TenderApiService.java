@@ -3,7 +3,11 @@ package uk.gov.crowncommercial.esourcing.integration.service;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
 import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
@@ -40,8 +45,10 @@ import uk.gov.crowncommercial.esourcing.salesforce.client.RfxStatusListApi;
 import uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatusList;
 
 @Service
+@Validated
 public class TenderApiService implements TendersApiDelegate {
 
+  private final Validator localValidatorFactoryBean;
   private final ProjectsApi projectsApi;
   private final RfxApi rfxApi;
   private final RfxStatusListApi rfxStatusListApi;
@@ -63,16 +70,24 @@ public class TenderApiService implements TendersApiDelegate {
   @Value("${ccs.esourcing.jaggaer.default.owner-user}")
   private String defaultOwnerUser;
 
+
   public TenderApiService(
-      ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi) {
+      ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi,
+      Validator localValidatorFactoryBean) {
     this.projectsApi = projectsApi;
     this.rfxApi = rfxApi;
     this.rfxStatusListApi = rfxStatusListApi;
+    this.localValidatorFactoryBean = localValidatorFactoryBean;
   }
 
   @Override
   public ResponseEntity<InlineResponse201> createProcurementCase(
       uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender projectTender) {
+
+    Set<ConstraintViolation<ProjectTender>> validate = localValidatorFactoryBean.validate(projectTender);
+    if (!validate.isEmpty()) {
+      throw new ConstraintViolationException(validate);
+    }
 
     InlineResponse201 inlineResponse201 = new InlineResponse201();
 

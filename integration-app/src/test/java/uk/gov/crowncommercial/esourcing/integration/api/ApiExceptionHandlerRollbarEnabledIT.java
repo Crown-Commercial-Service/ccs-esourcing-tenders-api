@@ -13,7 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rollbar.api.payload.Payload;
 import com.rollbar.api.payload.data.Level;
 import com.rollbar.notifier.sender.Sender;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.Clock;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -68,9 +72,19 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     registry.add("info.app.version", () -> "12.34.56");
   }
 
+  ClassLoader classLoader = getClass().getClassLoader();
+  InputStream inputStream = classLoader.getResourceAsStream("test-data/valid-request-body.json");
+  String requestBody;
+  {
+    assert inputStream != null;
+    requestBody = new BufferedReader(new InputStreamReader(inputStream))
+        .lines().collect(Collectors.joining("\n"));
+  }
+
   @Test
   public void salesforce_throwsNullPointerException_expectInternalServerErrorAndRollbarSend()
       throws Exception {
+
 
     /* mock the service call */
     when(tenderApiService.createProcurementCase(any(ProjectTender.class))).thenThrow(new NullPointerException(
@@ -79,7 +93,7 @@ public class ApiExceptionHandlerRollbarEnabledIT {
     /* "call" the REST API */
     MvcResult mvcResult = mockMvc
         .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 
     /* verify the REST API response */
