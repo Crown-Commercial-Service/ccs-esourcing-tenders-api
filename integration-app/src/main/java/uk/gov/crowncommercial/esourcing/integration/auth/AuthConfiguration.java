@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
@@ -43,8 +42,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
     apiKeyFilter.setAuthenticationManager(apiKeyAuthManager());
 
     // @formatter:off
-    http.addFilterBefore(ipAddressFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-        .addFilter(apiKeyFilter)
+    http.addFilter(apiKeyFilter)
         .authorizeRequests()
           .antMatchers("/actuator/**").permitAll()
           .antMatchers("/*/*/openapi.yaml").permitAll()
