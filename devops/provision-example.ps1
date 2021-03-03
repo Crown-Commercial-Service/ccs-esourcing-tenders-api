@@ -38,19 +38,13 @@ $SWAGGER_HUB_IP_ADDRESSES = "3.223.162.99, 18.213.102.186, 23.23.82.88, 34.231.3
 cf set-env $APP_NAME CCS_ESOURCING_IP_ALLOW_LIST "$ROWEIT_IP_ADDRESSES $SWAGGER_HUB_IP_ADDRESSES"
 
 # set the API keys needed to allow access to the application
-cf set-env $APP_NAME CCS_ESOURCING_API_KEYS "pzoduvoasekghcbapsfypaicfisahh, nas4daig7audgoaijdvjklavbgyua8"
-
-# set Jaggaer API endpoint URL
-cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENT_URL ""
-
-# set Salesforce API endpoint URL
-cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENT_URL ""
+cf set-env $APP_NAME CCS_ESOURCING_API_KEYS "replace-me-1, replace-me-2"
 
 # Jaggaer Oauth credentials
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKEN_URI = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_ID = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_SECRET = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_AUTHORIZATION_GRANT_TYPE = ""
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKEN_URI replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_ID replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_SECRET replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_AUTHORIZATION_GRANT_TYPE replace-me
 
 # Jaggaer Client URL
 cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENT_URL = ""
@@ -59,8 +53,8 @@ cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENT_URL = ""
 cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENT_URL = ""
 
 # Rollbar configuration
-# cf set-env $APP_NAME ROLLBAR_ENABLED true
-# cf set-env $APP_NAME ROLLBAR_ACCESSTOKEN a098sd7gpaisdhkghalkjsdhy
+cf set-env $APP_NAME ROLLBAR_ENABLED true
+cf set-env $APP_NAME ROLLBAR_ACCESSTOKEN replace-me
 
 # Application is now deployed but not running. It is anticipated that the actual
 # deployment will be via TravisCI and no other manual configuration is required.
