@@ -137,11 +137,11 @@ Given that most of these properties have suitable default values set for each of
 
 | Property                                                     | Environment variable                                         | Type          | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- | ------------------------------------------------------------ |
-| ccs.esourcing.ip-allow-list                                  | CCS_ESOURCING_IP_ALLOW_LIST                                  | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
-| ccs.esourcing.api-key-header                                 | CCS_ESOURCING_API_KEY_HEADER                                 | string        | HTTP header to be used for API Key authentication            |
-| ccs.esourcing.api-keys                                       | CCS_ESOURCING_API_KEYS                                       | string        | Comma separated list of API keys used for "authenticating" requests |
+| ccs.esourcing.ip-allow-list                                  | CCS_ESOURCING_IPALLOWLIST                                    | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
+| ccs.esourcing.api-key-header                                 | CCS_ESOURCING_APIKEYHEADER                                   | string        | HTTP header to be used for API Key authentication            |
+| ccs.esourcing.api-keys                                       | CCS_ESOURCING_APIKEYS                                        | string        | Comma separated list of API keys used for "authenticating" requests |
 | rollbar.enabled                                              | ROLLBAR_ENABLED                                              | true \| false | Enable Rollbar integration                                   |
-| rollbar.access-token                                         | ROLLBAR_ACCESS_TOKEN                                         | string        | The access token for the Rollbar account/project             |
+| rollbar.access-token                                         | ROLLBAR_ACCESSTOKEN                                          | string        | The access token for the Rollbar account/project             |
 | rollbar.environment                                          | ROLLBAR_ENVIRONMENT                                          | string        | Value to use for the Rollbar environment attribute           |
 | rollbar.framework                                            | ROLLBAR_FRAMEWORK                                            | string        | Value to use for the Rollbar framework attribute             |
 | rollbar.endpoint                                             | ROLLBAR_ENDPOINT                                             | string        | Can be used to override Rollbar URL endpoint                 |
