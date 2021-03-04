@@ -39,7 +39,7 @@ cf set-env $APP_NAME CCS_ESOURCING_IPALLOWLIST "$ROWEIT_IP_ADDRESSES $SWAGGER_HU
 
 # set the API keys needed to allow access to the application
 cf set-env $APP_NAME CCS_ESOURCING_APIKEYHEADER "replace-me"
-f set-env $APP_NAME CCS_ESOURCING_APIKEYS "replace-me-1, replace-me-2"
+cf set-env $APP_NAME CCS_ESOURCING_APIKEYS "replace-me-1, replace-me-2"
 
 # Jaggaer OAuth2 credentials
 cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKENURI replace-me
