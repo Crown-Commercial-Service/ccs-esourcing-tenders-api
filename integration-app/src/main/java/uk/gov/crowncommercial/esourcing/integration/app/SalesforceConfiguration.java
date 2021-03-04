@@ -12,7 +12,7 @@ import uk.gov.crowncommercial.esourcing.salesforce.client.RfxStatusListApi;
 public class SalesforceConfiguration {
   private static final Logger LOGGER = LoggerFactory.getLogger(SalesforceConfiguration.class);
 
-  @Value("${ccs.esourcing.salesforce-client-url}")
+  @Value("${ccs.esourcing.salesforce.client-url}")
   private String salesforceClientUrl;
 
   @Bean
