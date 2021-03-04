@@ -58,7 +58,7 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxApi;
 public class JaggaerConfiguration {
   private static final Logger LOGGER = LoggerFactory.getLogger(JaggaerConfiguration.class);
 
-  @Value("${ccs.esourcing.jaggaer-client-url}")
+  @Value("${ccs.esourcing.jaggaer.client-url}")
   private String jaggaerClientUrl;
 
   /*
