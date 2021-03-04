@@ -158,7 +158,7 @@ As the code is still in development the following properties are subject to chan
 | ccs.esourcing.jaggaer.default.buyer-company-id               | CCS_ESOURCING_JAGGAER_DEFAULT_BUYERCOMPANYID              | string |             |
 | ccs.esourcing.jaggaer.default.project-type                   | CCS_ESOURCING_JAGGAER_DEFAULT_PROJECTTYPE                 | string |             |
 | ccs.esourcing.jaggaer.default.source-template-reference-code | CCS_ESOURCING_JAGGAER_DEFAULT_SOURCETEMPLATEREFERENCECODE | string |             |
-| ccs.esourcing.jaggaer.default.owner-user=sro                 | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |             |
+| ccs.esourcing.jaggaer.default.owner-user                     | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |             |
 
 ## Licence
 
