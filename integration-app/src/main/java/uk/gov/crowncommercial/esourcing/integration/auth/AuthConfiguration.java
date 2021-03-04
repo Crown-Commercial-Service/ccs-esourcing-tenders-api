@@ -37,7 +37,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
-    LOGGER.info("API Key header name of '{}', used with API keys - {}.", apiKeyHeader, apiKeys);
+    LOGGER.info("API Key header name '{}', {} API keys configured.", apiKeyHeader, apiKeys.size());
     ApiKeyAuthFilter apiKeyFilter = new ApiKeyAuthFilter(apiKeyHeader);
     apiKeyFilter.setAuthenticationManager(apiKeyAuthManager());
 
