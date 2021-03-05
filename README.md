@@ -110,13 +110,13 @@ Within the GOV.UK PaaS Cloud Foundry [Organisation](https://docs.cloudfoundry.or
 
 The is taken further with the project contriving to create [Spring Profile](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-profiles)s which also match the Spaces and the deployment branches. The Spring Profile is then used to set the more static configuration suitable for the particular deployment environment. As an example the *local* profile configuration is defined in the [application-local.properties](./integration-app/src/main/resources/application-local.properties) file.
 
-| Profile | Space   | Branch         | Manifest         |                                                              |
-| ------- | ------- | -------------- | ---------------- | ------------------------------------------------------------ |
-| local   | none    | none           | none             | Used for local development testing                           |
-| dev     | Dev     | none           | manifest-dev     | Used for manual development testing, no CI/CD, manual pushes to Dev |
-| sandbox | sandbox | deploy/sandbox | manifest-sandbox | Shared development environment, CI/CD when changes pushed to deploy/sandbox |
-| test    | Test    | deploy/test    | manifest-test    | Shared test environment, CI/CD when changes pushed to deploy/test |
-| uat     | UAT     | deploy/uat     | manifest-uat     | Shared UAT environment, CI/CD when changes pushed to deploy/uat |
+| Spring Profile | Cloud Foundry Space | Git Branch     | Travis Manifest  |                                                              |
+| -------------- | ------------------- | -------------- | ---------------- | ------------------------------------------------------------ |
+| local          | none                | none           | none             | Used for local development testing                           |
+| dev            | Dev                 | none           | manifest-dev     | Used for manual development testing, no CI/CD, manual pushes to Dev |
+| sandbox        | sandbox             | deploy/sandbox | manifest-sandbox | Shared development environment, CI/CD when changes pushed to deploy/sandbox |
+| test           | Test                | deploy/test    | manifest-test    | Shared test environment, CI/CD when changes pushed to deploy/test |
+| uat            | UAT                 | none           | none             | Shared UAT environment, no CI/CD configured, not used        |
 
 ## How to configure and deploy the project
 
@@ -135,23 +135,32 @@ All of the ESourcing application specific application properties that can be set
 
 Given that most of these properties have suitable default values set for each of the environments the following lists properties that are of interest that may need to be set.
 
-| Property                                                                    | Environment variable                                                        | Value         | Description                                                                                                       |
-| --------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------- |
-| ccs.esourcing.ip-allow-list                                                 | CCS_ESOURCING_IP_ALLOW_LIST                                                 | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
-| ccs.esourcing.api-key-header                                                | CCS_ESOURCING_API_KEY_HEADER                                                | string        | HTTP header to be used for API Key authentication                                                                 |
-| ccs.esourcing.api-keys                                                      | CCS_ESOURCING_API_KEYS                                                      | string        | Comma separated list of API keys used for "authenticating" requests                                               |
-| rollbar.enabled                                                             | ROLLBAR_ENABLED                                                             | true \| false | Enable Rollbar integration                                                                                        |
-| rollbar.access-token                                                        | ROLLBAR_ACCESS_TOKEN                                                        | string        | The access token for the Rollbar account/project                                                                  |
-| rollbar.environment                                                         | ROLLBAR_ENVIRONMENT                                                         | string        | Value to use for the Rollbar environment attribute                                                                |
-| rollbar.framework                                                           | ROLLBAR_FRAMEWORK                                                           | string        | Value to use for the Rollbar framework attribute                                                                  |
-| rollbar.endpoint                                                            | ROLLBAR_ENDPOINT                                                            | string        | Can be used to override Rollbar URL endpoint                                                                      |
-| spring.security.oauth2.client.provider.jaggaer.token_uri                    | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKEN_URI                    | string        | Jaggaer Token API URL                                                                                             |
-| spring.security.oauth2.client.registration.jaggaer.client-id                | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_ID                | string        | Jaggaer Client ID                                                                                                 |
-| spring.security.oauth2.client.registration.jaggaer.client-secret            | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_SECRET            | string        | Jaggaer Client Secret                                                                                             |
-| spring.security.oauth2.client.registration.jaggaer.authorization-grant-type | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_AUTHORIZATION_GRANT_TYPE | string        | Jaggaer Oauth grant type                                                                                          |
-| ccs.esourcing.jaggaer-client-url                                            | CCS_ESOURCING_JAGGAER_CLIENT_URL                                            | string        | The URL of the Jaggaer API                                                                                        |
-| ccs.esourcing.salesforce-client-url                                         | CCS_ESOURCING_SALESFORCE_CLIENT_URL                                         | string        | The URL of the Salesforce API                                                                                     |
+| Property                                                     | Environment variable                                         | Type          | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- | ------------------------------------------------------------ |
+| ccs.esourcing.ip-allow-list                                  | CCS_ESOURCING_IPALLOWLIST                                    | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
+| ccs.esourcing.api-key-header                                 | CCS_ESOURCING_APIKEYHEADER                                   | string        | HTTP header to be used for API Key authentication            |
+| ccs.esourcing.api-keys                                       | CCS_ESOURCING_APIKEYS                                        | string        | Comma separated list of API keys used for "authenticating" requests |
+| rollbar.enabled                                              | ROLLBAR_ENABLED                                              | true \| false | Enable Rollbar integration                                   |
+| rollbar.access-token                                         | ROLLBAR_ACCESSTOKEN                                          | string        | The access token for the Rollbar account/project             |
+| rollbar.environment                                          | ROLLBAR_ENVIRONMENT                                          | string        | Value to use for the Rollbar environment attribute           |
+| rollbar.framework                                            | ROLLBAR_FRAMEWORK                                            | string        | Value to use for the Rollbar framework attribute             |
+| rollbar.endpoint                                             | ROLLBAR_ENDPOINT                                             | string        | Can be used to override Rollbar URL endpoint                 |
+| spring.security.oauth2.client.provider.jaggaer.token-uri     | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKENURI      | string        | Jaggaer Token API URL                                        |
+| spring.security.oauth2.client.registration.jaggaer.client-id | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTID  | string        | Jaggaer Client ID                                            |
+| spring.security.oauth2.client.registration.jaggaer.client-secret | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTSECRET | string        | Jaggaer Client Secret                                        |
+| ccs.esourcing.jaggaer.client-url                             | CCS_ESOURCING_JAGGAER_CLIENTURL                              | string        | The URL of the Jaggaer API                                   |
+| ccs.esourcing.salesforce.client-url                          | CCS_ESOURCING_SALESFORCE_CLIENTURL                           | string        | The URL of the Salesforce API                                |
+
+As the code is still in development the following properties are subject to change but should be set
+
+| Property                                                     | Environment variable                                      | Type   | Description |
+| ------------------------------------------------------------ | --------------------------------------------------------- | ------ | ----------- |
+| ccs.esourcing.jaggaer.default.buyer-company-id               | CCS_ESOURCING_JAGGAER_DEFAULT_BUYERCOMPANYID              | string |             |
+| ccs.esourcing.jaggaer.default.project-type                   | CCS_ESOURCING_JAGGAER_DEFAULT_PROJECTTYPE                 | string |             |
+| ccs.esourcing.jaggaer.default.source-template-reference-code | CCS_ESOURCING_JAGGAER_DEFAULT_SOURCETEMPLATEREFERENCECODE | string |             |
+| ccs.esourcing.jaggaer.default.owner-user                     | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |             |
 
 ## Licence
+
 The project is licensed with the [MIT License](https://opensource.org/licenses/MIT).
 
