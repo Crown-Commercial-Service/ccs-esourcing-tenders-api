@@ -3,7 +3,6 @@ package uk.gov.crowncommercial.esourcing.integration.app;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @Configuration
 public class AppConfiguration {
@@ -29,8 +28,4 @@ public class AppConfiguration {
     return new ActiveProfilesVerifier(true);
   }
 
-  @Bean
-  public javax.validation.Validator localValidatorFactoryBean() {
-    return new LocalValidatorFactoryBean();
-  }
 }
