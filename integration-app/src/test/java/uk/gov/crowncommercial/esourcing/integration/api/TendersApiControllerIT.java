@@ -111,7 +111,7 @@ public class TendersApiControllerIT {
             .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(invalidRequestBody))
         .andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
 
-    assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
+    assertThat(mvcResult.getResponse().getContentAsString()).contains("Validation failed");
   }
 
 }
