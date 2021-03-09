@@ -29,4 +29,5 @@ deploy:
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/test
-    skip_cleanup: 'true'      
+    skip_cleanup: 'true'
+    deployment_strategy: rolling      

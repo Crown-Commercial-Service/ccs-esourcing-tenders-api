@@ -18,7 +18,7 @@
 #
 
 # define the environment/space/spring profile we are using
-$ENVIRONMENT = "dev"
+$ENVIRONMENT = "test"
 
 # Application name.
 # Also defines the URL endpoint for the deployed service. As such this must
@@ -38,7 +38,6 @@ $SWAGGER_HUB_IP_ADDRESSES = "3.223.162.99, 18.213.102.186, 23.23.82.88, 34.231.3
 cf set-env $APP_NAME CCS_ESOURCING_IPALLOWLIST "$ROWEIT_IP_ADDRESSES $SWAGGER_HUB_IP_ADDRESSES"
 
 # set the API keys needed to allow access to the application
-cf set-env $APP_NAME CCS_ESOURCING_APIKEYHEADER "replace-me"
 cf set-env $APP_NAME CCS_ESOURCING_APIKEYS "replace-me-1, replace-me-2"
 
 # Jaggaer OAuth2 credentials
@@ -60,6 +59,6 @@ cf set-env $APP_NAME ROLLBAR_ACCESSTOKEN replace-me
 # deployment will be via TravisCI and no other manual configuration is required.
 
 # Push (or start, or restage) the application (as required)
-cf push -f .\manifest-$ENVIRONMENT.yml
+#cf push -f .\manifest-$ENVIRONMENT.yml
 #cf start $APP_NAME
 #cf restage $APP_NAME
