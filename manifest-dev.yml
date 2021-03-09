@@ -4,8 +4,7 @@
 #
 applications:
   - name: ccs-esourcing-tenders-api
-    instances: 2
-    memory: 512M
+    instances: 1
     routes:
       - route: dev-ccs-esourcing-tenders-api.london.cloudapps.digital
     buildpacks:
