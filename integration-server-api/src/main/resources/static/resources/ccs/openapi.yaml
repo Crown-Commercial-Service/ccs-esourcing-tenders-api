@@ -12,17 +12,17 @@ servers:
         enum:
           - dev
           - sandbox
-# Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/joeraymond-roweit/Integration_Server_API/0.0.1-SNAPSHOT
 tags:
-  - name: salesforce
+  - name: Salesforce
   - name: RfxStatus
 paths:
   /tenders/ProcurementProjects/salesforce:
     post:
       tags:
-        - salesforce
+        - Salesforce
       summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
       description: Creates a new CCS procurement case in the Jaggaer eSourcing platform.
       operationId: createProcurementCase
@@ -72,7 +72,7 @@ paths:
         description: Created sourcing object
         required: true
   /tenders/ProcurementProjects/updateProcurementStage:
-    post:
+    put:
       tags:
         - RfxStatus
       description: Update Procurement Project stage

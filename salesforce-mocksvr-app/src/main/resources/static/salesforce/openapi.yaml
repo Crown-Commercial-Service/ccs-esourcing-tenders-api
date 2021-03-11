@@ -10,7 +10,7 @@ tags:
   - name: RfxStatusList
 paths:
   /tenders/ProcurementProjects/updateProcurementStage:
-    post:
+    put:
       tags:
         - RfxStatusList
       description: Update Procurement Project stage
@@ -232,9 +232,12 @@ components:
                 example: Service Unavailable
                 default: Service Unavailable
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: api-key
+    oAuthPassword:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: >-
+            https://crowncommercial--bgsdtv2.my.salesforce.com/services/oauth2/token
+          scopes: {}
 security:
-  - ApiKeyAuth: []
+  - oAuthPassword: []
