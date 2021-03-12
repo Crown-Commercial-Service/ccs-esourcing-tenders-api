@@ -31,8 +31,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
-import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})
@@ -68,8 +68,8 @@ public class TendersApiControllerNoIpRestrictionsIT {
   @Test
   public void salesforce_expectOk() throws Exception {
 
-    InlineResponse201 inlineResponse201 = new InlineResponse201().tenderReferenceCode("trc").rfxReferenceCode("rfc");
-    doReturn(new ResponseEntity<>(inlineResponse201, HttpStatus.OK))
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
+    doReturn(new ResponseEntity<>(response, HttpStatus.OK))
     .when(tenderApiService).createProcurementCase(any(ProjectTender.class));
 
     MvcResult mvcResult = mockMvc
@@ -78,7 +78,7 @@ public class TendersApiControllerNoIpRestrictionsIT {
             .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    String expected = objectMapper.writeValueAsString(inlineResponse201);
+    String expected = objectMapper.writeValueAsString(response);
     JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
   }
 

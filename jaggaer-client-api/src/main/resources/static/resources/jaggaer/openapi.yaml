@@ -14,6 +14,8 @@ tags:
     description: Jaggaer Projects API
   - name: Rfx
     description: Jaggaer RFX API
+  - name: RfxWorkflows
+    description: Jaggaer RFXWORKFLOW API
 paths:
   /projects:
     post:
@@ -73,7 +75,7 @@ paths:
       operationId: createRFX
       responses:
         '201':
-          description: project created
+          description: rfx created
           content:
             application/json:
               schema:
@@ -112,6 +114,55 @@ paths:
             schema:
               $ref: '#/components/schemas/Rfxs'
         description: Created rfx object
+        required: true
+  /rfxworkflows/invalidate:
+    post:
+      tags:
+        - RfxWorkflows
+      summary: Invalidate an RFX
+      description: Invalidates a CCS RFX.
+      operationId: invalidateRFX
+      responses:
+        '201':
+          description: rfx invalidated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RfxInvalidationResponse'
+        '403':
+          description: >-
+            The API key and request syntax was valid but the server is refusing
+            to complete the request. This can happen if you are trying to read
+            or write to objects or properties that you do not have access to.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: You are not authorized to access this page.
+                    default: You are not authorized to access this page.
+        '404':
+          description: >-
+            Not found. Either the request method and path supplied do not
+            specify a known action in the API, or the object specified by the
+            request does not exist.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: The resource you were looking for could not be found.
+                    default: The resource you were looking for could not be found.
+        default:
+          description: successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RfxInvalidate'
+        description: Invalidate rfx object
         required: true
 components:
   schemas:
@@ -339,8 +390,81 @@ components:
         tenderReferenceCode:
           type: string
           example: project_1002
+    RfxInvalidate:
+      type: object
+      required:
+        - rfxReferenceCode
+        - operatorUser
+      properties:
+        rfxReferenceCode:
+          type: string
+          example: itt_725
+        operatorUser:
+          $ref: '#/components/schemas/OperatorUser'
+    OperatorUser:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: '89512'
+    RfxInvalidationResponse:
+      type: object
+      properties:
+        returnCode:
+          type: integer
+          example: 0
+        returnMessage:
+          type: string
+          example: OK
+        rfxId:
+          type: string
+          example: rfq_50487
+        rfxReferenceCode:
+          type: string
+          example: itt_725
+        initialStatusCode:
+          type: integer
+          example: 300
+        initialStatus:
+          type: string
+          example: Running
+        finalStatusCode:
+          type: integer
+          example: 1000
+        finalStatus:
+          type: string
+          example: Invalidated
+        reopenRound:
+          type: integer
+          example: 0
+        numInvolvedSuppliers:
+          type: integer
+          example: 0
+        numRespondedSuppliers:
+          type: integer
+          example: 0
+        numExcludedSuppliers:
+          type: integer
+          example: 0
+        qualEnvStatus:
+          type: integer
+          example: 0
+        techEnvStatus:
+          type: integer
+          example: 1
+        commEnvStatus:
+          type: integer
+          example: 0
+        publishDate:
+          type: string
+          example: "2021-03-12T09:01:40.000Z"
+        closeDate:
+          type: string
+          example: "2021-05-28T11:00:00.000Z"
   securitySchemes:
-    oAuthSample:
+    oAuthClientCredentials:
       type: oauth2
       flows:
         clientCredentials:
@@ -348,4 +472,4 @@ components:
             https://crowncommercialservice-ws02-prep.bravosolution.co.uk/esop/jint/api/public/v1/tokens/
           scopes: {}
 security:
-  - oAuthSample: []
+  - oAuthClientCredentials: []

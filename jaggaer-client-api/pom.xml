@@ -78,7 +78,7 @@
             </goals>
             <configuration>
               <inputSpec>${project.basedir}/src/main/resources/static/resources/jaggaer/openapi.yaml</inputSpec>
-              <apisToGenerate>Projects,Rfx</apisToGenerate>
+              <apisToGenerate>Projects,Rfx,RfxWorkflows</apisToGenerate>
               <generatorName>java</generatorName>
               <invokerPackage>uk.gov.crowncommercial.esourcing.jaggaer.client</invokerPackage>
               <apiPackage>uk.gov.crowncommercial.esourcing.jaggaer.client</apiPackage>

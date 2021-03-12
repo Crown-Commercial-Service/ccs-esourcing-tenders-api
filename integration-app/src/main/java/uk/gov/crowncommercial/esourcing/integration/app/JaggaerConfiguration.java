@@ -53,6 +53,7 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.ApiClient;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.ProjectsApi;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.RFC3339DateFormat;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxApi;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxWorkflowsApi;
 
 @Configuration
 public class JaggaerConfiguration {
@@ -66,7 +67,7 @@ public class JaggaerConfiguration {
    * Also add Jaggaer Client Registration using client creds from environment variables
    */
   @Bean
-  ReactiveClientRegistrationRepository esourcingClientRegistrationRepository(
+  ReactiveClientRegistrationRepository jaggaerClientRegistrationRepository(
       @Value("${spring.security.oauth2.client.provider.jaggaer.token-uri}") String tokenUri,
       @Value("${spring.security.oauth2.client.registration.jaggaer.client-id}") String clientId,
       @Value("${spring.security.oauth2.client.registration.jaggaer.client-secret}")
@@ -86,12 +87,12 @@ public class JaggaerConfiguration {
    *
    * <p>Also, override the token response parameters.
    *
-   * @param clientRegistrationRepository ReactiveClientRegistrationRepository
+   * @param jaggaerClientRegistrationRepository ReactiveClientRegistrationRepository
    * @return ApiClient
    */
   @Bean
   public ApiClient jaggaerApiClient(
-      ReactiveClientRegistrationRepository clientRegistrationRepository) {
+      ReactiveClientRegistrationRepository jaggaerClientRegistrationRepository) {
 
     /*
      Create new webclient to be used in combination with an Exchange Function Filter to
@@ -100,16 +101,21 @@ public class JaggaerConfiguration {
      to the Oauth standards.
     */
     ReactiveOAuth2AuthorizedClientService authorizedClientService =
-        new InMemoryReactiveOAuth2AuthorizedClientService(clientRegistrationRepository);
+        new InMemoryReactiveOAuth2AuthorizedClientService(jaggaerClientRegistrationRepository);
+
     AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager =
         new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
-            clientRegistrationRepository, authorizedClientService);
+            jaggaerClientRegistrationRepository, authorizedClientService);
+
     WebClientReactiveClientCredentialsTokenResponseClient
         webClientReactiveClientCredentialsTokenResponseClient =
             new WebClientReactiveClientCredentialsTokenResponseClient();
+
     WebClient accessTokenWebClient =
         WebClient.builder().filter(new JaggaerExchangeFilterFunction()).build();
+
     webClientReactiveClientCredentialsTokenResponseClient.setWebClient(accessTokenWebClient);
+
     ReactiveOAuth2AuthorizedClientProvider reactiveOAuth2AuthorizedClientProvider =
         ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
             .clientCredentials(
@@ -150,10 +156,12 @@ public class JaggaerConfiguration {
      */
     ServerOAuth2AuthorizedClientExchangeFilterFunction oauth =
         new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+
     oauth.setDefaultClientRegistrationId("jaggaer");
     WebClient.Builder webClientBuilder = WebClient.builder().exchangeStrategies(strategies);
     WebClient webClient = webClientBuilder.filter(oauth).build();
     ApiClient apiClient = new ApiClient(webClient, mapper, dateFormat);
+
     apiClient.setBasePath(jaggaerClientUrl);
     LOGGER.info("Using Jaggaer Endpoint - {}", jaggaerClientUrl);
     return apiClient;
@@ -171,6 +179,13 @@ public class JaggaerConfiguration {
     RfxApi rfxApi = new RfxApi();
     rfxApi.setApiClient(apiClient);
     return rfxApi;
+  }
+
+  @Bean
+  public RfxWorkflowsApi jaggaerRfxWorkflowsApi(ApiClient apiClient) {
+    RfxWorkflowsApi rfxWorkflowsApi = new RfxWorkflowsApi();
+    rfxWorkflowsApi.setApiClient(apiClient);
+    return rfxWorkflowsApi;
   }
 
   /**

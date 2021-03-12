@@ -12,15 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
-import uk.gov.crowncommercial.esourcing.integration.server.model.InlineResponse201;
+import uk.gov.crowncommercial.esourcing.integration.server.model.AbandonITT;
+import uk.gov.crowncommercial.esourcing.integration.server.model.AbandonITT200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatus200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatusItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.ProjectsApi;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxApi;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.RfxWorkflowsApi;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.AdditionalInfoItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.AdditionalInfoList;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.BuyerCompany;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.OperatorUser;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.OwnerUser;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Project;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.ProjectResponse;
@@ -28,6 +32,8 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Projects;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Rfx;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoList;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidate;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidationResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxSetting;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxValueItem;
@@ -37,6 +43,7 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Tender;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.ValueItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Values;
 import uk.gov.crowncommercial.esourcing.salesforce.client.RfxStatusListApi;
+import uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatus200ResponseList;
 import uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatusList;
 
 @Service
@@ -46,6 +53,7 @@ public class TenderApiService implements TendersApiDelegate {
   private final ProjectsApi projectsApi;
   private final RfxApi rfxApi;
   private final RfxStatusListApi rfxStatusListApi;
+  private final RfxWorkflowsApi rfxWorkflowsApi;
 
   private static final Logger logger = LoggerFactory.getLogger(TenderApiService.class);
 
@@ -64,19 +72,22 @@ public class TenderApiService implements TendersApiDelegate {
   @Value("${ccs.esourcing.jaggaer.default.owner-user}")
   private String defaultOwnerUser;
 
+  @Value("${ccs.esourcing.jaggaer.default.owner-user-id}")
+  private String defaultOwnerUserId;
+
 
   public TenderApiService(
-      ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi) {
+      ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi, RfxWorkflowsApi rfxWorkflowsApi) {
     this.projectsApi = projectsApi;
     this.rfxApi = rfxApi;
     this.rfxStatusListApi = rfxStatusListApi;
+    this.rfxWorkflowsApi = rfxWorkflowsApi;
   }
 
   @Override
-  public ResponseEntity<InlineResponse201> createProcurementCase(
-      uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender projectTender) {
+  public ResponseEntity<ProjectTender200Response> createProcurementCase(ProjectTender projectTender) {
 
-    InlineResponse201 inlineResponse201 = new InlineResponse201();
+    ProjectTender200Response response = new ProjectTender200Response();
 
     logger.info("Creating Tender with procurement : {}", projectTender);
 
@@ -106,13 +117,13 @@ public class TenderApiService implements TendersApiDelegate {
       final String ittRef =
           rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
 
-      inlineResponse201.setTenderReferenceCode(tenderRef);
-      inlineResponse201.setRfxReferenceCode(ittRef);
+      response.setTenderReferenceCode(tenderRef);
+      response.setRfxReferenceCode(ittRef);
 
-      return new ResponseEntity<>(inlineResponse201, HttpStatus.CREATED);
+      return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    return new ResponseEntity<>(inlineResponse201, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   @Override
@@ -128,7 +139,7 @@ public class TenderApiService implements TendersApiDelegate {
     logger.info(
         "Sending Update RFX Status request to Salesforce, request body : {}", rfxStatusRequestBody);
 
-    uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatus200ResponseList
+    RfxStatus200ResponseList
         sfRfxStatus200ResponseList =
             rfxStatusListApi
                 .updateCaseRFxStatus(rfxStatusRequestBody)
@@ -142,6 +153,31 @@ public class TenderApiService implements TendersApiDelegate {
     }
 
     return new ResponseEntity<>(rfxStatus200Responses, HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<AbandonITT200Response> invalidITT(AbandonITT abandonITT){
+
+    AbandonITT200Response response = new AbandonITT200Response();
+
+    logger.info("Invalidating ITT : {}", abandonITT);
+
+    OperatorUser operatorUser = new OperatorUser();
+    operatorUser.setId(defaultOwnerUserId);
+
+    RfxInvalidate rfxInvalidate = new RfxInvalidate();
+    rfxInvalidate.setRfxReferenceCode(abandonITT.getRfxReferenceCode());
+    rfxInvalidate.setOperatorUser(operatorUser);
+
+    RfxInvalidationResponse jaggaerResponse = rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+
+    if (jaggaerResponse != null) {
+      response.setReturnMessage(jaggaerResponse.getReturnMessage());
+      response.setRfxReferenceCode(jaggaerResponse.getRfxReferenceCode());
+      response.setFinalStatus(jaggaerResponse.getFinalStatus());
+      return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
 
   private Projects getProjectBody(ProjectTender projectTender) {
@@ -248,6 +284,9 @@ public class TenderApiService implements TendersApiDelegate {
     if (rfx.getRankingStrategy() != null) {
       rfxSetting.setRankingStrategy(rfx.getRankingStrategy());
     }
+    if (rfx.getTemplateReferenceCode() != null) {
+      rfxSetting.setTemplateReferenceCode(rfx.getTemplateReferenceCode());
+    }
 
     rfxSetting.setPublishDate(String.valueOf(rfx.getPublishDate()));
     rfxSetting.setCloseDate(String.valueOf(rfx.getCloseDate()));
@@ -296,8 +335,7 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   private List<RfxStatus200Response> convertRfxStatusResponse(
-      uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatus200ResponseList
-          sfRfxStatus200ResponseList) {
+      RfxStatus200ResponseList sfRfxStatus200ResponseList) {
 
     return sfRfxStatus200ResponseList.stream()
         .map(
