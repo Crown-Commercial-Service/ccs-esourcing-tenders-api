@@ -167,6 +167,9 @@ components:
         shortDescription:
           type: string
           example: RFQ for Provision of PPE
+        rfiFlag:
+          type: string
+          example: "1"
         value:
           type: string
           example: 0

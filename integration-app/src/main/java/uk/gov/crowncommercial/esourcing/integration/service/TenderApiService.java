@@ -267,7 +267,14 @@ public class TenderApiService implements TendersApiDelegate {
     ownerUser.setLogin(defaultOwnerUser);
     rfxSetting.setOwnerUser(ownerUser);
     rfxSetting.setValue(String.valueOf(rfx.getValue()));
-    rfxSetting.setRfxType("STANDARD_ITT");
+
+    if(rfx.getRfiFlag() != null && rfx.getRfiFlag().equals("1"))
+    {
+      rfxSetting.setRfxType("STANDARD_PQQ");
+      rfxSetting.setRfiFlag("1");
+    } else {
+      rfxSetting.setRfxType("STANDARD_ITT");
+    }
 
     if (rfx.getQualEnvStatus() != null) {
       rfxSetting.setQualEnvStatus(rfx.getQualEnvStatus());

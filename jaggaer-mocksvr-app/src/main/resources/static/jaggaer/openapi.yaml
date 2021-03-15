@@ -128,7 +128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RfxInvalidResponse'
+                $ref: '#/components/schemas/RfxInvalidationResponse'
         '403':
           description: >-
             The API key and request syntax was valid but the server is refusing
@@ -283,6 +283,9 @@ components:
         - publishDate
         - closeDate
       properties:
+        rfiFlag:
+          type: string
+          example: "1"
         rfxReferenceCode:
           type: string
           example: itt_597
@@ -325,7 +328,7 @@ components:
           example: '2019-08-30T13:54:32.000+00:00'
         rfxType:
           type: string
-          example: STANDARD_ITT
+          example: STANDARD_PQQ
         visibilityEGComments:
           type: string
           example: '1'
@@ -409,7 +412,7 @@ components:
         id:
           type: string
           example: '89512'
-    RfxInvalidResponse:
+    RfxInvalidationResponse:
       type: object
       properties:
         returnCode:
