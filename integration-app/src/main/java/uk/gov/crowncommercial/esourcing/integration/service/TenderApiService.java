@@ -75,6 +75,11 @@ public class TenderApiService implements TendersApiDelegate {
   @Value("${ccs.esourcing.jaggaer.default.owner-user-id}")
   private String defaultOwnerUserId;
 
+  @Value("${ccs.esourcing.jaggaer.default.open-market-template-id}")
+  private String openMarketTemplateId;
+
+  @Value("${ccs.esourcing.jaggaer.default.sta-template-id}")
+  private String staTemplateId;
 
   public TenderApiService(
       ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi, RfxWorkflowsApi rfxWorkflowsApi) {
@@ -232,9 +237,22 @@ public class TenderApiService implements TendersApiDelegate {
     Rfxs rfxs = new Rfxs();
     rfxs.setOperationCode("CREATE");
 
+    String rfxTemplateReferenceCode = "";
+    String rfxProcurementRoute = rfx.getProcurementRoute();
+
+    if (rfxProcurementRoute.equalsIgnoreCase("Open Market")) {
+      rfxTemplateReferenceCode = openMarketTemplateId;
+    } else if (rfxProcurementRoute.equalsIgnoreCase("Single Tender Action")) {
+      rfxTemplateReferenceCode = staTemplateId;
+    } else {
+      if (rfx.getTemplateReferenceCode() != null){
+        rfxTemplateReferenceCode = rfx.getTemplateReferenceCode();
+      }
+    }
+
     RfxAdditionalInfoList rfxAdditionalInfoList = new RfxAdditionalInfoList();
     rfxAdditionalInfoList.addAdditionalInfoItem(
-        getRfxAddInfo("Procurement Route", rfx.getProcurementRoute()));
+        getRfxAddInfo("Procurement Route", rfxProcurementRoute));
 
     if (rfx.getFrameworkName() != null) {
       rfxAdditionalInfoList.addAdditionalInfoItem(
@@ -291,8 +309,8 @@ public class TenderApiService implements TendersApiDelegate {
     if (rfx.getRankingStrategy() != null) {
       rfxSetting.setRankingStrategy(rfx.getRankingStrategy());
     }
-    if (rfx.getTemplateReferenceCode() != null) {
-      rfxSetting.setTemplateReferenceCode(rfx.getTemplateReferenceCode());
+    if (!rfxTemplateReferenceCode.isEmpty()) {
+      rfxSetting.setTemplateReferenceCode(rfxTemplateReferenceCode);
     }
 
     rfxSetting.setPublishDate(String.valueOf(rfx.getPublishDate()));
