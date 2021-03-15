@@ -135,30 +135,36 @@ All of the ESourcing application specific application properties that can be set
 
 Given that most of these properties have suitable default values set for each of the environments the following lists properties that are of interest that may need to be set.
 
-| Property                                                     | Environment variable                                         | Type          | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------- | ------------------------------------------------------------ |
-| ccs.esourcing.ip-allow-list                                  | CCS_ESOURCING_IPALLOWLIST                                    | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
-| ccs.esourcing.api-key-header                                 | CCS_ESOURCING_APIKEYHEADER                                   | string        | HTTP header to be used for API Key authentication            |
-| ccs.esourcing.api-keys                                       | CCS_ESOURCING_APIKEYS                                        | string        | Comma separated list of API keys used for "authenticating" requests |
-| rollbar.enabled                                              | ROLLBAR_ENABLED                                              | true \| false | Enable Rollbar integration                                   |
-| rollbar.access-token                                         | ROLLBAR_ACCESSTOKEN                                          | string        | The access token for the Rollbar account/project             |
-| rollbar.environment                                          | ROLLBAR_ENVIRONMENT                                          | string        | Value to use for the Rollbar environment attribute           |
-| rollbar.framework                                            | ROLLBAR_FRAMEWORK                                            | string        | Value to use for the Rollbar framework attribute             |
-| rollbar.endpoint                                             | ROLLBAR_ENDPOINT                                             | string        | Can be used to override Rollbar URL endpoint                 |
-| spring.security.oauth2.client.provider.jaggaer.token-uri     | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKENURI      | string        | Jaggaer Token API URL                                        |
-| spring.security.oauth2.client.registration.jaggaer.client-id | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTID  | string        | Jaggaer Client ID                                            |
-| spring.security.oauth2.client.registration.jaggaer.client-secret | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTSECRET | string        | Jaggaer Client Secret                                        |
-| ccs.esourcing.jaggaer.client-url                             | CCS_ESOURCING_JAGGAER_CLIENTURL                              | string        | The URL of the Jaggaer API                                   |
-| ccs.esourcing.salesforce.client-url                          | CCS_ESOURCING_SALESFORCE_CLIENTURL                           | string        | The URL of the Salesforce API                                |
+| Property                                                            | Environment variable                                               | Type          | Description                                                                                                       |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| ccs.esourcing.ip-allow-list                                         | CCS_ESOURCING_IPALLOWLIST                                          | string        | Comma separated list of ipv4 or ipv6 addresses from which requests are allowed from, empty list then no filtering |
+| ccs.esourcing.api-key-header                                        | CCS_ESOURCING_APIKEYHEADER                                         | string        | HTTP header to be used for API Key authentication                                                                 |
+| ccs.esourcing.api-keys                                              | CCS_ESOURCING_APIKEYS                                              | string        | Comma separated list of API keys used for "authenticating" requests                                               |
+| rollbar.enabled                                                     | ROLLBAR_ENABLED                                                    | true \| false | Enable Rollbar integration                                                                                        |
+| rollbar.access-token                                                | ROLLBAR_ACCESSTOKEN                                                | string        | The access token for the Rollbar account/project                                                                  |
+| rollbar.environment                                                 | ROLLBAR_ENVIRONMENT                                                | string        | Value to use for the Rollbar environment attribute                                                                |
+| rollbar.framework                                                   | ROLLBAR_FRAMEWORK                                                  | string        | Value to use for the Rollbar framework attribute                                                                  |
+| rollbar.endpoint                                                    | ROLLBAR_ENDPOINT                                                   | string        | Can be used to override Rollbar URL endpoint                                                                      |
+| spring.security.oauth2.client.provider.jaggaer.token-uri            | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKENURI            | string        | Jaggaer Token API URL                                                                                             |
+| spring.security.oauth2.client.registration.jaggaer.client-id        | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTID        | string        | Jaggaer Client ID                                                                                                 |
+| spring.security.oauth2.client.registration.jaggaer.client-secret    | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTSECRET    | string        | Jaggaer Client Secret                                                                                             |
+| ccs.esourcing.jaggaer.client-url                                    | CCS_ESOURCING_JAGGAER_CLIENTURL                                    | string        | The URL of the Jaggaer API                                                                                        |
+| ccs.esourcing.salesforce.client-url                                 | CCS_ESOURCING_SALESFORCE_CLIENTURL                                 | string        | The URL of the Salesforce API                                                                                     |
+| spring.security.oauth2.client.provider.salesforce.token-uri         | SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SALESFORCE_TOKENURI         | string        | Salesforce Token API URL                                                                                          |
+| spring.security.oauth2.client.registration.salesforce.client-id     | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_SALESFORCE_CLIENTID     | string        | Salesforce Client ID                                                                                              |
+| spring.security.oauth2.client.registration.salesforce.client-secret | SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_SALESFORCE_CLIENTSECRET | string        | Salesforce Client Secret                                                                                          |
+| ccs.esourcing.salesforce.oauth2.username                            | CCS_ESOURCING_SALESFORCE_OAUTH2_USERNAME                           | string        | Salesforce username                                                                                               |
+| ccs.esourcing.salesforce.oauth2.password                            | CCS_ESOURCING_SALESFORCE_OAUTH2_PASSWORD                           | string        | Salesforce password                                                                                               | |
 
 As the code is still in development the following properties are subject to change but should be set
 
-| Property                                                     | Environment variable                                      | Type   | Description |
-| ------------------------------------------------------------ | --------------------------------------------------------- | ------ | ----------- |
-| ccs.esourcing.jaggaer.default.buyer-company-id               | CCS_ESOURCING_JAGGAER_DEFAULT_BUYERCOMPANYID              | string |             |
-| ccs.esourcing.jaggaer.default.project-type                   | CCS_ESOURCING_JAGGAER_DEFAULT_PROJECTTYPE                 | string |             |
-| ccs.esourcing.jaggaer.default.source-template-reference-code | CCS_ESOURCING_JAGGAER_DEFAULT_SOURCETEMPLATEREFERENCECODE | string |             |
-| ccs.esourcing.jaggaer.default.owner-user                     | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |             |
+| Property                                                     | Environment variable                                      | Type   | Description                                                                    |
+| ------------------------------------------------------------ | --------------------------------------------------------- | ------ | ------------------------------------------------------------------------------ |
+| ccs.esourcing.jaggaer.default.buyer-company-id               | CCS_ESOURCING_JAGGAER_DEFAULT_BUYERCOMPANYID              | string |                                                                                |
+| ccs.esourcing.jaggaer.default.project-type                   | CCS_ESOURCING_JAGGAER_DEFAULT_PROJECTTYPE                 | string |                                                                                |
+| ccs.esourcing.jaggaer.default.source-template-reference-code | CCS_ESOURCING_JAGGAER_DEFAULT_SOURCETEMPLATEREFERENCECODE | string |                                                                                |
+| ccs.esourcing.jaggaer.default.owner-user                     | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |                                                                                |
+| ccs.esourcing.salesforce.oauth2.token.expires-in             | CCS_ESOURCING_SALESFORCE_OAUTH2_TOKEN_EXPIRESIN           | string | Expires in attribute added to Salesforce Oauth2 token response to force expiry |
 
 ## Licence
 

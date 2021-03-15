@@ -37,35 +37,37 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
   @ExceptionHandler({Throwable.class})
   public ResponseEntity<Object> handleThrowable(Throwable t, HttpServletRequest request) {
 
-    if (t instanceof ConstraintViolationException) {
-      LOG.warn("Constraint violation - {}", t.getMessage());
+    LOG.warn("Unhandled exception when handling REST call to {}", request.getPathInfo(), t);
 
-      HttpStatus status = HttpStatus.BAD_REQUEST;
+    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+    String path = request.getPathInfo();
 
-      return new ResponseEntity<>(
-          ErrorResponse.builder()
-              .timestamp(clock.instant())
-              .status(status.value())
-              .error(status.getReasonPhrase())
-              .message(String.format("Constraint violation - %s", t.getMessage()))
-              .build(),
-          status);
-    } else {
-      LOG.warn("Unhandled exception when handling REST call to {}", request.getPathInfo(), t);
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .timestamp(clock.instant())
+            .status(status.value())
+            .error(status.getReasonPhrase())
+            .message("Unhandled exception")
+            .path(path)
+            .build(),
+        status);
+  }
 
-      HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-      String path = request.getPathInfo();
+  @ExceptionHandler({ConstraintViolationException.class})
+  public ResponseEntity<Object> handleConstraintViolationException(
+      ConstraintViolationException cve, HttpServletRequest request) {
+    LOG.warn("Constraint violation - {}", cve.getMessage());
 
-      return new ResponseEntity<>(
-          ErrorResponse.builder()
-              .timestamp(clock.instant())
-              .status(status.value())
-              .error(status.getReasonPhrase())
-              .message("Unhandled exception")
-              .path(path)
-              .build(),
-          status);
-    }
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .timestamp(clock.instant())
+            .status(status.value())
+            .error(status.getReasonPhrase())
+            .message(String.format("Constraint violation - %s", cve.getMessage()))
+            .build(),
+        status);
   }
 
   @Override
@@ -81,7 +83,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
             .timestamp(clock.instant())
             .status(status.value())
             .error(status.getReasonPhrase())
-            .message(String.format("Constraint violation - %s", e.getMessage()))
+            .message(String.format("Method argument is not valid - %s", e.getMessage()))
             .build(),
         status);
   }

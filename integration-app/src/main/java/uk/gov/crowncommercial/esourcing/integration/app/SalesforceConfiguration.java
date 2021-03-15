@@ -1,14 +1,11 @@
 package uk.gov.crowncommercial.esourcing.integration.app;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,13 +57,14 @@ public class SalesforceConfiguration {
   @Value("${ccs.esourcing.salesforce.client-url}")
   private String salesforceClientUrl;
 
-  @Value("${salesforce.oauth2.username}")
+  @Value("${ccs.esourcing.salesforce.oauth2.username}")
   private String username;
 
-  @Value("${salesforce.oauth2.password}")
+  @Value("${ccs.esourcing.salesforce.oauth2.password}")
   private String password;
 
-  @Value("${salesforce.oauth2.token.expires-in}")
+  // Expires in defaulted to 4 hours as confirmed with Bright Gen
+  @Value("${ccs.esourcing.salesforce.oauth2.token.expires-in:14400}")
   private Long tokenExpiresIn;
 
   @Value("${spring.security.oauth2.client.registration.salesforce.client-id}")
@@ -74,6 +72,12 @@ public class SalesforceConfiguration {
 
   @Value("${spring.security.oauth2.client.registration.salesforce.client-secret}")
   private String clientSecret;
+
+  private final ObjectMapper clientObjectMapper;
+
+  public SalesforceConfiguration(ObjectMapper clientObjectMapper) {
+    this.clientObjectMapper = clientObjectMapper;
+  }
 
   @Bean
   ReactiveClientRegistrationRepository salesforceClientRegistrationRepository(
@@ -135,12 +139,6 @@ public class SalesforceConfiguration {
      */
     DateFormat dateFormat = new RFC3339DateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setDateFormat(dateFormat);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    JsonNullableModule jnm = new JsonNullableModule();
-    mapper.registerModule(jnm);
     ExchangeStrategies strategies =
         ExchangeStrategies.builder()
             .codecs(
@@ -148,11 +146,11 @@ public class SalesforceConfiguration {
                   clientDefaultCodecsConfigurer
                       .defaultCodecs()
                       .jackson2JsonEncoder(
-                          new Jackson2JsonEncoder(mapper, MediaType.APPLICATION_JSON));
+                          new Jackson2JsonEncoder(clientObjectMapper, MediaType.APPLICATION_JSON));
                   clientDefaultCodecsConfigurer
                       .defaultCodecs()
                       .jackson2JsonDecoder(
-                          new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
+                          new Jackson2JsonDecoder(clientObjectMapper, MediaType.APPLICATION_JSON));
                 })
             .build();
 
@@ -165,7 +163,7 @@ public class SalesforceConfiguration {
     oauth.setDefaultClientRegistrationId("salesforce");
     WebClient.Builder webClientBuilder = WebClient.builder().exchangeStrategies(strategies);
     WebClient webClient = webClientBuilder.filter(oauth).build();
-    ApiClient apiClient = new ApiClient(webClient, mapper, dateFormat);
+    ApiClient apiClient = new ApiClient(webClient, clientObjectMapper, dateFormat);
 
     apiClient.setBasePath(salesforceClientUrl);
     LOGGER.info("Using Saleforce Endpoint - {}", salesforceClientUrl);

@@ -175,7 +175,7 @@ public class TenderApiService implements TendersApiDelegate {
       response.setReturnMessage(jaggaerResponse.getReturnMessage());
       response.setRfxReferenceCode(jaggaerResponse.getRfxReferenceCode());
       response.setFinalStatus(jaggaerResponse.getFinalStatus());
-      return new ResponseEntity<>(response, HttpStatus.CREATED);
+      return new ResponseEntity<>(response, HttpStatus.OK);
     }
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }

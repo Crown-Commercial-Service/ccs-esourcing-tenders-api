@@ -1,15 +1,12 @@
 package uk.gov.crowncommercial.esourcing.integration.app;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +58,13 @@ public class JaggaerConfiguration {
 
   @Value("${ccs.esourcing.jaggaer.client-url}")
   private String jaggaerClientUrl;
+
+  private final ObjectMapper clientObjectMapper;
+
+  public JaggaerConfiguration(
+      ObjectMapper clientObjectMapper) {
+    this.clientObjectMapper = clientObjectMapper;
+  }
 
   /*
    * Create a new Client Registration Repository to hold Oauth credentials.
@@ -130,12 +134,6 @@ public class JaggaerConfiguration {
      */
     DateFormat dateFormat = new RFC3339DateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setDateFormat(dateFormat);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    JsonNullableModule jnm = new JsonNullableModule();
-    mapper.registerModule(jnm);
     ExchangeStrategies strategies =
         ExchangeStrategies.builder()
             .codecs(
@@ -143,11 +141,11 @@ public class JaggaerConfiguration {
                   clientDefaultCodecsConfigurer
                       .defaultCodecs()
                       .jackson2JsonEncoder(
-                          new Jackson2JsonEncoder(mapper, MediaType.APPLICATION_JSON));
+                          new Jackson2JsonEncoder(clientObjectMapper, MediaType.APPLICATION_JSON));
                   clientDefaultCodecsConfigurer
                       .defaultCodecs()
                       .jackson2JsonDecoder(
-                          new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_JSON));
+                          new Jackson2JsonDecoder(clientObjectMapper, MediaType.APPLICATION_JSON));
                 })
             .build();
 
@@ -160,7 +158,7 @@ public class JaggaerConfiguration {
     oauth.setDefaultClientRegistrationId("jaggaer");
     WebClient.Builder webClientBuilder = WebClient.builder().exchangeStrategies(strategies);
     WebClient webClient = webClientBuilder.filter(oauth).build();
-    ApiClient apiClient = new ApiClient(webClient, mapper, dateFormat);
+    ApiClient apiClient = new ApiClient(webClient, clientObjectMapper, dateFormat);
 
     apiClient.setBasePath(jaggaerClientUrl);
     LOGGER.info("Using Jaggaer Endpoint - {}", jaggaerClientUrl);
