@@ -112,7 +112,7 @@ public class SalesforceConfiguration {
     WebClient accessTokenWebClient =
         WebClient.builder()
             .filter(requestPasswordTokenRequestProcessor())
-            .filter(resposePasswordTokenRequestProcessor())
+            .filter(responsePasswordTokenRequestProcessor())
             .build();
 
     webClientReactivePasswordTokenResponseClient.setWebClient(accessTokenWebClient);
@@ -190,7 +190,7 @@ public class SalesforceConfiguration {
                     .build()));
   }
 
-  private ExchangeFilterFunction resposePasswordTokenRequestProcessor() {
+  private ExchangeFilterFunction responsePasswordTokenRequestProcessor() {
     return ExchangeFilterFunction.ofResponseProcessor(
         response -> {
           if (!isJsonCompatibleResponse(response)) {
