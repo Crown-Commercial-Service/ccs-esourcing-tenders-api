@@ -1,0 +1,361 @@
+{
+	"info": {
+		"_postman_id": "7f647e1f-16d3-4814-8f38-b0c89f2b44a1",
+		"name": "GPaaS Integration Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Project & ITT - US1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"tenderReferenceCode\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"rfxReferenceCode\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Non-template ITT\",\r\n        \"value\": \"0\",\r\n        \"qualEnvStatus\": \"0\",\r\n        \"techEnvStatus\": \"1\",\r\n        \"commEnvStatus\": \"0\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Open Market ITT - US1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"rfxReferenceCode\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{tenderReferenceCode}}\",\r\n    \"subject\": \"RoweIT Open Market ITT\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Open Market ITT\",\r\n        \"value\": \"0\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Open Market\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create STA ITT - US1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"rfxReferenceCode\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{tenderReferenceCode}}\",\r\n    \"subject\": \"RoweIT Single Tender Action ITT\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Single Tender Action ITT\",\r\n        \"value\": \"0\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Single Tender Action\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Call Off ITT - US1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"rfxReferenceCode\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{tenderReferenceCode}}\",\r\n    \"subject\": \"RoweIT Call Off ITT\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Call Off ITT\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\",\r\n        \"frameworkRMNumber\": \"12345\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create RFI - US1.1",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{tenderReferenceCode}}\",\r\n    \"subject\": \"RoweIT RFI\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"RFI\",\r\n        \"rfiFlag\": \"1\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalidate ITT - US9",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rfxReferenceCode\": \"{{rfxReferenceCode}}\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/abandon",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"abandon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Status - US3, US4, US5 & US6",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "6KGuz3WE7vBbxzSxXoKr7U",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"procurementReference\": \"324233324\",\r\n    \"stage\": \"ITT Live\",\r\n    \"actualStartDate\": \"2020-03-27T15:38:53.000+0000\",\r\n    \"tenderEndDate\": \"2020-03-27T15:38:53.000+0000\",\r\n    \"closingTime\": \"14:38:53.000Z\"\r\n  }\r\n]"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/updateProcurementStage",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"updateProcurementStage"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
