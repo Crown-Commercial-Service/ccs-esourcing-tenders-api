@@ -169,6 +169,10 @@ As the code is still in development the following properties are subject to chan
 | ccs.esourcing.jaggaer.default.owner-user                     | CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER                   | string |                                                                                |
 | ccs.esourcing.salesforce.oauth2.token.expires-in             | CCS_ESOURCING_SALESFORCE_OAUTH2_TOKEN_EXPIRESIN           | string | Expires in attribute added to Salesforce Oauth2 token response to force expiry |
 
+### Testing
+
+A Postman collection of integration tests is included under the dev folder along with some associated environment variables.  TO use them import the collection and environment files into a postman workspace and then update the 'api-key' environment variable.  The GPaaS environment is controlled by the 'env' environment variable.  The remaining variables are used to maintain reference codes between requests.
+
 ## Licence
 
 The project is licensed with the [MIT License](https://opensource.org/licenses/MIT).
