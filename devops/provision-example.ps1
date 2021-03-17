@@ -18,7 +18,7 @@
 #
 
 # define the environment/space/spring profile we are using
-$ENVIRONMENT = "dev"
+$ENVIRONMENT = "test"
 
 # Application name.
 # Also defines the URL endpoint for the deployed service. As such this must
@@ -35,37 +35,42 @@ $SALESFORCE_IP_ADDRESSES = ""
 $JAGGAER_IP_ADDRESSES = ""
 $ROWEIT_IP_ADDRESSES = ""
 $SWAGGER_HUB_IP_ADDRESSES = "3.223.162.99, 18.213.102.186, 23.23.82.88, 34.231.31.110, 54.158.217.73"
-cf set-env $APP_NAME CCS_ESOURCING_IP_ALLOW_LIST "$ROWEIT_IP_ADDRESSES $SWAGGER_HUB_IP_ADDRESSES"
+cf set-env $APP_NAME CCS_ESOURCING_IPALLOWLIST "$ROWEIT_IP_ADDRESSES $SWAGGER_HUB_IP_ADDRESSES"
 
 # set the API keys needed to allow access to the application
-cf set-env $APP_NAME CCS_ESOURCING_API_KEYS "pzoduvoasekghcbapsfypaicfisahh, nas4daig7audgoaijdvjklavbgyua8"
+cf set-env $APP_NAME CCS_ESOURCING_APIKEYS "replace-me-1, replace-me-2"
 
-# set Jaggaer API endpoint URL
-cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENT_URL ""
-
-# set Salesforce API endpoint URL
-cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENT_URL ""
-
-# Jaggaer Oauth credentials
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKEN_URI = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_ID = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENT_SECRET = ""
-cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_AUTHORIZATION_GRANT_TYPE = ""
+# Jaggaer OAuth2 credentials
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_JAGGAER_TOKENURI replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTID replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_JAGGAER_CLIENTSECRET replace-me
 
 # Jaggaer Client URL
-cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENT_URL = ""
+cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_CLIENTURL replace-me
+
+# Jaggaer Defaults
+cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_DEFAULT_BUYERCOMPANYID replace-me
+cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSER replace-me
+cf set-env $APP_NAME CCS_ESOURCING_JAGGAER_DEFAULT_OWNERUSERID replace-me
+
+# Salesforce OAuth2 credentials
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_SALESFORCE_TOKENURI replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_SALESFORCE_CLIENTID replace-me
+cf set-env $APP_NAME SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_SALESFORCE_CLIENTSECRET replace-me
+cf set-env $APP_NAME SALESFORCE_OAUTH2_USERNAME replace-me
+cf set-env $APP_NAME SALESFORCE_OAUTH2_PASSWORD replace-me
 
 # Salesforce Client URL
-cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENT_URL = ""
+cf set-env $APP_NAME CCS_ESOURCING_SALESFORCE_CLIENTURL replace-me
 
 # Rollbar configuration
-# cf set-env $APP_NAME ROLLBAR_ENABLED true
-# cf set-env $APP_NAME ROLLBAR_ACCESSTOKEN a098sd7gpaisdhkghalkjsdhy
+cf set-env $APP_NAME ROLLBAR_ENABLED true
+cf set-env $APP_NAME ROLLBAR_ACCESSTOKEN replace-me
 
 # Application is now deployed but not running. It is anticipated that the actual
 # deployment will be via TravisCI and no other manual configuration is required.
 
-# Push (or start, or restage) the application (if required)
-cf push -f .\manifest-$ENVIRONMENT.yml
+# Push (or start, or restage) the application (as required)
+#cf push -f .\manifest-$ENVIRONMENT.yml
 #cf start $APP_NAME
 #cf restage $APP_NAME

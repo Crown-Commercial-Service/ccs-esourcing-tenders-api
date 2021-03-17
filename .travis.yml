@@ -18,6 +18,7 @@ deploy:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/sandbox
     skip_cleanup: true
+    deployment_strategy: rolling      
   - provider: cloudfoundry
     api: https://api.london.cloud.service.gov.uk
     username: paul.illingworth+ccs-esourcing-test@roweit.co.uk
@@ -29,4 +30,5 @@ deploy:
     on:
       repo: Crown-Commercial-Service/ccs-esourcing-tenders-api
       branch: deploy/test
-    skip_cleanup: 'true'      
+    skip_cleanup: 'true'
+    deployment_strategy: rolling      
