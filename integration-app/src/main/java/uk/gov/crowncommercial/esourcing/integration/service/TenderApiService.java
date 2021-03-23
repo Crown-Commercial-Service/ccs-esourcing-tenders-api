@@ -177,10 +177,18 @@ public class TenderApiService implements TendersApiDelegate {
     RfxInvalidationResponse jaggaerResponse = rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
 
     if (jaggaerResponse != null) {
+
       response.setReturnMessage(jaggaerResponse.getReturnMessage());
       response.setRfxReferenceCode(jaggaerResponse.getRfxReferenceCode());
       response.setFinalStatus(jaggaerResponse.getFinalStatus());
-      return new ResponseEntity<>(response, HttpStatus.OK);
+
+      if (jaggaerResponse.getReturnMessage() != null) {
+        if (jaggaerResponse.getReturnMessage().contains("rfx can't be invalidate")) {
+          return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        } else {
+          return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+      }
     }
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
