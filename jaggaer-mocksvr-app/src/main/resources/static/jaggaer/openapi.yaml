@@ -189,6 +189,7 @@ components:
       required:
         - title
         - buyerCompany
+        - projectOwner
         - additionalInfoList
       properties:
         tenderReferenceCode:
@@ -199,6 +200,8 @@ components:
           example: Test Project 123
         buyerCompany:
           $ref: '#/components/schemas/BuyerCompany'
+        projectOwner:
+          $ref: '#/components/schemas/ProjectOwner'
         sourceTemplateReferenceCode:
           type: string
           example: project_609
@@ -215,6 +218,14 @@ components:
         id:
           type: string
           example: '51435'
+    ProjectOwner:
+      type: object
+      required:
+        - login
+      properties:
+        login:
+          type: string
+          example: user@crowncommercial.gov.uk
     OwnerUser:
       type: object
       required:
