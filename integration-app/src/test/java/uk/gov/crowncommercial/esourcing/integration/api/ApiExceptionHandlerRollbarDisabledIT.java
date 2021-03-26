@@ -35,6 +35,7 @@ import uk.gov.crowncommercial.esourcing.integration.app.ErrorResponse;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
 import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 
 @WebMvcTest(controllers = {TendersApiController.class})
@@ -48,6 +49,9 @@ public class ApiExceptionHandlerRollbarDisabledIT {
 
   @MockBean
   private TenderApiService tenderApiService;
+
+  @MockBean
+  private EmailService emailService;
 
   @Autowired
   private ObjectMapper objectMapper;

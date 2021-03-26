@@ -15,17 +15,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.crowncommercial.esourcing.integration.server.api.ApiUtil;
+import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
+import uk.gov.crowncommercial.esourcing.integration.service.SalesforceUpdateException;
 
 /*
  * Catches any errors raised by the API layer and returns a suitable error response.
  */
 @ControllerAdvice(basePackageClasses = ApiUtil.class)
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler
- {
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+  private final EmailService emailService;
 
   private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
   @Autowired private Clock clock;
+
+  public ApiExceptionHandler(EmailService emailService) {
+    this.emailService = emailService;
+  }
 
   /**
    * Catch/mop up everything else and return a generic Internal Server Error status code.
@@ -37,10 +43,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
   @ExceptionHandler({Throwable.class})
   public ResponseEntity<Object> handleThrowable(Throwable t, HttpServletRequest request) {
 
-    LOG.warn("Unhandled exception when handling REST call to {}", request.getPathInfo(), t);
-
     HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     String path = request.getPathInfo();
+
+    LOG.warn("Unhandled exception when handling REST call to {}", path, t);
 
     return new ResponseEntity<>(
         ErrorResponse.builder()
@@ -55,7 +61,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
 
   @ExceptionHandler({ConstraintViolationException.class})
   public ResponseEntity<Object> handleConstraintViolationException(
-      ConstraintViolationException cve, HttpServletRequest request) {
+      ConstraintViolationException cve) {
     LOG.warn("Constraint violation - {}", cve.getMessage());
 
     HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -66,6 +72,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler
             .status(status.value())
             .error(status.getReasonPhrase())
             .message(String.format("Constraint violation - %s", cve.getMessage()))
+            .build(),
+        status);
+  }
+
+  @ExceptionHandler({SalesforceUpdateException.class})
+  public ResponseEntity<Object> handleSalesforceUpdateException(SalesforceUpdateException sue) {
+    LOG.warn("Salesforce Status Update failure - {}", sue.getMessage());
+
+    emailService.sendSalesforceUpdateFailureEmail(sue.getMap());
+
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .timestamp(clock.instant())
+            .status(status.value())
+            .error(status.getReasonPhrase())
+            .message(String.format("Salesforce Status Update failure - %s", sue.getMessage()))
             .build(),
         status);
   }
