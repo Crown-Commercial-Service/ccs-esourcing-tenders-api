@@ -192,6 +192,8 @@ public class TenderApiService implements TendersApiDelegate {
     // TODO work out how to invalidate using ProcID and EventID
     //    rfxInvalidate.setRfxReferenceCode(abandonITT.getRfxReferenceCode());
     rfxInvalidate.setOperatorUser(operatorUser);
+    rfxInvalidate.setRfxReferenceCode(eventID);
+
     RfxInvalidationResponse jaggaerResponse =
         rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
     final String finalStatus = (jaggaerResponse == null) ? "" : jaggaerResponse.getFinalStatus();
