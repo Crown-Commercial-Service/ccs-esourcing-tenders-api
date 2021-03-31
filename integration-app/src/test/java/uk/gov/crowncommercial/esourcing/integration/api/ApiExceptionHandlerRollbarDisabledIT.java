@@ -82,12 +82,12 @@ public class ApiExceptionHandlerRollbarDisabledIT {
   public void salesforce_throwsNullPointerException_expectInternalServerErrorAndRollbarSend()
       throws Exception {
     /* mock the service call */
-    when(tenderApiService.createProcurementCase(any(ProjectTender.class))).thenThrow(new NullPointerException(
+    when(tenderApiService.createCase(any(ProjectTender.class))).thenThrow(new NullPointerException(
         "Thrown as part of getTenderById_throwsNullPointerException_expectInternalServerError"));
 
     /* "call" the REST API */
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
+        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
 

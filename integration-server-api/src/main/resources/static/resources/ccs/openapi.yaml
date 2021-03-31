@@ -16,26 +16,23 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/joeraymond-roweit/Integration_Server_API/0.0.1-SNAPSHOT
 tags:
-  - name: ProjectTender
+  - name: Procurement Case
+  - name: ITT Events
   - name: RfxStatus
-  - name: RfxAbandon
 paths:
   /tenders/ProcurementProjects/salesforce:
-    post:
+    put:
       tags:
-        - ProjectTender
-      summary: Create a new case in Jaggaer - Salesforce will call Jaggaer
-      description: Creates a new CCS procurement case in the Jaggaer eSourcing platform.
-      operationId: createProcurementCase
+        - Procurement Case
+      summary:  "US 1.0 - Create a new case in Jaggaer - Salesforce will call Jaggaer"
+      operationId: createCase
       responses:
-        '201':
-          description: Success (for object creation). Its information is available in the
-            data field at the top level of the response body. The API URL where
-            the object can be retrieved is also returned in the Location header of the response.
+        '202':
+          description: Project Code
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectTender200Response'
+                $ref: '#/components/schemas/ProcurementID'
         '400':
           $ref: '#/components/responses/400InvalidRequest'
         '401':
@@ -59,6 +56,86 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProjectTender'
+        description: Created sourcing object
+        required: true
+  /tenders/ProcurementProjects/{procID}/events:
+    parameters:
+      - $ref: '#/components/parameters/ProcurementParam'
+    post:
+      description: Creates a new Event for the Procurement Project.
+      summary: Create a Procurement Event
+      tags:
+        - ITT Events
+      operationId: createRFx
+      responses:
+        '200':
+          description: Event Code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventID'
+        '400':
+          $ref: '#/components/responses/400InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+        '502':
+          $ref: '#/components/responses/502BadGateway'
+        '504':
+          $ref: '#/components/responses/504GatewayTimeout'
+        default:
+          description: successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rfx'
+        description: Created sourcing object
+        required: true
+  /tenders/ProcurementProjects/{procID}/events/{eventID}/terminate/:
+    parameters:
+      - $ref: '#/components/parameters/ProcurementParam'
+      - $ref: '#/components/parameters/EventParam'
+    put:
+      description: Terminate the RFx
+      tags:
+        - ITT Events
+      operationId: terminateRFx
+      responses:
+        '200':
+          description: Termination Code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminationCode'
+        '400':
+          $ref: '#/components/responses/400InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+        '502':
+          $ref: '#/components/responses/502BadGateway'
+        '504':
+          $ref: '#/components/responses/504GatewayTimeout'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerUser'
         description: Created sourcing object
         required: true
   /tenders/ProcurementProjects/updateProcurementStage:
@@ -95,75 +172,38 @@ paths:
           $ref: '#/components/responses/502BadGateway'
         '504':
           $ref: '#/components/responses/504GatewayTimeout'
-  /tenders/ProcurementProjects/abandon:
-    post:
-      tags:
-        - RfxAbandon
-      summary: Invalidate ITT - Salesforce will call Jaggaer
-      description: Invalidate ITT in the Jaggaer eSourcing platform.
-      operationId: invalidITT
-      responses:
-        '200':
-          description: ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AbandonITT200Response'
-        '400':
-          $ref: '#/components/responses/400InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401Unauthorized'
-        '403':
-          $ref: '#/components/responses/403Forbidden'
-        '404':
-          $ref: '#/components/responses/404NotFound'
-        '429':
-          $ref: '#/components/responses/429TooManyRequests'
-        '500':
-          $ref: '#/components/responses/500InternalServerError'
-        '502':
-          $ref: '#/components/responses/502BadGateway'
-        '504':
-          $ref: '#/components/responses/504GatewayTimeout'
-        default:
-          description: successful operation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AbandonITT'
-        description: Created sourcing object
-        required: true
 components:
   schemas:
     ProjectTender:
       type: object
       required:
+        - projectOwnerLogin
         - subject
         - procurementReference
-        - rfx
       properties:
-        tenderReferenceCode:
+        projectOwnerLogin:
           type: string
-          example: project_1078
+          example: user@crowncommercial.gov.uk
         subject:
           type: string
           example: Project for Provision of Face Masks
         procurementReference:
           type: string
           example: '324233324'
-        rfx:
-          $ref: '#/components/schemas/Rfx'
     Rfx:
       title: Rfx
       type: object
       required:
+        - ownerUserLogin
         - shortDescription
         - value
         - publishDate
         - closeDate
         - procurementRoute
       properties:
+        ownerUserLogin:
+          type: string
+          example: user@crowncommercial.gov.uk
         shortDescription:
           type: string
           example: RFQ for Provision of PPE
@@ -216,6 +256,7 @@ components:
     RfxStatusItem:
       title: RfxStatus
       required:
+        - ownerUserLogin
         - actualStartDate
         - closingTime
         - procurementReference
@@ -223,6 +264,9 @@ components:
         - tenderEndDate
       type: object
       properties:
+        ownerUserLogin:
+          type: string
+          example: user@crowncommercial.gov.uk
         procurementReference:
           type: string
           example: CO0001
@@ -242,12 +286,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/RfxStatus200Response'
-    AbandonITT:
-      type: object
-      properties:
-        rfxReferenceCode:
-          type: string
-          example: itt_725
     Errors:
       type: object
       properties:
@@ -264,17 +302,6 @@ components:
           type: string
         detail:
           type: string
-    ProjectTender200Response:
-      type: object
-      properties:
-        tenderReferenceCode:
-          type: string
-          description: project code (project id)
-          example: project_1063
-        rfxReferenceCode:
-          type: string
-          description: the itt code (tender id)
-          example: itt_586
     RfxStatus200Response:
       type: object
       properties:
@@ -287,21 +314,38 @@ components:
         errorMessage:
           type: string
           example: ''
-    AbandonITT200Response:
+    ProcurementID:
+      type: string
+      example: project_1187
+    EventID:
+      type: string
+      example: itt_185
+    TerminationCode:
+      type: string
+      example: Invalidated
+    OwnerUser:
+      required:
+        - ownerUserId
       type: object
       properties:
-        returnMessage:
+        ownerUserId:
           type: string
-          description: Return code
-          example: OK
-        rfxReferenceCode:
-          type: string
-          description: the itt code being invalidated
-          example: itt_725
-        finalStatus:
-          type: string
-          description: Status
-          example: Invalidated
+          example: 89512
+  parameters:
+    ProcurementParam:
+      name: procID
+      in: path
+      required: true
+      description: Procurement Project ID
+      schema:
+        $ref: '#/components/schemas/ProcurementID'
+    EventParam:
+      name: eventID
+      in: path
+      required: true
+      description: Procurement Event ID
+      schema:
+        $ref: '#/components/schemas/EventID'
   responses:
     400InvalidRequest:
       description: >-

@@ -6,13 +6,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.API_KEY_HEADER;
 import static uk.gov.crowncommercial.esourcing.integration.api.Constants.CCS_API_BASE_PATH;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,7 +29,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
-import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
 import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
 import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
@@ -50,9 +47,6 @@ public class TendersApiControllerIT {
 
   @MockBean
   private EmailService emailService;
-  
-  @Autowired
-  private ObjectMapper objectMapper;
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -79,17 +73,16 @@ public class TendersApiControllerIT {
   @Test
   public void salesforce_expectOk() throws Exception {
 
-    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
-    when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
+    String response = "trc";
+    when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
+        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    String expected = objectMapper.writeValueAsString(response);
-    JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
+    assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(response);
   }
 
   @Test
@@ -106,12 +99,12 @@ public class TendersApiControllerIT {
   @Test
   public void salesforce_expectBadRequest() throws Exception {
 
-    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
-    when(tenderApiService.createProcurementCase(any(ProjectTender.class)))
+    String response = "trc";
+    when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
     MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
+        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
             .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(invalidRequestBody))
         .andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
 
