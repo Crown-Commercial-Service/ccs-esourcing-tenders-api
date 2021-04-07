@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatus200Response;
@@ -32,6 +33,7 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Projects;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Rfx;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoList;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxGetResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidate;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidationResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxResponse;
@@ -60,7 +62,7 @@ public class TenderApiService implements TendersApiDelegate {
   private Long defaultApiTimeout;
 
   @Value("${ccs.esourcing.jaggaer.default.buyer-company-id}")
-  private String defaultBuyerCompanyId;
+  private Integer defaultBuyerCompanyId;
 
   @Value("${ccs.esourcing.jaggaer.default.project-type}")
   private String defaultProjectType;
@@ -179,23 +181,50 @@ public class TenderApiService implements TendersApiDelegate {
   @Override
   public ResponseEntity<String> terminateRFx(
       String procID,
-      String eventID,
-      uk.gov.crowncommercial.esourcing.integration.server.model.OwnerUser ownerUser) {
+      String eventID) {
 
     logger.info("Invalidating ITT  - ProcID : {} / EventID : {}", procID, eventID);
 
-    // TODO work out how to get OwenrUserID
+    RfxGetResponse rfx = rfxApi.getRFX(String.format("rfxReferenceCode==%s", eventID)).block(Duration.ofSeconds(defaultApiTimeout));
+
+    final RfxSetting rfxSetting;
+    if (rfx != null) {
+      if (rfx.getDataList() != null) {
+        if (rfx.getDataList().getRfx() != null) {
+          rfxSetting =
+              rfx.getDataList() != null ? rfx.getDataList().getRfx().get(0).getRfxSetting() : null;
+        } else {
+          throw new IllegalStateException(String.format("No RFx details found for refReferenceCode - %s", eventID));
+        }
+      } else {
+        throw new IllegalStateException(String.format("No RFx dataList found for refReferenceCode - %s", eventID));
+      }
+    } else {
+      throw new IllegalStateException(String.format("No RFx found for refReferenceCode - %s", eventID));
+    }
+
+    Integer ownerUserId;
+    if (rfxSetting != null) {
+      ownerUserId = rfxSetting.getOwnerUser().getId();
+    } else {
+      throw new IllegalStateException(String.format("No Owner found for refReferenceCode - %s", eventID));
+    }
+    
+    String status = rfxSetting.getStatus();
     OperatorUser operatorUser = new OperatorUser();
-    operatorUser.setId(ownerUser.getOwnerUserId());
+    operatorUser.setId(ownerUserId);
 
     RfxInvalidate rfxInvalidate = new RfxInvalidate();
-    // TODO work out how to invalidate using ProcID and EventID
-    //    rfxInvalidate.setRfxReferenceCode(abandonITT.getRfxReferenceCode());
     rfxInvalidate.setOperatorUser(operatorUser);
     rfxInvalidate.setRfxReferenceCode(eventID);
 
-    RfxInvalidationResponse jaggaerResponse =
-        rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    RfxInvalidationResponse jaggaerResponse;
+
+    if (status != null && status.equals("To be Published")){
+      jaggaerResponse = rfxWorkflowsApi.deleteRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    } else {
+      jaggaerResponse = rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    }
     final String finalStatus = (jaggaerResponse == null) ? "" : jaggaerResponse.getFinalStatus();
 
     String response;
@@ -208,8 +237,6 @@ public class TenderApiService implements TendersApiDelegate {
     } else {
       response = finalStatus;
     }
-
-    // TODO Add delete for pre-running event
 
     if (jaggaerResponse != null) {
       if (jaggaerResponse.getReturnMessage() != null
@@ -315,11 +342,11 @@ public class TenderApiService implements TendersApiDelegate {
     OwnerUser ownerUser = new OwnerUser();
     ownerUser.setLogin(defaultOwnerUser);
     rfxSetting.setOwnerUser(ownerUser);
-    rfxSetting.setValue(String.valueOf(rfx.getValue()));
+    rfxSetting.setValue(rfx.getValue());
 
     if (rfx.getRfiFlag() != null && rfx.getRfiFlag().equals("1")) {
       rfxSetting.setRfxType("STANDARD_PQQ");
-      rfxSetting.setRfiFlag("1");
+      rfxSetting.setRfiFlag(1);
     } else {
       rfxSetting.setRfxType("STANDARD_ITT");
     }

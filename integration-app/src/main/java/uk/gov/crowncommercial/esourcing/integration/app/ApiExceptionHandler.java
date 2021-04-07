@@ -16,7 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.crowncommercial.esourcing.integration.server.api.ApiUtil;
 import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
-import uk.gov.crowncommercial.esourcing.integration.service.SalesforceUpdateException;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 
 /*
  * Catches any errors raised by the API layer and returns a suitable error response.

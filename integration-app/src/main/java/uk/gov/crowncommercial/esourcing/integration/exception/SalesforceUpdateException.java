@@ -1,4 +1,4 @@
-package uk.gov.crowncommercial.esourcing.integration.service;
+package uk.gov.crowncommercial.esourcing.integration.exception;
 
 import java.util.Map;
 

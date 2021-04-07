@@ -66,7 +66,55 @@ paths:
               $ref: '#/components/schemas/Projects'
         description: Created sourcing object
         required: true
-  /rfxs:
+  /rfxs/:
+    get:
+      parameters:
+        - in: query
+          name: flt
+          required: true
+          schema:
+            type: string
+            example: rfxReferenceCode==itt_599
+      tags:
+        - Rfx
+      summary: Search for RFX
+      description: Retrieve RFx details.
+      operationId: getRFX
+      responses:
+        '201':
+          description: get rfx
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RfxGetResponse'
+        '403':
+          description: >-
+            The API key and request syntax was valid but the server is refusing
+            to complete the request. This can happen if you are trying to read
+            or write to objects or properties that you do not have access to.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: You are not authorized to access this page.
+                    default: You are not authorized to access this page.
+        '404':
+          description: >-
+            Not found. Either the request method and path supplied do not
+            specify a known action in the API, or the object specified by the
+            request does not exist.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: The resource you were looking for could not be found.
+                    default: The resource you were looking for could not be found.
+        default:
+          description: successful operation
     post:
       tags:
         - Rfx
@@ -164,6 +212,55 @@ paths:
               $ref: '#/components/schemas/RfxInvalidate'
         description: Invalidate rfx object
         required: true
+  /rfxworkflows/delete:
+    post:
+      tags:
+        - RfxWorkflows
+      summary: Delete an RFX
+      description: Deletes a CCS RFX.
+      operationId: deleteRFX
+      responses:
+        '201':
+          description: rfx deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RfxInvalidationResponse'
+        '403':
+          description: >-
+            The API key and request syntax was valid but the server is refusing
+            to complete the request. This can happen if you are trying to read
+            or write to objects or properties that you do not have access to.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: You are not authorized to access this page.
+                    default: You are not authorized to access this page.
+        '404':
+          description: >-
+            Not found. Either the request method and path supplied do not
+            specify a known action in the API, or the object specified by the
+            request does not exist.
+          content:
+            application/vnd.api+json:
+              schema:
+                properties:
+                  error:
+                    type: string
+                    example: The resource you were looking for could not be found.
+                    default: The resource you were looking for could not be found.
+        default:
+          description: successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RfxInvalidate'
+        description: Delete rfx object
+        required: true
 components:
   schemas:
     Projects:
@@ -216,8 +313,14 @@ components:
         - id
       properties:
         id:
+          type: integer
+          example: 51435
+        code:
           type: string
-          example: '51435'
+          example: N/A
+        name:
+          type: string
+          example: Crown Commercial Service
     ProjectOwner:
       type: object
       required:
@@ -231,6 +334,12 @@ components:
       required:
         - login
       properties:
+        id:
+          type: integer
+          example: 89512
+        name:
+          type: string
+          example: SRO- CCS
         login:
           type: string
           example: sro-ccs
@@ -294,58 +403,200 @@ components:
         - publishDate
         - closeDate
       properties:
-        rfiFlag:
+        rfxId:
           type: string
-          example: "1"
+          example: rfq_49410
         rfxReferenceCode:
           type: string
           example: itt_597
+        rfiFlag:
+          type: integer
+          example: 1
+        dummyFlag:
+          type: integer
+          example: 0
+        statusCode:
+          type: integer
+          example: 0
+        status:
+          type: string
+          example: To be Published
+        tenderCode:
+          type: string
+          example: tender_40990
         tenderReferenceCode:
           type: string
           example: projetct_1002
+        templateId:
+          type: string
+          example: rfq_47693
+        templateReferenceCode:
+          type: string
+          example: itt_543
+        templateTitle:
+          type: string
+          example: JAGGAER_Scale Test_Template
         shortDescription:
           type: string
           example: ITT Test 03122019 Attempt 3
+        longDescription:
+          type: string
+          example:
+        archiveStatus:
+          type: integer
+          example: 0
         buyerCompany:
           $ref: '#/components/schemas/BuyerCompany'
         ownerUser:
           $ref: '#/components/schemas/OwnerUser'
-        templateReferenceCode:
+        divisionName:
           type: string
-          example: itt_543
+          example: Division
+        divisionId:
+          type: integer
+          example: 7173496
+        supplierAccess:
+          type: string
+          example: RFQ_TYPE_PRIVATE_WITH_ANSWER
+        offersOpeningCriteria:
+          type: string
+          example: BLIND_PARALLEL
         value:
-          type: string
-          example: '9000'
+          type: number
+          format: float
+          example: 9000.0
         valueCurrency:
           type: string
           example: GBP
         bidsCurrency:
           type: string
           example: GBP
+        envelopeDigitalSignature:
+          type: string
+          example: NO
+        rankingStrategy:
+          type: string
+          example: BEST_TECHNICAL_SCORE
+        techScoreWeight:
+          type: number
+          format: float
+          example: 100.0
+        comScoreWeight:
+          type: number
+          format: float
+          example: 0.0
+        numInvolvedSuppliers:
+          type: integer
+          example: 0
+        numRespondedSuppliers:
+          type: integer
+          example: 0
+        numExcludedSuppliers:
+          type: integer
+          example: 0
+        numAwardedSuppliers:
+          type: integer
+          example: 0
+        qualEvaluationTeamSize:
+          type: integer
+          example: 0
+        techEvaluationTeamSize:
+          type: integer
+          example: 0
+        commEvaluationTeamSize:
+          type: integer
+          example: 0
         qualEnvStatus:
-          type: string
-          example: '0'
+          type: integer
+          example: 0
         techEnvStatus:
-          type: string
-          example: '1'
+          type: integer
+          example: 1
         commEnvStatus:
+          type: integer
+          example: 0
+        lastUpdate:
           type: string
-          example: '0'
+          example: '2021-02-08T12:07:17.000Z'
+        autopublish:
+          type: integer
+          example: 0
+        creationDate:
+          type: string
+          example: '2021-02-08T12:07:16.000Z'
         publishDate:
           type: string
           example: '2019-08-20T13:54:32.000+00:00'
         closeDate:
           type: string
           example: '2019-08-30T13:54:32.000+00:00'
+        awardingStrategy:
+          type: string
+          example: NONE
+        awardingLevel:
+          type: string
+          example: OVERALL
+        awardingSource:
+          type: string
+          example: PRICE
         rfxType:
           type: string
-          example: STANDARD_PQQ
+          example: STANDARD_ITT
+        rfxTypeDescription:
+          type: string
+          example: Standard ITT
+        qualEnvelopeDigitalSignature:
+          type: string
+          example: NO
+        techEnvelopeDigitalSignature:
+          type: string
+          example: NO
+        commEnvelopeDigitalSignature:
+          type: string
+          example: NO
+        tcoVisibleToSuppliers:
+          type: integer
+          example: 0
+        consortiumAvailable:
+          type: integer
+          example: 0
+        defaultScoringCalcCriteria:
+          type: string
+          example: AUTOMATIC
+        scoringMethod:
+          type: string
+          example: W
+        commEnvScoringMode:
+          type: integer
+          example: 0
+        hideValueFromSupplier:
+          type: integer
+          example: 1
+        reservedPrice:
+          type: number
+          format: float
+          example: 0.0
+        enableOpeningCommittees:
+          type: integer
+          example: 0
+        maxScoreVisibleToSuppliers:
+          type: integer
+          example: 0
+        numReOpenRounds:
+          type: integer
+          example: 0
+        numUltimateOffers:
+          type: integer
+          example: 0
+        multicurrencyBids:
+          type: integer
+          example: 0
+        multicurrencyTCO:
+          type: integer
+          example: 0
         visibilityEGComments:
-          type: string
-          example: '1'
-        rankingStrategy:
-          type: string
-          example: BEST_TECHNICAL_SCORE
+          type: integer
+          example: 1
     RfxAdditionalInfoList:
       type: object
       properties:
@@ -374,6 +625,36 @@ components:
         value:
           type: object
           example: Open Market
+    RfxGetResponse:
+      type: object
+      properties:
+        returnCode:
+          type: integer
+          example: 0
+        returnMessage:
+          type: string
+          example: OK
+        totRecords:
+          type: integer
+          example: 1
+        returnedRecords:
+          type: integer
+          example: 1
+        startAt:
+          type: integer
+          example: 1
+        dataList:
+          type: object
+          properties:
+            rfx:
+              type: array
+              items:
+                $ref: '#/components/schemas/RfxList'
+    RfxList:
+      type: object
+      properties:
+        rfxSetting:
+          $ref: '#/components/schemas/RfxSetting'
     RfxResponse:
       type: object
       properties:
@@ -421,8 +702,8 @@ components:
         - id
       properties:
         id:
-          type: string
-          example: '89512'
+          type: integer
+          example: 89512
     RfxInvalidationResponse:
       type: object
       properties:

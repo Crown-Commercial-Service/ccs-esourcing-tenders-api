@@ -131,13 +131,6 @@ paths:
           $ref: '#/components/responses/502BadGateway'
         '504':
           $ref: '#/components/responses/504GatewayTimeout'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OwnerUser'
-        description: Created sourcing object
-        required: true
   /tenders/ProcurementProjects/updateProcurementStage:
     put:
       tags:
@@ -211,19 +204,20 @@ components:
           type: string
           example: "1"
         value:
-          type: string
-          example: 0
+          type: number
+          format: float
+          example: 9000.0
         templateReferenceCode:
           type: string
           example: itt_543
         qualEnvStatus:
-          type: string
+          type: integer
           example: 0
         techEnvStatus:
-          type: string
+          type: integer
           example: 1
         commEnvStatus:
-          type: string
+          type: integer
           example: 0
         publishDate:
           type: string
@@ -232,7 +226,7 @@ components:
           type: string
           example: '2021-02-27T12:00:00.000+00:00'
         visibilityEGComments:
-          type: string
+          type: integer
           example: 1
         rankingStrategy:
           type: string
