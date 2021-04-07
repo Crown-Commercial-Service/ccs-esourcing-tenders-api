@@ -16,6 +16,7 @@ import reactor.util.retry.Retry;
 import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatus200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatusItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.ProjectsApi;
@@ -67,9 +68,6 @@ public class TenderApiService implements TendersApiDelegate {
   @Value("${ccs.esourcing.jaggaer.default.project-type}")
   private String defaultProjectType;
 
-  @Value("${ccs.esourcing.jaggaer.default.owner-user}")
-  private String defaultOwnerUser;
-
   @Value("${ccs.esourcing.jaggaer.default.open-market-template-id}")
   private String openMarketTemplateId;
 
@@ -94,56 +92,51 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   @Override
-  public ResponseEntity<String> createCase(ProjectTender projectTender) {
+  public ResponseEntity<ProjectTender200Response> createCase(ProjectTender projectTender) {
+    String tenderReferenceCode = projectTender.getTenderReferenceCode();
 
-    logger.info("Creating Tender with procurement : {}", projectTender);
+    if (tenderReferenceCode == null) {
+      logger.info("Creating Tender with procurement : {}", projectTender);
+      Projects projectsRequestBody = getProjectBody(projectTender);
+      logger.info("Sending Project request to Jaggaer, request body : {}", projectsRequestBody);
+      ProjectResponse projectsResponseBody =
+          projectsApi
+              .createProject(projectsRequestBody)
+              .block(Duration.ofSeconds(defaultApiTimeout));
+      logger.info("Create Project response : {}", projectsResponseBody);
+      tenderReferenceCode =
+          projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
+    }
 
-    Projects projectsRequestBody = getProjectBody(projectTender);
-
-    logger.info("Sending Project request to Jaggaer, request body : {}", projectsRequestBody);
-
-    ProjectResponse projectsResponseBody =
-        projectsApi.createProject(projectsRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
-
-    logger.info("Create Project response : {}", projectsResponseBody);
-
-    final String tenderRef =
-        projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
-
-    return new ResponseEntity<>(tenderRef, HttpStatus.CREATED);
-  }
-
-  @Override
-  public ResponseEntity<String> createRFx(
-      String procID, uk.gov.crowncommercial.esourcing.integration.server.model.Rfx rfx) {
-
-    Rfxs rfxRequestBody = getRfxsBody(procID, rfx);
-
+    Rfxs rfxRequestBody = getRfxsBody(tenderReferenceCode, projectTender.getProjectOwnerLogin(), projectTender.getRfx());
     logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody);
-
     RfxResponse rfxsResponseBody =
         rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
-
     logger.info("Create ITT Event response : {}", rfxsResponseBody);
 
     final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
+    ProjectTender200Response response = new ProjectTender200Response();
+    response.setTenderReferenceCode(tenderReferenceCode);
+    response.setRfxReferenceCode(ittRef);
 
-    return new ResponseEntity<>(ittRef, HttpStatus.CREATED);
+    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+  }
+
+  @Override
+  public ResponseEntity<String> createRFx (String procID, Object body){
+    // TODO Implement API endpoint once we have a stable openapi spec that resolves
+    return new ResponseEntity<>("", HttpStatus.OK);
   }
 
   @Override
   public ResponseEntity<List<RfxStatus200Response>> updateCaseRFxStatus(
       List<RfxStatusItem> rfxStatusItemList) {
-
     List<RfxStatus200Response> rfxStatus200Responses = new ArrayList<>();
-
     logger.info(
         "Sending Status Update request to Salesforce, request body : {}", rfxStatusItemList);
     RfxStatusList rfxStatusRequestBody = getRfxStatusBody(rfxStatusItemList);
-
     logger.info(
         "Sending Update RFX Status request to Salesforce, request body : {}", rfxStatusRequestBody);
-
     Map<String, String> errorMap =
         rfxStatusItemList.stream()
             .collect(
@@ -179,13 +172,14 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   @Override
-  public ResponseEntity<String> terminateRFx(
-      String procID,
-      String eventID) {
+  public ResponseEntity<String> terminateRFx(String procID, String eventID) {
 
     logger.info("Invalidating ITT  - ProcID : {} / EventID : {}", procID, eventID);
 
-    RfxGetResponse rfx = rfxApi.getRFX(String.format("rfxReferenceCode==%s", eventID)).block(Duration.ofSeconds(defaultApiTimeout));
+    RfxGetResponse rfx =
+        rfxApi
+            .getRFX(String.format("rfxReferenceCode==%s", eventID))
+            .block(Duration.ofSeconds(defaultApiTimeout));
 
     final RfxSetting rfxSetting;
     if (rfx != null) {
@@ -194,22 +188,26 @@ public class TenderApiService implements TendersApiDelegate {
           rfxSetting =
               rfx.getDataList() != null ? rfx.getDataList().getRfx().get(0).getRfxSetting() : null;
         } else {
-          throw new IllegalStateException(String.format("No RFx details found for refReferenceCode - %s", eventID));
+          throw new IllegalStateException(
+              String.format("No RFx details found for refReferenceCode - %s", eventID));
         }
       } else {
-        throw new IllegalStateException(String.format("No RFx dataList found for refReferenceCode - %s", eventID));
+        throw new IllegalStateException(
+            String.format("No RFx dataList found for refReferenceCode - %s", eventID));
       }
     } else {
-      throw new IllegalStateException(String.format("No RFx found for refReferenceCode - %s", eventID));
+      throw new IllegalStateException(
+          String.format("No RFx found for refReferenceCode - %s", eventID));
     }
 
     Integer ownerUserId;
     if (rfxSetting != null) {
       ownerUserId = rfxSetting.getOwnerUser().getId();
     } else {
-      throw new IllegalStateException(String.format("No Owner found for refReferenceCode - %s", eventID));
+      throw new IllegalStateException(
+          String.format("No Owner found for refReferenceCode - %s", eventID));
     }
-    
+
     String status = rfxSetting.getStatus();
     OperatorUser operatorUser = new OperatorUser();
     operatorUser.setId(ownerUserId);
@@ -220,10 +218,12 @@ public class TenderApiService implements TendersApiDelegate {
 
     RfxInvalidationResponse jaggaerResponse;
 
-    if (status != null && status.equals("To be Published")){
-      jaggaerResponse = rfxWorkflowsApi.deleteRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    if (status != null && status.equals("To be Published")) {
+      jaggaerResponse =
+          rfxWorkflowsApi.deleteRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
     } else {
-      jaggaerResponse = rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+      jaggaerResponse =
+          rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
     }
     final String finalStatus = (jaggaerResponse == null) ? "" : jaggaerResponse.getFinalStatus();
 
@@ -290,6 +290,7 @@ public class TenderApiService implements TendersApiDelegate {
 
   private Rfxs getRfxsBody(
       String tenderReferenceCode,
+      String ownerLogin,
       uk.gov.crowncommercial.esourcing.integration.server.model.Rfx rfx) {
 
     Rfxs rfxs = new Rfxs();
@@ -334,13 +335,15 @@ public class TenderApiService implements TendersApiDelegate {
 
     rfxSetting.setTenderReferenceCode(tenderReferenceCode);
     rfxSetting.setShortDescription(tenderReferenceCode + " " + rfx.getShortDescription());
-
+    rfxSetting.setLongDescription(rfx.getLongDescription());
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId(defaultBuyerCompanyId);
     rfxSetting.setBuyerCompany(buyerCompany);
 
     OwnerUser ownerUser = new OwnerUser();
-    ownerUser.setLogin(defaultOwnerUser);
+
+      ownerUser.setLogin(ownerLogin);
+
     rfxSetting.setOwnerUser(ownerUser);
     rfxSetting.setValue(rfx.getValue());
 

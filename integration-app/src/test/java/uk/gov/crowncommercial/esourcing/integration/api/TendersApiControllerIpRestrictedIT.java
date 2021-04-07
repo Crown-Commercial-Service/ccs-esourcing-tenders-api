@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +30,7 @@ import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiController;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
+import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
 import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 
@@ -45,6 +48,9 @@ public class TendersApiControllerIpRestrictedIT {
 
   @MockBean
   private EmailService emailService;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -64,7 +70,7 @@ public class TendersApiControllerIpRestrictedIT {
   @Test
   public void salesforce_expectForbidden() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
@@ -90,7 +96,7 @@ public class TendersApiControllerIpRestrictedIT {
   @Test
   public void salesforce_withValidXForwardedForHeader_expectOk() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
@@ -100,13 +106,14 @@ public class TendersApiControllerIpRestrictedIT {
             .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(response);
+    String expected = objectMapper.writeValueAsString(response);
+    JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
   }
 
   @Test
   public void salesforce_withValidLowerLimitMultipleXForwardedForHeader_expectOk() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
@@ -116,13 +123,14 @@ public class TendersApiControllerIpRestrictedIT {
             .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(response);
+    String expected = objectMapper.writeValueAsString(response);
+    JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
   }
 
   @Test
   public void salesforce_withValidUpperLimitMultipleXForwardedForHeader_expectOk() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
@@ -132,13 +140,14 @@ public class TendersApiControllerIpRestrictedIT {
             .contentType(MediaType.APPLICATION_JSON).content(requestBody))
         .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
 
-    assertThat(mvcResult.getResponse().getContentAsString()).isEqualTo(response);
+    String expected = objectMapper.writeValueAsString(response);
+    JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
   }
 
   @Test
   public void salesforce_withInvalidXForwardedForHeader_expectForbidden() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
@@ -154,7 +163,7 @@ public class TendersApiControllerIpRestrictedIT {
   @Test
   public void salesforce_withInvalidMultipleXForwardedForHeader_expectForbidden() throws Exception {
 
-    String response = "trc";
+    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 

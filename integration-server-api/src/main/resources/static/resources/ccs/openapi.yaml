@@ -28,11 +28,13 @@ paths:
       operationId: createCase
       responses:
         '202':
-          description: Project Code
+          description: Success (for object creation). Its information is available in the
+            data field at the top level of the response body. The API URL where
+            the object can be retrieved is also returned in the Location header of the response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProcurementID'
+                $ref: '#/components/schemas/ProjectTender200Response'
         '400':
           $ref: '#/components/responses/400InvalidRequest'
         '401':
@@ -96,7 +98,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Rfx'
+              type: object
         description: Created sourcing object
         required: true
   /tenders/ProcurementProjects/{procID}/events/{eventID}/terminate/:
@@ -173,7 +175,11 @@ components:
         - projectOwnerLogin
         - subject
         - procurementReference
+        - rfx
       properties:
+        tenderReferenceCode:
+          type: string
+          example: project_1078
         projectOwnerLogin:
           type: string
           example: user@crowncommercial.gov.uk
@@ -183,23 +189,24 @@ components:
         procurementReference:
           type: string
           example: '324233324'
+        rfx:
+          $ref: '#/components/schemas/Rfx'
     Rfx:
       title: Rfx
       type: object
       required:
-        - ownerUserLogin
         - shortDescription
         - value
         - publishDate
         - closeDate
         - procurementRoute
       properties:
-        ownerUserLogin:
-          type: string
-          example: user@crowncommercial.gov.uk
         shortDescription:
           type: string
           example: RFQ for Provision of PPE
+        longDescription:
+          type: string
+          example: Possibly used to identify RFI
         rfiFlag:
           type: string
           example: "1"
@@ -316,15 +323,18 @@ components:
       example: itt_185
     TerminationCode:
       type: string
-      example: Invalidated
-    OwnerUser:
-      required:
-        - ownerUserId
+      example: withdrawn
+    ProjectTender200Response:
       type: object
       properties:
-        ownerUserId:
+        tenderReferenceCode:
           type: string
-          example: 89512
+          description: project code (project id)
+          example: project_1063
+        rfxReferenceCode:
+          type: string
+          description: the itt code (tender id)
+          example: itt_586
   parameters:
     ProcurementParam:
       name: procID
