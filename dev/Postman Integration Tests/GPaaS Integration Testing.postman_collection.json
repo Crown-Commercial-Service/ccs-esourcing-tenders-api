@@ -6,13 +6,15 @@
 	},
 	"item": [
 		{
-			"name": "Create Project - US1",
+			"name": "Create Project & ITT - US1",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.environment.set(\"procID\", responseBody);"
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
 						],
 						"type": "text/javascript"
 					}
@@ -21,11 +23,6 @@
 			"request": {
 				"method": "PUT",
 				"header": [
-					{
-						"key": "accept",
-						"value": "application/json",
-						"disabled": true
-					},
 					{
 						"key": "x-api-key",
 						"value": "{{api-key}}"
@@ -37,7 +34,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\"\r\n}"
+					"raw": "{\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Non-template ITT\",\r\n        \"value\": 9000,\r\n        \"qualEnvStatus\": 0,\r\n        \"techEnvStatus\": 1,\r\n        \"commEnvStatus\": 0,\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-02-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": 1,\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\",\r\n        \"frameworkRMNumber\": \"12345\"\r\n    }\r\n}"
 				},
 				"url": {
 					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
@@ -61,81 +58,23 @@
 			"response": []
 		},
 		{
-			"name": "Create ITT - US1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.environment.set(\"eventID\", responseBody);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "accept",
-						"value": "application/json",
-						"disabled": true
-					},
-					{
-						"key": "x-api-key",
-						"value": "{{api-key}}"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"ownerUserLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"shortDescription\": \"Non-template ITT\",\r\n    \"value\": \"0\",\r\n    \"qualEnvStatus\": \"0\",\r\n    \"techEnvStatus\": \"1\",\r\n    \"commEnvStatus\": \"0\",\r\n    \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n    \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n    \"visibilityEGComments\": \"1\",\r\n    \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n    \"procurementRoute\": \"Call Off (Competition)\",\r\n    \"frameworkName\": \"TT3242\",\r\n    \"frameworkLotNumber\": \"Lot 1\"\r\n}"
-				},
-				"url": {
-					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/{{procID}}/events",
-					"protocol": "https",
-					"host": [
-						"{{env}}-ccs-esourcing-tenders-api",
-						"london",
-						"cloudapps",
-						"digital"
-					],
-					"path": [
-						"crown-commercial-service",
-						"ccs-esourcing-client",
-						"0.0.1-SNAPSHOT",
-						"tenders",
-						"ProcurementProjects",
-						"{{procID}}",
-						"events"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Create Open Market ITT - US1",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.environment.set(\"eventID\", responseBody);"
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
-					{
-						"key": "accept",
-						"value": "application/json"
-					},
 					{
 						"key": "x-api-key",
 						"value": "{{api-key}}"
@@ -147,10 +86,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"ownerUserLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"shortDescription\": \"Open Market ITT\",\r\n    \"value\": \"0\",\r\n    \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n    \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n    \"visibilityEGComments\": \"1\",\r\n    \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n    \"procurementRoute\": \"Open Market\"\r\n}"
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{procID}}\",\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Open Market ITT\",\r\n        \"value\": 9000,\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-02-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Open Market\"\r\n    }\r\n}"
 				},
 				"url": {
-					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/{{procID}}/events",
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
 					"protocol": "https",
 					"host": [
 						"{{env}}-ccs-esourcing-tenders-api",
@@ -164,8 +103,7 @@
 						"0.0.1-SNAPSHOT",
 						"tenders",
 						"ProcurementProjects",
-						"{{procID}}",
-						"events"
+						"salesforce"
 					]
 				}
 			},
@@ -178,19 +116,17 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.environment.set(\"eventID\", responseBody);"
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
-					{
-						"key": "accept",
-						"value": "application/json"
-					},
 					{
 						"key": "x-api-key",
 						"value": "{{api-key}}"
@@ -202,10 +138,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"ownerUserLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"shortDescription\": \"Single Tender Action ITT\",\r\n    \"value\": \"0\",\r\n    \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n    \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n    \"visibilityEGComments\": \"1\",\r\n    \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n    \"procurementRoute\": \"Single Tender Action\"\r\n}"
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{procID}}\",\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Single Tender Action ITT\",\r\n        \"value\": 9000,\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-02-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Single Tender Action\"\r\n    }\r\n}"
 				},
 				"url": {
-					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/{{procID}}/events",
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
 					"protocol": "https",
 					"host": [
 						"{{env}}-ccs-esourcing-tenders-api",
@@ -219,8 +155,7 @@
 						"0.0.1-SNAPSHOT",
 						"tenders",
 						"ProcurementProjects",
-						"{{procID}}",
-						"events"
+						"salesforce"
 					]
 				}
 			},
@@ -233,19 +168,17 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.environment.set(\"eventID\", responseBody);"
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
-					{
-						"key": "accept",
-						"value": "application/json"
-					},
 					{
 						"key": "x-api-key",
 						"value": "{{api-key}}"
@@ -257,10 +190,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"ownerUserLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"shortDescription\": \"Call Off ITT\",\r\n    \"value\": \"0\",\r\n    \"templateReferenceCode\": \"itt_188\",\r\n    \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n    \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n    \"visibilityEGComments\": \"1\",\r\n    \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n    \"procurementRoute\": \"Call Off (Competition)\",\r\n    \"frameworkName\": \"TT3242\",\r\n    \"frameworkLotNumber\": \"Lot 1\",\r\n    \"frameworkRMNumber\": \"12345\"\r\n}"
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{procID}}\",\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"Call Off ITT\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\",\r\n        \"frameworkRMNumber\": \"12345\"\r\n    }\r\n}"
 				},
 				"url": {
-					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/{{procID}}/events",
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
 					"protocol": "https",
 					"host": [
 						"{{env}}-ccs-esourcing-tenders-api",
@@ -274,22 +207,30 @@
 						"0.0.1-SNAPSHOT",
 						"tenders",
 						"ProcurementProjects",
-						"{{procID}}",
-						"events"
+						"salesforce"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Create RFI - US1.1",
+			"name": "Create RFI (RFI Flag) - US1.1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
-					{
-						"key": "accept",
-						"value": "application/json"
-					},
 					{
 						"key": "x-api-key",
 						"value": "{{api-key}}"
@@ -301,7 +242,59 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"tenderReferenceCode\": \"{{tenderReferenceCode}}\",\r\n    \"subject\": \"RoweIT RFI\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"RFI\",\r\n        \"rfiFlag\": \"1\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T12:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T12:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\"\r\n    }\r\n}"
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{procID}}\",\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"RFI - RFI Flag\",\r\n        \"rfiFlag\": \"1\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\",\r\n        \"frameworkRMNumber\": \"12345\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
+					"protocol": "https",
+					"host": [
+						"{{env}}-ccs-esourcing-tenders-api",
+						"london",
+						"cloudapps",
+						"digital"
+					],
+					"path": [
+						"crown-commercial-service",
+						"ccs-esourcing-client",
+						"0.0.1-SNAPSHOT",
+						"tenders",
+						"ProcurementProjects",
+						"salesforce"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create RFI  (Long Desc) - US1.1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"procID\", jsonData.tenderReferenceCode);\r",
+							"pm.environment.set(\"eventID\", jsonData.rfxReferenceCode);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{api-key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tenderReferenceCode\": \"{{procID}}\",\r\n    \"projectOwnerLogin\": \"joe.raymond@roweit.co.uk\",\r\n    \"subject\": \"RoweIT New Case\",\r\n    \"procurementReference\": \"324233324\",\r\n    \"rfx\": {\r\n        \"shortDescription\": \"RFI - Long Desc\",\r\n        \"longDescription\": \"Possible way to identify RFI\",\r\n        \"value\": \"0\",\r\n        \"templateReferenceCode\": \"itt_188\",\r\n        \"publishDate\": \"2021-01-28T09:00:00.000+00:00\",\r\n        \"closeDate\": \"2021-10-27T09:00:00.000+00:00\",\r\n        \"visibilityEGComments\": \"1\",\r\n        \"rankingStrategy\": \"BEST_TECHNICAL_SCORE\",\r\n        \"procurementRoute\": \"Call Off (Competition)\",\r\n        \"frameworkName\": \"TT3242\",\r\n        \"frameworkLotNumber\": \"Lot 1\",\r\n        \"frameworkRMNumber\": \"12345\"\r\n    }\r\n}"
 				},
 				"url": {
 					"raw": "https://{{env}}-ccs-esourcing-tenders-api.london.cloudapps.digital/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce",
