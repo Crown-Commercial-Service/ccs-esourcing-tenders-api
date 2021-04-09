@@ -48,23 +48,17 @@ import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 @ActiveProfiles("integrationtest")
 public class ApiExceptionHandlerRollbarEnabledIT {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @MockBean
-  private TenderApiService tenderApiService;
+  @MockBean private TenderApiService tenderApiService;
 
-  @MockBean
-  private EmailService emailService;
+  @MockBean private EmailService emailService;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private Sender rollbarSender;
+  @Autowired private Sender rollbarSender;
 
-  @Autowired
-  private Clock clock;
+  @Autowired private Clock clock;
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -79,31 +73,45 @@ public class ApiExceptionHandlerRollbarEnabledIT {
   ClassLoader classLoader = getClass().getClassLoader();
   InputStream inputStream = classLoader.getResourceAsStream("test-data/valid-request-body.json");
   String requestBody;
+
   {
     assert inputStream != null;
-    requestBody = new BufferedReader(new InputStreamReader(inputStream))
-        .lines().collect(Collectors.joining("\n"));
+    requestBody =
+        new BufferedReader(new InputStreamReader(inputStream))
+            .lines()
+            .collect(Collectors.joining("\n"));
   }
 
   @Test
   public void salesforce_throwsNullPointerException_expectInternalServerErrorAndRollbarSend()
       throws Exception {
 
-
     /* mock the service call */
-    when(tenderApiService.createCase(any(ProjectTender.class))).thenThrow(new NullPointerException(
-        "Thrown as part of getTenderById_throwsNullPointerException_expectInternalServerError"));
+    when(tenderApiService.createCase(any(ProjectTender.class)))
+        .thenThrow(
+            new NullPointerException(
+                "Thrown as part of getTenderById_throwsNullPointerException_expectInternalServerError"));
 
     /* "call" the REST API */
-    MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(requestBody))
-        .andExpect(MockMvcResultMatchers.status().isInternalServerError()).andReturn();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/salesforce")
+                    .header(API_KEY_HEADER, "integration-test-api-key")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+            .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+            .andReturn();
 
     /* verify the REST API response */
-    ErrorResponse errorResponse = ErrorResponse.builder().timestamp(clock.instant()).status(500)
-        .error("Internal Server Error").message("Unhandled exception")
-        .path("/crown-commercial-service/ccs-esourcing-client/0.0.1-SNAPSHOT/tenders/ProcurementProjects/salesforce").build();
+    ErrorResponse errorResponse =
+        ErrorResponse.builder()
+            .timestamp(clock.instant())
+            .status(500)
+            .error("Internal Server Error")
+            .message("Unhandled exception")
+            .path(CCS_API_BASE_PATH + "/salesforce")
+            .build();
     String expected = objectMapper.writeValueAsString(errorResponse);
     JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
 
@@ -122,14 +130,17 @@ public class ApiExceptionHandlerRollbarEnabledIT {
   @Test
   public void getNoSuchFile_withApiKey_expectNotFoundAndNoRollbarSend() throws Exception {
 
-    MvcResult mvcResult = mockMvc.perform(
-        MockMvcRequestBuilders.get("/nosuchfile.txt").header(Constants.API_KEY_HEADER, "integration-test-api-key"))
-        .andExpect(MockMvcResultMatchers.status().isNotFound()).andReturn();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.get("/nosuchfile.txt")
+                    .header(Constants.API_KEY_HEADER, "integration-test-api-key"))
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
 
     /* check that nothing was sent to rollbar */
     verify(rollbarSender, never()).send(any(Payload.class));
   }
-
 }

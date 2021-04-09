@@ -1,11 +1,15 @@
 package uk.gov.crowncommercial.esourcing.integration.service;
 
+import com.rollbar.notifier.Rollbar;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceError;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -13,6 +17,8 @@ import uk.gov.service.notify.NotificationClientException;
 public class GovNotifyEmailService implements EmailService {
 
   private static final Logger LOG = LoggerFactory.getLogger(GovNotifyEmailService.class);
+
+  final Rollbar rollbar;
 
   @Value("${ccs.esourcing.gov.notify.apikey}")
   private String govNotifyApiKey;
@@ -23,13 +29,22 @@ public class GovNotifyEmailService implements EmailService {
   @Value("${ccs.esourcing.gov.notify.salesforce.template.id}")
   private String salesforceTemplateId;
 
-  public void sendSalesforceUpdateFailureEmail(Map<String, String> map) {
+  public GovNotifyEmailService(Rollbar rollbar) {
+    this.rollbar = rollbar;
+  }
+
+  public void sendSalesforceUpdateFailureEmails(List<SalesforceError> salesforceErrorList) {
     NotificationClient client = new NotificationClient(govNotifyApiKey);
-    map.forEach((k, v) -> prepareMessage(client, k, v));
+    final LocalDateTime now = LocalDateTime.now();
+    salesforceErrorList.forEach(
+        e -> prepareMessage(client, now, e.getProcurementRef(), e.getOwnerUserLogin()));
   }
 
   private void prepareMessage(
-      NotificationClient client, String procurmentReference, String emailAddress) {
+      NotificationClient client,
+      LocalDateTime now,
+      String procurmentReference,
+      String emailAddress) {
 
     LOG.info("Sending email to {}", emailAddress);
     Map<String, Object> personalisation = new HashMap<>();
@@ -37,7 +52,7 @@ public class GovNotifyEmailService implements EmailService {
     personalisation.put("title", "Salesforce status update failure");
     personalisation.put(
         "responsecodemessage", String.format("Procurement Reference - %s", procurmentReference));
-    personalisation.put("issuetext", java.time.LocalDateTime.now());
+    personalisation.put("issuetext", now);
 
     sendMessage(client, techopsEmail, personalisation);
     sendMessage(client, emailAddress, personalisation);
@@ -48,7 +63,7 @@ public class GovNotifyEmailService implements EmailService {
     try {
       client.sendEmail(salesforceTemplateId, emailAddress, personalisation, null);
     } catch (NotificationClientException e) {
-      e.printStackTrace();
+      rollbar.error(String.format("Failed to send email to %s", emailAddress));
     }
   }
 }

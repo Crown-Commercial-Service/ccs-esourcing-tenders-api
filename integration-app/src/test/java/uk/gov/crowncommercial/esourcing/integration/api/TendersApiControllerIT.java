@@ -42,17 +42,13 @@ import uk.gov.crowncommercial.esourcing.integration.service.TenderApiService;
 @ActiveProfiles("integrationtest")
 public class TendersApiControllerIT {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @MockBean
-  private TenderApiService tenderApiService;
+  @MockBean private TenderApiService tenderApiService;
 
-  @MockBean
-  private EmailService emailService;
+  @MockBean private EmailService emailService;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   @DynamicPropertySource
   public static void setDynamicProperties(DynamicPropertyRegistry registry) {
@@ -63,30 +59,44 @@ public class TendersApiControllerIT {
   ClassLoader classLoader = getClass().getClassLoader();
   InputStream inputStream = classLoader.getResourceAsStream("test-data/valid-request-body.json");
   String requestBody;
+
   {
     assert inputStream != null;
-    requestBody = new BufferedReader(new InputStreamReader(inputStream))
-        .lines().collect(Collectors.joining("\n"));
+    requestBody =
+        new BufferedReader(new InputStreamReader(inputStream))
+            .lines()
+            .collect(Collectors.joining("\n"));
   }
-  InputStream isMissingParam = classLoader.getResourceAsStream("test-data/request-body-missing-mandatory-params.json");
+
+  InputStream isMissingParam =
+      classLoader.getResourceAsStream("test-data/request-body-missing-mandatory-params.json");
   String invalidRequestBody;
+
   {
     assert isMissingParam != null;
-    invalidRequestBody = new BufferedReader(new InputStreamReader(isMissingParam))
-        .lines().collect(Collectors.joining("\n"));
+    invalidRequestBody =
+        new BufferedReader(new InputStreamReader(isMissingParam))
+            .lines()
+            .collect(Collectors.joining("\n"));
   }
 
   @Test
   public void salesforce_expectOk() throws Exception {
 
-    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
+    ProjectTender200Response response =
+        new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
-    MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(requestBody))
-        .andExpect(MockMvcResultMatchers.status().isOk()).andReturn();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/salesforce")
+                    .header(API_KEY_HEADER, "integration-test-api-key")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn();
 
     String expected = objectMapper.writeValueAsString(response);
     JSONAssert.assertEquals(expected, mvcResult.getResponse().getContentAsString(), false);
@@ -95,10 +105,14 @@ public class TendersApiControllerIT {
   @Test
   public void salesforce_noApiKey_expectForbidden() throws Exception {
 
-    MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .contentType(MediaType.APPLICATION_JSON).content("{requestBody}"))
-        .andExpect(MockMvcResultMatchers.status().isForbidden()).andReturn();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post(CCS_API_BASE_PATH + "/salesforce")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{requestBody}"))
+            .andExpect(MockMvcResultMatchers.status().isForbidden())
+            .andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).isEmpty();
   }
@@ -106,16 +120,21 @@ public class TendersApiControllerIT {
   @Test
   public void salesforce_expectBadRequest() throws Exception {
 
-    ProjectTender200Response response = new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
+    ProjectTender200Response response =
+        new ProjectTender200Response().tenderReferenceCode("trc").rfxReferenceCode("rfc");
     when(tenderApiService.createCase(any(ProjectTender.class)))
         .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
-    MvcResult mvcResult = mockMvc
-        .perform(MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/tenders/ProcurementProjects/salesforce")
-            .header(API_KEY_HEADER, "integration-test-api-key").contentType(MediaType.APPLICATION_JSON).content(invalidRequestBody))
-        .andExpect(MockMvcResultMatchers.status().isBadRequest()).andReturn();
+    MvcResult mvcResult =
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.put(CCS_API_BASE_PATH + "/salesforce")
+                    .header(API_KEY_HEADER, "integration-test-api-key")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(invalidRequestBody))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andReturn();
 
     assertThat(mvcResult.getResponse().getContentAsString()).contains("Validation failed");
   }
-
 }

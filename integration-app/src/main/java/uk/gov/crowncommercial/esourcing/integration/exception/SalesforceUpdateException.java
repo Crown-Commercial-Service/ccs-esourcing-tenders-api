@@ -1,19 +1,18 @@
 package uk.gov.crowncommercial.esourcing.integration.exception;
 
-import java.util.Map;
+import java.util.List;
 
 public class SalesforceUpdateException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
-  private final Map<String, String> map;
+  private final List<SalesforceError> salesforceErrorList;
 
-
-  public SalesforceUpdateException(Map<String, String> map) {
-    this.map = map;
+  public SalesforceUpdateException(List<SalesforceError> salesforceErrorList) {
+    this.salesforceErrorList = salesforceErrorList;
   }
 
-  public Map<String, String> getMap() {
-    return map;
+  public List<SalesforceError> getSalesforceErrorList() {
+    return salesforceErrorList;
   }
 }

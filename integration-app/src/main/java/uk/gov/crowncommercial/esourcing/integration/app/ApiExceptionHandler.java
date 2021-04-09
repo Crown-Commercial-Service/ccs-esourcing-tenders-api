@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +13,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 import uk.gov.crowncommercial.esourcing.integration.server.api.ApiUtil;
 import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
-import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 
 /*
  * Catches any errors raised by the API layer and returns a suitable error response.
@@ -24,13 +23,13 @@ import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateEx
 @ControllerAdvice(basePackageClasses = ApiUtil.class)
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   private final EmailService emailService;
+  private final Clock clock;
 
   private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-  @Autowired private Clock clock;
-
-  public ApiExceptionHandler(EmailService emailService) {
+  public ApiExceptionHandler(EmailService emailService, Clock clock) {
     this.emailService = emailService;
+    this.clock = clock;
   }
 
   /**
@@ -80,7 +79,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleSalesforceUpdateException(SalesforceUpdateException sue) {
     LOG.warn("Salesforce Status Update failure - {}", sue.getMessage());
 
-    emailService.sendSalesforceUpdateFailureEmail(sue.getMap());
+    emailService.sendSalesforceUpdateFailureEmails(sue.getSalesforceErrorList());
 
     HttpStatus status = HttpStatus.BAD_REQUEST;
 

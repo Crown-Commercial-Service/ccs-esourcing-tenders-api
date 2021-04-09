@@ -208,8 +208,8 @@ components:
           type: string
           example: Possibly used to identify RFI
         rfiFlag:
-          type: string
-          example: "1"
+          type: integer
+          example: 1
         value:
           type: number
           format: float

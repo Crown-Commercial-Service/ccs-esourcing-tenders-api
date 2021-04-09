@@ -3,7 +3,6 @@ package uk.gov.crowncommercial.esourcing.integration.service;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceError;
 import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
@@ -51,6 +51,10 @@ import uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatusList;
 
 @Service
 public class TenderApiService implements TendersApiDelegate {
+
+  public static final String DELETED = "Deleted";
+  public static final String INVALIDATED = "Invalidated";
+  public static final String TO_BE_PUBLISHED = "To be Published";
 
   private final ProjectsApi projectsApi;
   private final RfxApi rfxApi;
@@ -108,7 +112,9 @@ public class TenderApiService implements TendersApiDelegate {
           projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
     }
 
-    Rfxs rfxRequestBody = getRfxsBody(tenderReferenceCode, projectTender.getProjectOwnerLogin(), projectTender.getRfx());
+    Rfxs rfxRequestBody =
+        getRfxsBody(
+            tenderReferenceCode, projectTender.getProjectOwnerLogin(), projectTender.getRfx());
     logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody);
     RfxResponse rfxsResponseBody =
         rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
@@ -123,7 +129,7 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   @Override
-  public ResponseEntity<String> createRFx (String procID, Object body){
+  public ResponseEntity<String> createRFx(String procID, Object body) {
     // TODO Implement API endpoint once we have a stable openapi spec that resolves
     return new ResponseEntity<>("", HttpStatus.OK);
   }
@@ -137,11 +143,16 @@ public class TenderApiService implements TendersApiDelegate {
     RfxStatusList rfxStatusRequestBody = getRfxStatusBody(rfxStatusItemList);
     logger.info(
         "Sending Update RFX Status request to Salesforce, request body : {}", rfxStatusRequestBody);
-    Map<String, String> errorMap =
+    List<SalesforceError> errorList =
         rfxStatusItemList.stream()
-            .collect(
-                Collectors.toMap(
-                    RfxStatusItem::getProcurementReference, RfxStatusItem::getOwnerUserLogin));
+            .map(
+                r -> {
+                  SalesforceError salesforceError = new SalesforceError();
+                  salesforceError.setProcurementRef(r.getProcurementReference());
+                  salesforceError.setOwnerUserLogin(r.getOwnerUserLogin());
+                  return salesforceError;
+                })
+            .collect(Collectors.toList());
 
     RfxStatus200ResponseList sfRfxStatus200ResponseList;
 
@@ -155,10 +166,10 @@ public class TenderApiService implements TendersApiDelegate {
                       .filter(this::is5xxServerError)
                       .onRetryExhaustedThrow(
                           (retryBackoffSpec, retrySignal) ->
-                              new SalesforceUpdateException(errorMap)))
+                              new SalesforceUpdateException(errorList)))
               .block(Duration.ofSeconds(defaultApiTimeout));
     } catch (WebClientResponseException we) {
-      throw new SalesforceUpdateException(errorMap);
+      throw new SalesforceUpdateException(errorList);
     }
 
     logger.info("Update RFX Status response : {}", sfRfxStatus200ResponseList);
@@ -182,23 +193,19 @@ public class TenderApiService implements TendersApiDelegate {
             .block(Duration.ofSeconds(defaultApiTimeout));
 
     final RfxSetting rfxSetting;
-    if (rfx != null) {
-      if (rfx.getDataList() != null) {
-        if (rfx.getDataList().getRfx() != null) {
-          rfxSetting =
-              rfx.getDataList() != null ? rfx.getDataList().getRfx().get(0).getRfxSetting() : null;
-        } else {
-          throw new IllegalStateException(
-              String.format("No RFx details found for refReferenceCode - %s", eventID));
-        }
-      } else {
-        throw new IllegalStateException(
-            String.format("No RFx dataList found for refReferenceCode - %s", eventID));
-      }
-    } else {
+    if (rfx == null) {
       throw new IllegalStateException(
           String.format("No RFx found for refReferenceCode - %s", eventID));
     }
+    if (rfx.getDataList() == null) {
+      throw new IllegalStateException(
+          String.format("No RFx dataList found for refReferenceCode - %s", eventID));
+    }
+    if (rfx.getDataList().getRfx() == null) {
+      throw new IllegalStateException(
+          String.format("No RFx details found for refReferenceCode - %s", eventID));
+    }
+    rfxSetting = rfx.getDataList().getRfx().get(0).getRfxSetting();
 
     Integer ownerUserId;
     if (rfxSetting != null) {
@@ -218,7 +225,7 @@ public class TenderApiService implements TendersApiDelegate {
 
     RfxInvalidationResponse jaggaerResponse;
 
-    if (status != null && status.equals("To be Published")) {
+    if (status != null && status.equals(TO_BE_PUBLISHED)) {
       jaggaerResponse =
           rfxWorkflowsApi.deleteRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
     } else {
@@ -230,14 +237,15 @@ public class TenderApiService implements TendersApiDelegate {
     String response;
 
     // Convert Jaggaer termination status to OCDS
-    if (finalStatus != null && finalStatus.equalsIgnoreCase("Invalidated")) {
+    if (finalStatus != null && finalStatus.equalsIgnoreCase(INVALIDATED)) {
       response = "withdrawn";
-    } else if (finalStatus != null && finalStatus.equalsIgnoreCase("Deleted")) {
+    } else if (finalStatus != null && finalStatus.equalsIgnoreCase(DELETED)) {
       response = "cancelled";
     } else {
       response = finalStatus;
     }
 
+    // Jaggaer error covers more than one error so checking for only rfx can't be in validated
     if (jaggaerResponse != null) {
       if (jaggaerResponse.getReturnMessage() != null
           && jaggaerResponse.getReturnMessage().contains("rfx can't be invalidate")) {
@@ -342,12 +350,12 @@ public class TenderApiService implements TendersApiDelegate {
 
     OwnerUser ownerUser = new OwnerUser();
 
-      ownerUser.setLogin(ownerLogin);
+    ownerUser.setLogin(ownerLogin);
 
     rfxSetting.setOwnerUser(ownerUser);
     rfxSetting.setValue(rfx.getValue());
 
-    if (rfx.getRfiFlag() != null && rfx.getRfiFlag().equals("1")) {
+    if (rfx.getRfiFlag() != null && rfx.getRfiFlag().equals(1)) {
       rfxSetting.setRfxType("STANDARD_PQQ");
       rfxSetting.setRfiFlag(1);
     } else {
