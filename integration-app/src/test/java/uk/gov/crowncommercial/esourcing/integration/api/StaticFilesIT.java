@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.gov.crowncommercial.esourcing.integration.app.AppConfiguration;
 import uk.gov.crowncommercial.esourcing.integration.app.RollbarConfig;
+import uk.gov.crowncommercial.esourcing.integration.service.EmailService;
 
 @WebMvcTest
 @AutoConfigureMockMvc
@@ -31,6 +33,9 @@ public class StaticFilesIT {
 
   @Autowired
   private MockMvc mockMvc;
+
+  @MockBean
+  private EmailService emailService;
 
   @Test
   public void getCCsOpenApiYaml_noApiKey_expectOk() throws Exception {

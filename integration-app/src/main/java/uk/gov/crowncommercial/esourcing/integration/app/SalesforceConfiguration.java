@@ -222,8 +222,9 @@ public class SalesforceConfiguration {
 
   private Map<String, Object> addTokenTypeIfNecessary(Map<String, Object> params) {
     Map<String, Object> newParams = new HashMap<>(params);
+    Object accessToken = params.get("access_token");
     Object expiresIn = params.get("expires_in");
-    if (expiresIn == null) {
+    if (accessToken != null && expiresIn == null) {
       newParams.put("expires_in", tokenExpiresIn);
     }
     return newParams;
