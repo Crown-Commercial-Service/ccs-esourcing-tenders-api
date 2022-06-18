@@ -40,7 +40,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     
 		<swagger-annotations-version>1.6.2</swagger-annotations-version>
-		<jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+		<jackson-databind-nullable-version>0.2.2</jackson-databind-nullable-version>
 	</properties>
 
 	<modules>
