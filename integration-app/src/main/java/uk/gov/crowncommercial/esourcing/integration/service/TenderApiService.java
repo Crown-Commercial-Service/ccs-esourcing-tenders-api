@@ -4,16 +4,17 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceError;
+import uk.gov.crowncommercial.esourcing.integration.exception.SalesforceUpdateException;
 import uk.gov.crowncommercial.esourcing.integration.server.api.TendersApiDelegate;
-import uk.gov.crowncommercial.esourcing.integration.server.model.AbandonITT;
-import uk.gov.crowncommercial.esourcing.integration.server.model.AbandonITT200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender;
 import uk.gov.crowncommercial.esourcing.integration.server.model.ProjectTender200Response;
 import uk.gov.crowncommercial.esourcing.integration.server.model.RfxStatus200Response;
@@ -27,11 +28,13 @@ import uk.gov.crowncommercial.esourcing.jaggaer.client.model.BuyerCompany;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.OperatorUser;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.OwnerUser;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Project;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.ProjectOwner;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.ProjectResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Projects;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.Rfx;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoItem;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxAdditionalInfoList;
+import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxGetResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidate;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxInvalidationResponse;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.model.RfxResponse;
@@ -49,6 +52,9 @@ import uk.gov.crowncommercial.esourcing.salesforce.client.model.RfxStatusList;
 @Service
 public class TenderApiService implements TendersApiDelegate {
 
+  public static final String DELETED = "Deleted";
+  public static final String INVALIDATED = "Invalidated";
+  public static final String TO_BE_PUBLISHED = "To be Published";
 
   private final ProjectsApi projectsApi;
   private final RfxApi rfxApi;
@@ -61,19 +67,10 @@ public class TenderApiService implements TendersApiDelegate {
   private Long defaultApiTimeout;
 
   @Value("${ccs.esourcing.jaggaer.default.buyer-company-id}")
-  private String defaultBuyerCompanyId;
+  private Integer defaultBuyerCompanyId;
 
   @Value("${ccs.esourcing.jaggaer.default.project-type}")
   private String defaultProjectType;
-
-  @Value("${ccs.esourcing.jaggaer.default.source-template-reference-code}")
-  private String defaultSourceTemplateReferenceCode;
-
-  @Value("${ccs.esourcing.jaggaer.default.owner-user}")
-  private String defaultOwnerUser;
-
-  @Value("${ccs.esourcing.jaggaer.default.owner-user-id}")
-  private String defaultOwnerUserId;
 
   @Value("${ccs.esourcing.jaggaer.default.open-market-template-id}")
   private String openMarketTemplateId;
@@ -81,8 +78,17 @@ public class TenderApiService implements TendersApiDelegate {
   @Value("${ccs.esourcing.jaggaer.default.sta-template-id}")
   private String staTemplateId;
 
+  @Value("${ccs.esourcing.salesforce.retry.maxAttempts:3}")
+  private Long salesforceMaxAttempts;
+
+  @Value("${ccs.esourcing.salesforce.retry.waitDuration:10}")
+  private Long salesforcWwaitDuration;
+
   public TenderApiService(
-      ProjectsApi projectsApi, RfxApi rfxApi, RfxStatusListApi rfxStatusListApi, RfxWorkflowsApi rfxWorkflowsApi) {
+      ProjectsApi projectsApi,
+      RfxApi rfxApi,
+      RfxStatusListApi rfxStatusListApi,
+      RfxWorkflowsApi rfxWorkflowsApi) {
     this.projectsApi = projectsApi;
     this.rfxApi = rfxApi;
     this.rfxStatusListApi = rfxStatusListApi;
@@ -90,65 +96,81 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   @Override
-  public ResponseEntity<ProjectTender200Response> createProcurementCase(ProjectTender projectTender) {
+  public ResponseEntity<ProjectTender200Response> createCase(ProjectTender projectTender) {
+    String tenderReferenceCode = projectTender.getTenderReferenceCode();
 
-    ProjectTender200Response response = new ProjectTender200Response();
-
-    logger.info("Creating Tender with procurement : {}", projectTender);
-
-    Projects projectsRequestBody = getProjectBody(projectTender);
-
-    logger.info("Sending Project request to Jaggaer, request body : {}", projectsRequestBody);
-
-    ProjectResponse projectsResponseBody =
-        projectsApi.createProject(projectsRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
-
-    logger.info("Create Project response : {}", projectsResponseBody);
-
-    final String tenderRef =
-        projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
-
-    if (tenderRef != null) {
-
-      Rfxs rfxRequestBody = getRfxsBody(tenderRef, projectTender.getRfx());
-
-      logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody);
-
-      RfxResponse rfxsResponseBody =
-          rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
-
-      logger.info("Create ITT Event response : {}", rfxsResponseBody);
-
-      final String ittRef =
-          rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
-
-      response.setTenderReferenceCode(tenderRef);
-      response.setRfxReferenceCode(ittRef);
-
-      return new ResponseEntity<>(response, HttpStatus.CREATED);
+    if (tenderReferenceCode == null) {
+      logger.info("Creating Tender with procurement : {}", projectTender);
+      Projects projectsRequestBody = getProjectBody(projectTender);
+      logger.info("Sending Project request to Jaggaer, request body : {}", projectsRequestBody);
+      ProjectResponse projectsResponseBody =
+          projectsApi
+              .createProject(projectsRequestBody)
+              .block(Duration.ofSeconds(defaultApiTimeout));
+      logger.info("Create Project response : {}", projectsResponseBody);
+      tenderReferenceCode =
+          projectsResponseBody != null ? projectsResponseBody.getTenderReferenceCode() : null;
     }
 
-    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    Rfxs rfxRequestBody =
+        getRfxsBody(
+            tenderReferenceCode, projectTender.getProjectOwnerLogin(), projectTender.getRfx());
+    logger.info("Sending RFX request to Jaggaer, request body : {}", rfxRequestBody);
+    RfxResponse rfxsResponseBody =
+        rfxApi.createRFX(rfxRequestBody).block(Duration.ofSeconds(defaultApiTimeout));
+    logger.info("Create ITT Event response : {}", rfxsResponseBody);
+
+    final String ittRef = rfxsResponseBody != null ? rfxsResponseBody.getRfxReferenceCode() : null;
+    ProjectTender200Response response = new ProjectTender200Response();
+    response.setTenderReferenceCode(tenderReferenceCode);
+    response.setRfxReferenceCode(ittRef);
+
+    return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+  }
+
+  @Override
+  public ResponseEntity<String> createRFx(String procID, Object body) {
+    // TODO Implement API endpoint once we have a stable openapi spec that resolves
+    return new ResponseEntity<>("", HttpStatus.OK);
   }
 
   @Override
   public ResponseEntity<List<RfxStatus200Response>> updateCaseRFxStatus(
       List<RfxStatusItem> rfxStatusItemList) {
-
     List<RfxStatus200Response> rfxStatus200Responses = new ArrayList<>();
-
     logger.info(
         "Sending Status Update request to Salesforce, request body : {}", rfxStatusItemList);
     RfxStatusList rfxStatusRequestBody = getRfxStatusBody(rfxStatusItemList);
-
     logger.info(
         "Sending Update RFX Status request to Salesforce, request body : {}", rfxStatusRequestBody);
+    List<SalesforceError> errorList =
+        rfxStatusItemList.stream()
+            .map(
+                r -> {
+                  SalesforceError salesforceError = new SalesforceError();
+                  salesforceError.setProcurementRef(r.getProcurementReference());
+                  salesforceError.setOwnerUserLogin(r.getOwnerUserLogin());
+                  return salesforceError;
+                })
+            .collect(Collectors.toList());
 
-    RfxStatus200ResponseList
-        sfRfxStatus200ResponseList =
-            rfxStatusListApi
-                .updateCaseRFxStatus(rfxStatusRequestBody)
-                .block(Duration.ofSeconds(defaultApiTimeout));
+    RfxStatus200ResponseList sfRfxStatus200ResponseList;
+
+    try {
+      sfRfxStatus200ResponseList =
+          rfxStatusListApi
+              .updateCaseRFxStatus(rfxStatusRequestBody)
+              .retryWhen(
+                  Retry.fixedDelay(
+                          salesforceMaxAttempts, Duration.ofSeconds(salesforcWwaitDuration))
+                      .filter(this::is5xxServerError)
+                      .onRetryExhaustedThrow(
+                          (retryBackoffSpec, retrySignal) ->
+                              new SalesforceUpdateException(errorList)))
+              .block(Duration.ofSeconds(defaultApiTimeout));
+    } catch (WebClientResponseException we) {
+      throw new SalesforceUpdateException(errorList);
+    }
 
     logger.info("Update RFX Status response : {}", sfRfxStatus200ResponseList);
 
@@ -161,26 +183,76 @@ public class TenderApiService implements TendersApiDelegate {
   }
 
   @Override
-  public ResponseEntity<AbandonITT200Response> invalidITT(AbandonITT abandonITT){
+  public ResponseEntity<String> terminateRFx(String procID, String eventID) {
 
-    AbandonITT200Response response = new AbandonITT200Response();
+    logger.info("Invalidating ITT  - ProcID : {} / EventID : {}", procID, eventID);
 
-    logger.info("Invalidating ITT : {}", abandonITT);
+    RfxGetResponse rfx =
+        rfxApi
+            .getRFX(String.format("rfxReferenceCode==%s", eventID))
+            .block(Duration.ofSeconds(defaultApiTimeout));
 
+    final RfxSetting rfxSetting;
+    if (rfx == null) {
+      throw new IllegalStateException(
+          String.format("No RFx found for refReferenceCode - %s", eventID));
+    }
+    if (rfx.getDataList() == null) {
+      throw new IllegalStateException(
+          String.format("No RFx dataList found for refReferenceCode - %s", eventID));
+    }
+    if (rfx.getDataList().getRfx() == null) {
+      throw new IllegalStateException(
+          String.format("No RFx details found for refReferenceCode - %s", eventID));
+    }
+    rfxSetting = rfx.getDataList().getRfx().get(0).getRfxSetting();
+
+    Integer ownerUserId;
+    if (rfxSetting != null) {
+      ownerUserId = rfxSetting.getOwnerUser().getId();
+    } else {
+      throw new IllegalStateException(
+          String.format("No Owner found for refReferenceCode - %s", eventID));
+    }
+
+    String status = rfxSetting.getStatus();
     OperatorUser operatorUser = new OperatorUser();
-    operatorUser.setId(defaultOwnerUserId);
+    operatorUser.setId(ownerUserId);
 
     RfxInvalidate rfxInvalidate = new RfxInvalidate();
-    rfxInvalidate.setRfxReferenceCode(abandonITT.getRfxReferenceCode());
     rfxInvalidate.setOperatorUser(operatorUser);
+    rfxInvalidate.setRfxReferenceCode(eventID);
 
-    RfxInvalidationResponse jaggaerResponse = rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    RfxInvalidationResponse jaggaerResponse;
 
+    if (status != null && status.equals(TO_BE_PUBLISHED)) {
+      jaggaerResponse =
+          rfxWorkflowsApi.deleteRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    } else {
+      jaggaerResponse =
+          rfxWorkflowsApi.invalidateRFX(rfxInvalidate).block(Duration.ofSeconds(defaultApiTimeout));
+    }
+    final String finalStatus = (jaggaerResponse == null) ? "" : jaggaerResponse.getFinalStatus();
+
+    String response;
+
+    // Convert Jaggaer termination status to OCDS
+    if (finalStatus != null && finalStatus.equalsIgnoreCase(INVALIDATED)) {
+      response = "withdrawn";
+    } else if (finalStatus != null && finalStatus.equalsIgnoreCase(DELETED)) {
+      response = "cancelled";
+    } else {
+      response = finalStatus;
+    }
+
+    // Jaggaer error covers more than one error so checking for only rfx can't be in validated
     if (jaggaerResponse != null) {
-      response.setReturnMessage(jaggaerResponse.getReturnMessage());
-      response.setRfxReferenceCode(jaggaerResponse.getRfxReferenceCode());
-      response.setFinalStatus(jaggaerResponse.getFinalStatus());
-      return new ResponseEntity<>(response, HttpStatus.OK);
+      if (jaggaerResponse.getReturnMessage() != null
+          && jaggaerResponse.getReturnMessage().contains("rfx can't be invalidate")) {
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+      } else {
+        return new ResponseEntity<>(response, HttpStatus.OK);
+      }
     }
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
@@ -188,11 +260,8 @@ public class TenderApiService implements TendersApiDelegate {
   private Projects getProjectBody(ProjectTender projectTender) {
 
     Projects projects = new Projects();
-    if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())) {
-      projects.setOperationCode("CREATEUPDATE");
-    } else {
-      projects.setOperationCode("CREATE_FROM_TEMPLATE");
-    }
+
+    projects.setOperationCode("CREATE");
 
     AdditionalInfoList additionalInfoList = new AdditionalInfoList();
     List<AdditionalInfoItem> additionalInfoItemList = new ArrayList<>();
@@ -213,13 +282,10 @@ public class TenderApiService implements TendersApiDelegate {
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId(defaultBuyerCompanyId);
     tender.setBuyerCompany(buyerCompany);
-    if (StringUtils.isNotEmpty(projectTender.getTenderReferenceCode())) {
-      tender.setTenderReferenceCode(projectTender.getTenderReferenceCode());
-      tender.setProjectType(defaultProjectType);
-    } else {
-      tender.setSourceTemplateReferenceCode(defaultSourceTemplateReferenceCode);
-    }
-
+    ProjectOwner projectOwner = new ProjectOwner();
+    projectOwner.setLogin(projectTender.getProjectOwnerLogin());
+    tender.setProjectOwner(projectOwner);
+    tender.setProjectType(defaultProjectType);
     tender.setAdditionalInfoList(additionalInfoList);
 
     Project project = new Project();
@@ -232,6 +298,7 @@ public class TenderApiService implements TendersApiDelegate {
 
   private Rfxs getRfxsBody(
       String tenderReferenceCode,
+      String ownerLogin,
       uk.gov.crowncommercial.esourcing.integration.server.model.Rfx rfx) {
 
     Rfxs rfxs = new Rfxs();
@@ -245,7 +312,7 @@ public class TenderApiService implements TendersApiDelegate {
     } else if (rfxProcurementRoute.equalsIgnoreCase("Single Tender Action")) {
       rfxTemplateReferenceCode = staTemplateId;
     } else {
-      if (rfx.getTemplateReferenceCode() != null){
+      if (rfx.getTemplateReferenceCode() != null) {
         rfxTemplateReferenceCode = rfx.getTemplateReferenceCode();
       }
     }
@@ -275,21 +342,22 @@ public class TenderApiService implements TendersApiDelegate {
     RfxSetting rfxSetting = new RfxSetting();
 
     rfxSetting.setTenderReferenceCode(tenderReferenceCode);
-    rfxSetting.setShortDescription(String.valueOf(rfx.getShortDescription()));
-
+    rfxSetting.setShortDescription(tenderReferenceCode + " " + rfx.getShortDescription());
+    rfxSetting.setLongDescription(rfx.getLongDescription());
     BuyerCompany buyerCompany = new BuyerCompany();
     buyerCompany.setId(defaultBuyerCompanyId);
     rfxSetting.setBuyerCompany(buyerCompany);
 
     OwnerUser ownerUser = new OwnerUser();
-    ownerUser.setLogin(defaultOwnerUser);
-    rfxSetting.setOwnerUser(ownerUser);
-    rfxSetting.setValue(String.valueOf(rfx.getValue()));
 
-    if(rfx.getRfiFlag() != null && rfx.getRfiFlag().equals("1"))
-    {
+    ownerUser.setLogin(ownerLogin);
+
+    rfxSetting.setOwnerUser(ownerUser);
+    rfxSetting.setValue(rfx.getValue());
+
+    if (rfx.getRfiFlag() != null && rfx.getRfiFlag().equals(1)) {
       rfxSetting.setRfxType("STANDARD_PQQ");
-      rfxSetting.setRfiFlag("1");
+      rfxSetting.setRfiFlag(1);
     } else {
       rfxSetting.setRfxType("STANDARD_ITT");
     }
@@ -372,5 +440,10 @@ public class TenderApiService implements TendersApiDelegate {
               return rfxStatus200Response;
             })
         .collect(Collectors.toList());
+  }
+
+  private boolean is5xxServerError(Throwable throwable) {
+    return throwable instanceof WebClientResponseException
+        && ((WebClientResponseException) throwable).getStatusCode().is5xxServerError();
   }
 }

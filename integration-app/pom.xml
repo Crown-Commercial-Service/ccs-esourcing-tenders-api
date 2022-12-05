@@ -13,7 +13,6 @@
 
 	<artifactId>integration-app</artifactId>
 	<name>eSourcing Integration Application</name>
-
 	<dependencies>
 		<dependency>
 			<groupId>uk.gov.crowncommercial.esourcing</groupId>
@@ -49,6 +48,11 @@
 			<groupId>com.rollbar</groupId>
 			<artifactId>rollbar-spring-boot-webmvc</artifactId>
 			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.service.notify</groupId>
+			<artifactId>notifications-java-client</artifactId>
+			<version>3.17.0-RELEASE</version>
 		</dependency>
 
 		<!-- Test -->
