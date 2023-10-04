@@ -39,8 +39,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     
-		<swagger-annotations-version>1.6.2</swagger-annotations-version>
+
+		<swagger-annotations-version>1.6.6</swagger-annotations-version>
 		<jackson-databind-nullable-version>0.2.5</jackson-databind-nullable-version>
+
+
 	</properties>
 
 	<modules>
