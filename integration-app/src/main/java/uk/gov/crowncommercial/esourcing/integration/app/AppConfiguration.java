@@ -9,10 +9,6 @@ import java.util.TimeZone;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import uk.gov.crowncommercial.esourcing.jaggaer.client.RFC3339DateFormat;
 
 @Configuration
